@@ -3,29 +3,25 @@
 name: Deploy to Heroku
 
 on:
-  # This action runs automatically whenever you push code to the 'main' branch
   push:
     branches:
       - beta
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # Use the latest version of Ubuntu for the job
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        # This step checks out a copy of your repository code
         uses: actions/checkout@v4
 
+      # 👇 ADD THIS NEW STEP TO INSTALL THE HEROKU CLI
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
+
       - name: Deploy to Heroku
-        # This is a popular and well-maintained action for Heroku deployment
         uses: akhileshns/heroku-deploy@v3.14.15
         with:
-          # The name of your Heroku app (must be unique)
           heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-
-          # Your Heroku API key
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-
-          # The email address associated with your Heroku account
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
