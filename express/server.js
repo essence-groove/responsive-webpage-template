@@ -4,7 +4,7 @@ const path = require('path');
 
 // Create an instance of an Express application
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Tell Express to serve the static files (HTML, CSS, JS) from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
