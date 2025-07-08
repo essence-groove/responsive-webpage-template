@@ -1,0 +1,31 @@
+# .github/workflows/heroku-deploy.yml
+
+name: Deploy to Heroku
+
+on:
+  # This action runs automatically whenever you push code to the 'main' branch
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu for the job
+
+    steps:
+      - name: Checkout repository
+        # This step checks out a copy of your repository code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Heroku
+        # This is a popular and well-maintained action for Heroku deployment
+        uses: akhileshns/heroku-deploy@v3.14.15
+        with:
+          # The name of your Heroku app (must be unique)
+          heroku_app_name: "your-app-name"
+
+          # Your Heroku API key
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+
+          # The email address associated with your Heroku account
+          heroku_email: "your-heroku-email@example.com"
