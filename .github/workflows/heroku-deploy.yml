@@ -6,7 +6,7 @@ on:
   # This action runs automatically whenever you push code to the 'main' branch
   push:
     branches:
-      - main
+      - beta
 
 jobs:
   deploy:
