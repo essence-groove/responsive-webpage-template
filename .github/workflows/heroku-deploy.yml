@@ -28,4 +28,4 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
 
           # The email address associated with your Heroku account
-          heroku_email: "your-heroku-email@example.com"
+          heroku_email: "github-management@eeshvardasikcm.com"
