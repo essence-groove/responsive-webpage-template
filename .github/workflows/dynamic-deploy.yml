@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - main # Or 'master'
-    # Trigger if anything within 'homepage-app' (including its subfolders like to_do_list) changes,
+    # Trigger if any file within the 'homepage-app' directory (including all its subfolders) changes,
     # or if the workflow file itself changes.
     paths:
-      - 'homepage-app/**'
+      - 'homepage-app/**' # <--- This will now correctly capture changes in homepage-app/package.json
+                          #      AND homepage-app/to_do_list/package.json (and other files)
       - '.github/workflows/dynamic-deploy.yml'
 
 jobs:
@@ -16,10 +17,16 @@ jobs:
     env:
       HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-      # Define the base directory to scan for apps
-      # We'll scan from 'homepage-app', and it will find apps at depth.
-      APP_BASE_DIRS: "homepage-app" # <-- Only need to scan this top-level app folder
-      HEROKU_APP_SECRET_PREFIX: 'HEROKU_APP_NAME_' # Naming standard prefix
+      APP_BASE_DIRS: "homepage-app"
+      HEROKU_APP_SECRET_PREFIX: 'HEROKU_APP_NAME_'
+
+      # --- YOU MUST LIST ALL YOUR APP-SPECIFIC SECRETS HERE ---
+      # Example:
+      HEROKU_APP_NAME_HOMEPAGE_APP: ${{ secrets.HEROKU_APP_NAME_HOMEPAGE_APP }}
+      HEROKU_APP_NAME_TO_DO_LIST: ${{ secrets.HEROKU_APP_NAME_TO_DO_LIST }}
+      # Add more lines here as you add new apps:
+      # HEROKU_APP_NAME_YOUR_NESTED_APP_FOLDER_NAME_UPPERCASE: ${{ secrets.HEROKU_APP_NAME_YOUR_NESTED_APP_FOLDER_NAME_UPPERCASE }}
+      # -----------------------------------------------------------
 
     steps:
       - name: Checkout code
@@ -42,52 +49,37 @@ jobs:
         run: |
           set -e # Exit immediately if a critical command fails
 
-          # This will store the list of deployable app directories
           ALL_APP_DIRS=""
-
-          # Iterate through each defined base directory
           for BASE_DIR in $APP_BASE_DIRS; do
             echo "Scanning for apps in: $BASE_DIR"
-            # Find package.json files:
-            # -type f -name "package.json": finds files named package.json
-            # -exec dirname {}: gets the directory containing that package.json
-            # This will find homepage-app/package.json and homepage-app/to_do_list/package.json
+            # Finds package.json files within BASE_DIR and any of its subdirectories
             FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
             ALL_APP_DIRS="$ALL_APP_DIRS $FOUND_DIRS"
           done
 
-          # Remove duplicates and trim whitespace
           ALL_APP_DIRS=$(echo "$ALL_APP_DIRS" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
           if [ -z "$ALL_APP_DIRS" ]; then
             echo "No applications found with package.json in '$APP_BASE_DIRS'. Skipping deployment."
-            exit 0 # Exit successfully if no apps are found
+            exit 0
           fi
 
           echo "Found applications in directories:"
           for d in $ALL_APP_DIRS; do echo "- $d"; done
 
-          DEPLOYMENT_SUCCESS=true # To track if any app deployment failed
+          DEPLOYMENT_SUCCESS=true
 
           for APP_DIR in $ALL_APP_DIRS; do
             echo "--- Processing app in: $APP_DIR ---"
 
-            # Determine the app's effective name for secret lookup
-            # If it's the top-level 'homepage-app', use 'HOMEPAGE_APP' for secret mapping.
-            # Otherwise, use the direct folder name (e.g., 'to_do_list').
             if [ "$APP_DIR" == "homepage-app" ]; then
-                APP_SECRET_IDENTIFIER="HOMEPAGE_APP" # Standard identifier for the main app
+                APP_SECRET_IDENTIFIER="HOMEPAGE_APP"
             else
-                APP_SECRET_IDENTIFIER=$(basename "$APP_DIR") # e.g., 'to_do_list'
+                APP_SECRET_IDENTIFIER=$(basename "$APP_DIR")
             fi
 
-
-            # Read app name from package.json for consistency check
             PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
 
-            # --- Consistency Check: Folder Name (or Identifier) vs. package.json name ---
-            # For the root app (homepage-app), compare against its package.json name.
-            # For nested apps, compare folder name against package.json name.
             if [ "$APP_SECRET_IDENTIFIER" == "HOMEPAGE_APP" ]; then
                 if [ "$APP_SECRET_IDENTIFIER" != "$(echo ${PACKAGE_JSON_APP_NAME} | tr '[:lower:]-' '[:upper:]_')" ]; then
                     echo "::error::Inconsistency detected for main app (path: '${APP_DIR}'):"
@@ -101,34 +93,28 @@ jobs:
               echo "::error::Folder name ('${APP_SECRET_IDENTIFIER}') does NOT match 'name' in package.json ('${PACKAGE_JSON_APP_NAME}')."
               echo "::error::Please **rename either the folder or the 'name' in package.json to match**, then commit and re-run. This app will be skipped."
               DEPLOYMENT_SUCCESS=false
-              continue # Skip to the next app
+              continue
             fi
 
-            # Construct the secret environment variable name (e.g., HEROKU_APP_NAME_HOMEPAGE_APP, HEROKU_APP_NAME_TO_DO_LIST)
             APP_SECRET_ENV_VAR_NAME="${HEROKU_APP_SECRET_PREFIX}$(echo ${APP_SECRET_IDENTIFIER} | tr '[:lower:]-' '[:upper:]_')"
-
-            # Access the secret's VALUE via the environment variable.
-            # This relies on the secret being explicitly listed in the job's 'env' block.
             HEROKU_APP_TARGET_NAME="${!APP_SECRET_ENV_VAR_NAME}"
 
-            # --- Secret Existence Check ---
             if [ -z "$HEROKU_APP_TARGET_NAME" ]; then
               echo "::error::Heroku app name secret '${APP_SECRET_ENV_VAR_NAME}' is UNDEFINED or EMPTY for app '${APP_SECRET_IDENTIFIER}' (path: '${APP_DIR}')."
               echo "::error::Please ensure this secret is correctly defined and its value is set in your GitHub repository secrets and also listed in the 'env' block of this GitHub Actions workflow job."
               DEPLOYMENT_SUCCESS=false
-              continue # Skip to the next app
+              continue
             fi
             
             echo "Installing dependencies for ${APP_SECRET_IDENTIFIER} (path: '${APP_DIR}')..."
             npm install --prefix "$APP_DIR" || {
                 echo "::error::npm install failed for app in '${APP_DIR}'. Skipping deployment for this app."
                 DEPLOYMENT_SUCCESS=false
-                continue # Skip to the next app
+                continue
             }
 
             echo "Attempting to deploy ${APP_SECRET_IDENTIFIER} to Heroku app: ${HEROKU_APP_TARGET_NAME}"
             
-            # Execute the deployment action
             /usr/bin/docker run --rm \
               -e HEROKU_API_KEY="$HEROKU_API_KEY" \
               -e HEROKU_EMAIL="$HEROKU_EMAIL" \
@@ -144,7 +130,7 @@ jobs:
 
           if [ "$DEPLOYMENT_SUCCESS" = false ]; then
             echo "::error::One or more application deployments failed due to errors or inconsistencies. Please review the logs above."
-            exit 1 # Fail the entire workflow job if any app failed
+            exit 1
           fi
 
         shell: bash
