@@ -152,10 +152,10 @@ jobs:
           echo "Generating apps.md content..."
           
           # --- CRITICAL FIX: Ensure APP_DIRS_JSON is correctly retrieved from 'find_apps' job output ---
-          # This line MUST correctly fetch the JSON from the previous job.
+          # This line MUST fetch the JSON from the previous job using GitHub Actions' context.
           # The problematic hardcoded string "[\"homepage-app\",\"homepage-app/to_do_list\"]"
-          # causes Bash quoting issues and subsequent jq parse errors.
-          APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}" 
+          # is the source of the `jq` parse error.
+          APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}" # <--- This is the ONLY CORRECT LINE for this assignment
 
           # Handle the case where the JSON might somehow be empty or invalid (though it shouldn't if find_apps succeeded)
           if [ -z "$APP_DIRS_JSON" ] || [ "$APP_DIRS_JSON" == "null" ] || [ "$APP_DIRS_JSON" == "[]" ]; then
@@ -182,8 +182,7 @@ jobs:
               echo "apps_md_updated_flag=false" >> "$GITHUB_OUTPUT"
               exit 0 # Exit successfully
           fi
-
-
+          
           APPS_MD_CONTENT="# 🚀 Deployed Applications\n\n"
           APPS_MD_CONTENT+="This file lists the applications deployed from this repository to Heroku.\n\n"
           APPS_MD_CONTENT+="## App List\n\n"
@@ -205,13 +204,13 @@ jobs:
             APPS_MD_CONTENT+="* **${APP_FOLDER_NAME}:** [${APP_URL}](${APP_URL})\n"
             APPS_UPDATED_FLAG=true
           done
-
+          
           # Output the generated content and a flag indicating if there's anything to write
           APPS_MD_CONTENT_ESCAPED=$(echo -e "$APPS_MD_CONTENT" | sed -E ':a;N;$!ba;s/\n/%0A/g;s/\r/%0D/g;s/%/%25/g')
           echo "apps_md_section_content=$APPS_MD_CONTENT_ESCAPED" >> "$GITHUB_OUTPUT"
           echo "apps_md_updated_flag=$APPS_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
         shell: bash
-
+        
       - name: Write apps.md File
         # This step will only run if apps_md_updated_flag is true (meaning content was generated)
         # and the previous 'generate_content' step succeeded.
