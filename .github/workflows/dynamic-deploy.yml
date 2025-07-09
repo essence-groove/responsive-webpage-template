@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - main # Or 'master'
-      - new-javascript
     paths:
       - 'homepage-app/**'
+      - 'to_do_list/**' # Ensure this is correct if to_do_list is also top-level. If nested, homepage-app/** covers it.
       - '.github/workflows/dynamic-deploy.yml'
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
     env:
-      APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are
+      APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are (e.g., "homepage-app" or "homepage-app to_do_list" if both are top-level)
 
     steps:
       - name: Checkout code
@@ -89,6 +89,7 @@ jobs:
         run: |
           set -e
           APP_DIR="${{ matrix.app_dir }}"
+          echo "Current APP_DIR: $APP_DIR" # Debugging line
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
           HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
@@ -130,7 +131,7 @@ jobs:
           appdir: ${{ matrix.app_dir }}
 
   generate_app_list_file: # Job 3: Generates apps.md file using Python
-    needs: [find_apps, deploy_each_app] 
+    needs: [find_apps, deploy_each_app] # This job needs both previous jobs
     runs-on: ubuntu-latest
     if: |
       always() &&
@@ -152,6 +153,7 @@ jobs:
         run: python .github/scripts/generate_app_list.py
         env:
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # Passed to the Python script
         shell: bash
 
       - name: Write apps.md File
@@ -161,21 +163,14 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
       
-      # --- NEW STEP: Generate apps.json file ---
-      - name: Generate apps.json File with Python
-        id: generate_json_py # Give it an ID
-        run: python .github/scripts/generate_apps_json.py # Run the new script
-        env:
-          APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-        shell: bash
-      # ----------------------------------------
-
       - name: Commit and Push generated files
-        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || success() }} # Commit if apps.md generated or if previous steps passed (to commit apps.json)
+        if: |
+          always() &&
+          (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || 
+           steps.generate_content_py.outputs.apps_json_updated_flag == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list"
           branch: main
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Tell git-auto-commit-action to include the new 'apps/' folder
-          add_options: --all # Use --all to stage newly created files/folders
+          add_options: "apps.md homepage-app/apps/apps.json" # Explicitly add files
