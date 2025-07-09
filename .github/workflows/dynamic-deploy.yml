@@ -23,7 +23,7 @@ jobs:
       - name: Install jq (for package.json parsing and JSON output)
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Scan for Apps
+      - name: Find and Deploy Apps
         id: scan # Give this step an ID to reference its output
         run: |
           set -e
@@ -39,28 +39,29 @@ jobs:
             done
           done
 
-          # Remove duplicates and convert to a clean, space-separated string
-          UNIQUE_APP_DIRS=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u | tr '\n' ' ')
+          # Remove duplicates and ensure each unique directory is on a new line
+          # This is the key change: we need newlines for jq to parse as separate items.
+          UNIQUE_APP_DIRS_NEWLINES=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u)
 
-          if [ -z "$UNIQUE_APP_DIRS" ]; then
+          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then # Check for emptiness based on newline separated string
             echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
-            # Set a special output if no apps are found, so the next job can handle it
             echo "app_dirs_json=[]" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "Found applications in directories:"
-          for d in $UNIQUE_APP_DIRS; do echo "- $d"; done
+          echo "Found applications in directories (for debugging):"
+          echo "$UNIQUE_APP_DIRS_NEWLINES" # Print for clarity in logs
 
-          # Convert the space-separated string of directories into a JSON array
-          # jq -R creates a raw string, then -s reads all raw strings, -c compresses, -R converts to JSON array
-          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS" | jq -R . | jq -s .)
+          # Convert the newline-separated string of directories into a valid JSON array
+          # jq -R creates raw strings from each line.
+          # jq -s . combines these into a single array.
+          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s .)
           echo "Generated JSON: $APP_DIRS_JSON"
 
           # Set the output variable for the next job
           echo "app_dirs_json=$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
-        shell: bash
-
+        shell: bash # Ensure bash is used for advanced shell scripting
+        
   deploy_each_app: # Job 2: Deploys each app found in the previous job
     needs: find_apps # This job depends on 'find_apps' job
     runs-on: ubuntu-latest
