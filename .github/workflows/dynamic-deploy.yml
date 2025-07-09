@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main # Or 'master'
+      - new-build-scripting
     paths:
       - 'homepage-app/**'
       - '.github/workflows/dynamic-deploy.yml'
