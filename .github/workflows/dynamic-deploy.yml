@@ -132,9 +132,10 @@ jobs:
   generate_app_list_file: # Job 3: Generates apps.md file using Python
     needs: [find_apps, deploy_each_app] # This job needs both previous jobs
     runs-on: ubuntu-latest
+    # FIX: Removed comments from the 'if:' condition
     if: |
       always() &&
-      needs.find_apps.outputs.app_dirs_json != '[]' # Only run if apps were found to deploy
+      needs.find_apps.outputs.app_dirs_json != '[]'
 
     steps:
       - name: Checkout code
@@ -149,11 +150,11 @@ jobs:
 
       - name: Generate apps.md Content with Python Script
         id: generate_content_py # ID this step
-        run: python .github/scripts/generate_app_list.py # <--- Launch the Python script
+        run: python .github/scripts/generate_app_list.py # Launch the Python script
         env:
           # Pass the JSON list of app directories as an environment variable to the Python script
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-        # Removed 'shell: bash' as 'python' is now the direct command.
+        shell: bash # Use bash to run the python command
 
       - name: Write apps.md File
         if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
