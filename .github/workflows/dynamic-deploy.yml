@@ -11,6 +11,7 @@ on:
       - '.github/workflows/deploy-app-reusable.yml'
       - '.github/workflows/utils-1.yml'
 
+
 jobs:
   prepare_deploy_matrix: # NEW JOB: Reads apps.json and outputs the matrix data for deploy_all_apps (now runs first)
     # This job no longer needs 'find_apps' or 'generate_docs_files' for its execution order.
@@ -60,6 +61,7 @@ jobs:
       matrix:
         app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -69,12 +71,14 @@ jobs:
         with:
           node-version: '20'
 
+      # FIX: More robust Heroku CLI installation
       - name: Install Heroku CLI
         run: |
           curl -L https://cli-assets.heroku.com/install.sh -o /tmp/heroku-install.sh
           chmod +x /tmp/heroku-install.sh
           /tmp/heroku-install.sh
         shell: bash
+
 
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -85,6 +89,7 @@ jobs:
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
           echo "Current APP_DIR: $APP_DIR"
+
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           
           # Re-read package.json to get its 'name' for consistency check
@@ -117,6 +122,7 @@ jobs:
 
       - name: Deploy to Heroku - Actual Action
         id: deploy_action
+        # This step is now directly within deploy_all_apps, accessing secrets from job scope
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
@@ -225,3 +231,4 @@ jobs:
           branch: main
           token: ${{ secrets.GITHUB_TOKEN }}
           add_options: "apps.md homepage-app/apps/apps.json"
+
