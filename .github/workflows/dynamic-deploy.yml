@@ -41,17 +41,18 @@ jobs:
 
           if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
             echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
-            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT" # <-- Using printf for robustness
+            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           echo "Found applications in directories (for debugging):"
           echo "$UNIQUE_APP_DIRS_NEWLINES"
 
-          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s .)
-          echo "Generated JSON: $APP_DIRS_JSON"
+          # --- CRITICAL FIX: Force jq to output on a single line with -c ---
+          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .) # <--- Added -c here
+          echo "Generated JSON (single line): $APP_DIRS_JSON" # Log for confirmation
 
-          # --- FIX: Use printf for robust output to GITHUB_OUTPUT ---
+          # Set the output variable for the next job
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
         
