@@ -4,33 +4,27 @@ on:
   push:
     branches:
       - main # Or 'master'
-      - new-build-scripting # Your feature branch
+      - new-build-scripting
     paths:
       - 'homepage-app/**'
       - '.github/workflows/dynamic-deploy.yml'
-      - '.github/workflows/deploy-app-reusable.yml' # Trigger if the reusable deploy workflow changes
-      - '.github/workflows/utils-1.yml' # Trigger if the reusable find apps workflow changes
+      - '.github/workflows/deploy-app-reusable.yml'
+      - '.github/workflows/utils-1.yml'
 
 jobs:
-  deploy_all_apps: # Job 1: Orchestrates deployment of all apps (now runs first, depends on apps.json)
-    # This job no longer explicitly depends on find_apps or generate_docs_files for its execution order.
-    # It relies on apps.json being present from a previous run or manual creation.
+  prepare_deploy_matrix: # NEW JOB: Reads apps.json and outputs the matrix data for deploy_all_apps (now runs first)
+    # This job no longer needs 'find_apps' or 'generate_docs_files' for its execution order.
+    # It will run first to prepare the deployment matrix from the existing apps.json.
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false # Allow other apps to deploy even if one fails
-      matrix:
-        # The matrix will be populated by a step within this job that reads apps.json
-        app_data: ${{ fromJson(steps.read_apps_json_for_matrix.outputs.app_data_json) }}
-
+    outputs:
+      app_data_json: ${{ steps.read_json.outputs.app_data_json }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install jq (for JSON parsing)
+      - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Read apps.json for Matrix
-        id: read_apps_json_for_matrix # ID this step to get its output
+        id: read_json
         run: |
           set -e
           APPS_JSON_PATH="homepage-app/apps/apps.json" # Path to your apps.json file
@@ -57,6 +51,19 @@ jobs:
           echo "app_data_json=$APP_DATA_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
+  deploy_all_apps: # Job: Orchestrates deployment of all apps (now runs first, depends on apps.json)
+    needs: prepare_deploy_matrix # Now depends on the new job for matrix data
+    runs-on: ubuntu-latest
+    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }}
+    strategy:
+      fail-fast: false # Allow other apps to deploy even if one fails
+      matrix:
+        app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -69,44 +76,40 @@ jobs:
           /tmp/heroku-install.sh
         shell: bash
 
+      - name: Install jq (for package.json parsing)
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Read App Config and Prepare Deploy Variables
         id: prepare_vars
-        # This step will now use matrix.app_data directly
         run: |
           set -e
-          # Access data from the matrix item
           APP_DIR="${{ matrix.app_data.app_dir }}"
-          HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}"
-
-          echo "Current APP_DIR: $APP_DIR" # Debugging line
+          echo "Current APP_DIR: $APP_DIR"
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           
           # Re-read package.json to get its 'name' for consistency check
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
+          HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
 
-          # Consistency Check: Folder Name vs. package.json 'name'
           if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
             echo "::error::Inconsistency detected for app '${APP_FOLDER_NAME}' (path: '${APP_DIR}'):"
             echo "::error::Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${PACKAGE_JSON_APP_NAME}')."
             echo "::error::Please **rename either the folder or the 'name' in package.json to match**, then commit and re-run."
-            exit 1 # Fail this specific matrix job
+            exit 1
           fi
 
-          # The herokuAppName check is implicitly handled by the apps.json generation,
-          # but we still need to ensure the HEROKU_APP_TARGET_NAME from matrix is valid.
           if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
             echo "::error::Heroku app name (derived from URL in apps.json) is empty for app '${APP_FOLDER_NAME}'."
             echo "::error::Please ensure 'deployedUrl' is correctly set in '$APP_DIR/package.json' and points to a valid Heroku app URL."
-            exit 1 # Fail this specific matrix job
+            exit 1
           fi
           
           echo "Installing dependencies for ${APP_FOLDER_NAME} (path: '${APP_DIR}')..."
           npm install --prefix "$APP_DIR" || {
               echo "::error::npm install failed for app in '${APP_DIR}'. Deployment failed for this app."
-              exit 1 # Fail this specific matrix job
+              exit 1
           }
 
-          # Output variables for the deploy action
           echo "heroku_app_name_for_deploy=$HEROKU_APP_TARGET_NAME" >> "$GITHUB_OUTPUT"
           echo "app_folder_name_for_deploy=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
 
@@ -116,10 +119,10 @@ jobs:
         id: deploy_action
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }} # Access directly from repository secrets
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}     # Access directly from repository secrets
-          heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name_for_deploy }} # Use output from prepare_vars
-          appdir: ${{ matrix.app_data.app_dir }} # Use app_dir from matrix
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name_for_deploy }}
+          appdir: ${{ matrix.app_data.app_dir }}
 
   find_apps: # Job 2: Finds all deployable app directories (now runs after deploy_all_apps, or in parallel)
     # No 'needs' here if you want it to run in parallel with deploy_all_apps.
