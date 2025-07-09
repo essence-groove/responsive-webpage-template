@@ -71,7 +71,7 @@ jobs:
         uses: ./.github/workflows/deploy-app-reusable.yml # Path to the reusable workflow
         with:
           app_dir: ${{ matrix.app_dir }} # Pass the app directory as an input
-        secrets: # Pass required secrets to the reusable workflow
+        secrets: # <--- THIS LINE'S INDENTATION IS CRUCIAL (same level as 'with:')
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
 
