@@ -171,24 +171,32 @@ jobs:
           set -e
           echo "Generating README content..."
           
-          # --- FIX: Access app_dirs_json from 'find_apps' job output ---
-          APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}"
+          # --- FIX: Pass APP_DIRS_JSON from the previous job's output.
+          # The problem is that when you hardcode a JSON string in Bash,
+          # Bash interprets the inner quotes.
+          # You MUST use the output from 'needs.find_apps.outputs.app_dirs_json'
+          # wrapped in double quotes.
+          APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}" # <--- This is the correct way to get it
+          
+          # This line below (from your log) is what caused the error because
+          # it hardcoded the JSON string with incorrect Bash quoting for inner quotes.
+          # APP_DIRS_JSON="["homepage-app","homepage-app/to_do_list"]"
+          
           APP_DIRS=$(echo "$APP_DIRS_JSON" | jq -r '.[]') # Convert JSON array back to newline-separated strings
-
-          if [ -z "$APP_DIRS" ]; then # Add a check here just in case
+          
+          if [ -z "$APP_DIRS" ]; then
             echo "No app directories received from find_apps job. Skipping README content generation."
             echo "readme_section_content=" >> "$GITHUB_OUTPUT"
             echo "readme_updated_flag=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
+          
           README_CONTENT="## 🚀 Live Demos\n\n"
           README_UPDATED_FLAG=false
-
+          
           for APP_DIR in $APP_DIRS; do
             APP_FOLDER_NAME=$(basename "$APP_DIR")
             
-            # Read package.json to get herokuAppName (it's consistent with this job)
             HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "") 
             
             if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
@@ -196,13 +204,11 @@ jobs:
                 continue
             fi
             
-            # Construct the full deployed URL
             APP_URL="https://${HEROKU_APP_TARGET_NAME}.herokuapp.com/"
             README_CONTENT+="* **${APP_FOLDER_NAME}:** [${APP_URL}](${APP_URL})\n"
             README_UPDATED_FLAG=true
           done
-
-          # Output the generated content and a flag indicating if there's anything to write
+          
           README_SECTION_CONTENT_ESCAPED=$(echo -e "$README_CONTENT" | sed -E ':a;N;$!ba;s/\n/%0A/g' | sed -E 's/\r/%0D/g' | sed -E 's/%/%25/g')
           echo "readme_section_content=$README_SECTION_CONTENT_ESCAPED" >> "$GITHUB_OUTPUT"
           echo "readme_updated_flag=$README_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
