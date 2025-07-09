@@ -13,5 +13,5 @@
     "node": "20.x"
   },
   "herokuAppName": "my-ml-portfolio-homepage-app",
-  "deployedUrl": "https://my-ml-portfolio-homepage-app-RANDOMCHARS.herokuapp.com/"
+  "deployedUrl": "https://apm-essence-groove-h002-7cc826ef4a8c.herokuapp.com/"
 }
