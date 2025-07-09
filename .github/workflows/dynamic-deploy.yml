@@ -41,7 +41,7 @@ jobs:
 
           if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
             echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
-            echo "app_dirs_json=[]" >> "$GITHUB_OUTPUT"
+            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT" # <-- Using printf for robustness
             exit 0
           fi
 
@@ -51,12 +51,8 @@ jobs:
           APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s .)
           echo "Generated JSON: $APP_DIRS_JSON"
 
-          # --- CRITICAL FIX: Ensure no extra whitespace around the variable ---
-          # Use 'echo -n' to prevent an extra newline, and assign directly.
-          echo "app_dirs_json=$APP_DIRS_JSON" >> "$GITHUB_OUTPUT" # This line is usually fine, but let's confirm no hidden chars.
-
-          # Alternative more robust way (if the above still fails due to hidden chars):
-          # printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
+          # --- FIX: Use printf for robust output to GITHUB_OUTPUT ---
+          printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
         
   deploy_each_app: # Job 2: Deploys each app found in the previous job
