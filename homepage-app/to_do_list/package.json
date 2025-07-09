@@ -13,5 +13,5 @@
     "node": "20.x"
   },
   "herokuAppName": "my-ml-portfolio-todolist-app",
-  "deployedUrl": "https://my-ml-portfolio-todolist-app-RANDOMCHARS.herokuapp.com/"
+  "deployedUrl": "https://apm-essence-groove-h004-fc1ff5ff5de7.herokuapp.com/"
 }
