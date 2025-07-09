@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A simple backend for our homepage.",
   "main": "server.js",
-    "herokuAppName": "your-homepage-app-name-on-heroku",
+  "herokuAppName": "apm-essence-groove-h002",
   "scripts": {
     "start": "node server.js"
   },
