@@ -6,16 +6,17 @@ on:
       - main # Or 'master'
     paths:
       - 'homepage-app/**'
-      - 'to_do_list/**'
       - '.github/workflows/dynamic-deploy.yml'
 
 jobs:
-  find_apps: # Job 1: Finds all deployable app directories
+  find_apps:
     runs-on: ubuntu-latest
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
     env:
-      APP_BASE_DIRS: "homepage-app to_do_list" # Your top-level folders for apps
+      # FIX: Only list the top-level app folder to scan.
+      # The 'find' command will recursively find nested apps within 'homepage-app'.
+      APP_BASE_DIRS: "homepage-app" # <--- CORRECTED LINE
 
     steps:
       - name: Checkout code
@@ -32,6 +33,7 @@ jobs:
           ALL_APP_DIRS_ARRAY=()
           echo "Scanning for apps in: $APP_BASE_DIRS"
           for BASE_DIR in $APP_BASE_DIRS; do
+            # Find package.json files within BASE_DIR and any of its subdirectories
             FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
             for DIR in $FOUND_DIRS; do
               ALL_APP_DIRS_ARRAY+=("$DIR")
@@ -54,6 +56,8 @@ jobs:
 
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
+
+  # ... (deploy_each_app job and update_readme job remain unchanged) ...
 
   deploy_each_app: # Job 2: Deploys each app found in the previous job
     needs: find_apps
