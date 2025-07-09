@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main # Or 'master'
-      - new-javascript
+      - new-build-scripting # Your feature branch
     paths:
       - 'homepage-app/**'
       - '.github/workflows/dynamic-deploy.yml'
+      # Removed deploy-app-reusable.yml from paths as it's no longer called directly
+      # - '.github/workflows/deploy-app-reusable.yml' # No longer needed here
 
 jobs:
   find_apps: # Job 1: Finds all deployable app directories
@@ -55,18 +57,70 @@ jobs:
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
-  deploy_each_app: # Job 2: Deploys each app found in the previous job
-    needs: find_apps
+  generate_docs_files: # Job: Generates apps.md and apps.json files using Python (runs before deploy)
+    needs: find_apps # Only needs 'find_apps' to get the list of apps
+    runs-on: ubuntu-latest
+    if: |
+      always() &&
+      needs.find_apps.outputs.app_dirs_json != '[]'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }} # Checkout the branch we're working on
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use a recent Python version
+
+      # NEW STEP: Check for presence of writable file secrets
+      - name: Check Writable File Secrets
+        run: |
+          if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
+            echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty. Writing to apps.md might be skipped by the script."
+          fi
+          if [ -z "${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}" ]; then
+            echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty. Writing to homepage-app/apps/apps.json might be skipped by the script."
+          fi
+        shell: bash
+
+      - name: Generate apps.md and apps.json Content with Python Script
+        id: generate_content_py
+        run: python .github/scripts/generate_app_list.py
+        env:
+          APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # Passed to the Python script
+        shell: bash
+
+      - name: Write apps.md File
+        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
+        run: |
+          APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
+          echo "$APPS_MD_SECTION_CONTENT" > apps.md
+        shell: bash
+      
+      - name: Commit and Push generated files
+        if: |
+          always() &&
+          (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || 
+           steps.generate_content_py.outputs.apps_json_updated_flag == 'true')
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Docs: Update deployed app links and JSON list"
+          branch: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add_options: "apps.md homepage-app/apps/apps.json"
+
+  deploy_all_apps: # Job: Orchestrates deployment of all apps (now self-contained)
+    needs: [find_apps, generate_docs_files] # Now depends on docs generation completing
     runs-on: ubuntu-latest
     if: ${{ needs.find_apps.outputs.app_dirs_json != '[]' }}
     strategy:
       fail-fast: false # Allow other apps to deploy even if one fails
       matrix:
         app_dir: ${{ fromJson(needs.find_apps.outputs.app_dirs_json) }}
-
-    env:
-      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
 
     steps:
       - name: Checkout code
@@ -77,9 +131,13 @@ jobs:
         with:
           node-version: '20'
 
+      # FIX: More robust Heroku CLI installation
       - name: Install Heroku CLI
         run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
+          curl -L https://cli-assets.heroku.com/install.sh -o /tmp/heroku-install.sh
+          chmod +x /tmp/heroku-install.sh
+          /tmp/heroku-install.sh
+        shell: bash # Ensure bash is used for this script
 
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -89,6 +147,7 @@ jobs:
         run: |
           set -e
           APP_DIR="${{ matrix.app_dir }}"
+          echo "Current APP_DIR: $APP_DIR" # Debugging line
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
           HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
@@ -122,60 +181,10 @@ jobs:
 
       - name: Deploy to Heroku - Actual Action
         id: deploy_action
+        # This step is now directly within deploy_all_apps, accessing secrets from job scope
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }} # Access directly from repository secrets
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}     # Access directly from repository secrets
           heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name }}
           appdir: ${{ matrix.app_dir }}
-
-  generate_app_list_file: # Job 3: Generates apps.md file using Python
-    needs: [find_apps, deploy_each_app] 
-    runs-on: ubuntu-latest
-    if: |
-      always() &&
-      needs.find_apps.outputs.app_dirs_json != '[]'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }} # Checkout the branch we're working on
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x' # Use a recent Python version
-
-      - name: Generate apps.md Content with Python Script
-        id: generate_content_py
-        run: python .github/scripts/generate_app_list.py
-        env:
-          APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-        shell: bash
-
-      - name: Write apps.md File
-        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
-        run: |
-          APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
-          echo "$APPS_MD_SECTION_CONTENT" > apps.md
-        shell: bash
-      
-      # --- NEW STEP: Generate apps.json file ---
-      - name: Generate apps.json File with Python
-        id: generate_json_py # Give it an ID
-        run: python .github/scripts/generate_apps_json.py # Run the new script
-        env:
-          APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-        shell: bash
-      # ----------------------------------------
-
-      - name: Commit and Push generated files
-        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || success() }} # Commit if apps.md generated or if previous steps passed (to commit apps.json)
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Docs: Update deployed app links and JSON list"
-          branch: main
-          token: ${{ secrets.GITHUB_TOKEN }}
-          # Tell git-auto-commit-action to include the new 'apps/' folder
-          add_options: --all # Use --all to stage newly created files/folders

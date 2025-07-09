@@ -3,6 +3,32 @@ import os
 import sys
 
 def main():
+    # --- Retrieve Writable Files Secrets (Individual) ---
+    allowed_write_paths = []
+    
+    # Check for apps.md secret
+    apps_md_path = os.environ.get("RWT_WRITABLE_FILE_APPS_MD")
+    if apps_md_path:
+        allowed_write_paths.append(os.path.normpath(apps_md_path.strip()))
+    
+    # Check for homepage-app/apps/apps.json secret
+    homepage_apps_json_path = os.environ.get("RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON")
+    if homepage_apps_json_path:
+        allowed_write_paths.append(os.path.normpath(homepage_apps_json_path.strip()))
+
+    # Function to check if a target path is allowed
+    def is_write_allowed(target_path):
+        normalized_target_path = os.path.normpath(target_path)
+        if normalized_target_path in allowed_write_paths:
+            return True
+        
+        # --- REFINED WARNING MESSAGE for individual secrets ---
+        print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in RWT_WRITABLE_FILES secrets. Write operation skipped.", file=sys.stderr)
+        print(f"::warning::Please ensure the corresponding secret (e.g., 'RWT_WRITABLE_FILE_APPS_MD' or 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON') is correctly set with the exact path '{target_path}' if this write is intended.", file=sys.stderr)
+        # --- END REFINED WARNING MESSAGE ---
+        return False
+
+    # --- Data Collection Logic (Remains unchanged) ---
     app_dirs_json = os.environ.get("APP_DIRS_JSON_FROM_FIND_APPS") 
     
     if not app_dirs_json:
@@ -15,14 +41,11 @@ def main():
         print(f"::error::Failed to parse JSON from env var: {app_dirs_json}", file=sys.stderr)
         sys.exit(1)
 
-    # Building content with literal newlines (\n)
-    header = "# 🚀 Deployed Applications\n\n"
-    intro_text = "This file lists the applications deployed from this repository to Heroku.\n\n"
-    app_list_heading = "## App List\n\n"
-    
-    app_items = [] # Use a list to build individual app entries
+    apps_for_md_content = [] 
+    apps_for_json_data = []  
 
-    apps_updated_flag = False
+    apps_updated_flag_md = False 
+    apps_updated_flag_json = False 
 
     for app_dir in app_dirs:
         app_folder_name = os.path.basename(app_dir)
@@ -39,37 +62,59 @@ def main():
             app_url = package_json_data.get("deployedUrl") 
             
             if not app_url: 
-                print(f"::warning::Skipping apps.md entry for \'{app_folder_name}\' as \'deployedUrl\' is missing or empty in its package.json. Please add it.", file=sys.stderr)
+                print(f"::warning::Skipping entry for \'{app_folder_name}\' as \'deployedUrl\' is missing or empty in its package.json.", file=sys.stderr)
                 continue
             
-            # Add an extra newline at the end of each list item for more spacing
-            app_items.append(f"* **{app_folder_name}:** [{app_url}]({app_url})") # No trailing \n here yet
-            apps_updated_flag = True
+            apps_for_md_content.append(f"* **{app_folder_name}:** [{app_url}]({app_url})")
+            apps_updated_flag_md = True
+
+            apps_for_json_data.append({
+                "name": app_folder_name,
+                "url": app_url
+            })
+            apps_updated_flag_json = True
 
         except Exception as e:
             print(f"::error::Error processing {package_json_path}: {e}", file=sys.stderr)
             continue
 
-    # Join the app items with double newlines for spacing
-    app_list_content = "\n\n".join(app_items) + "\n\n" if app_items else "" # Add two newlines after last item
+    # --- Generate apps.md Content ---
+    md_header = "# 🚀 Deployed Applications\n\n"
+    md_intro = "This file lists the applications deployed from this repository to Heroku.\n\n"
+    md_list_heading = "## App List\n\n"
+    md_app_list_str = "\n\n".join(apps_for_md_content) + "\n\n" if apps_for_md_content else ""
 
-    # Concatenate all parts into the final content
-    final_apps_md_content = header + intro_text + app_list_heading + app_list_content
+    final_apps_md_content = md_header + md_intro + md_list_heading + md_app_list_str
 
-    # --- CRITICAL FIX: Write to GITHUB_OUTPUT using native multi-line variable syntax ---
-    # This involves setting a custom delimiter.
-    # We'll print a special marker, then the content, then the marker again.
-    # This tells GHA that the variable spans multiple lines.
-    
-    # Generate a unique delimiter
-    delimiter = "EOF_APPS_MD" 
-    
-    # Write to $GITHUB_OUTPUT file using the multi-line format
+    # --- Generate apps.json File ---
+    json_output_dir = os.path.join("homepage-app", "apps")
+    json_output_file_path = os.path.join(json_output_dir, "apps.json")
+
+    # Only write if permission is granted via secret
+    if is_write_allowed(json_output_file_path):
+        os.makedirs(json_output_dir, exist_ok=True)
+        try:
+            with open(json_output_file_path, "w") as f:
+                json.dump(apps_for_json_data, f, indent=2)
+            print(f"::notice::Successfully generated {json_output_file_path}")
+        except Exception as e:
+            print(f"::error::Failed to write {json_output_file_path}: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        apps_updated_flag_json = False # Mark as not updated if write was skipped
+
+    # --- Write to GITHUB_OUTPUT for apps.md ---
+    md_delimiter = "EOF_APPS_MD_CONTENT"
     with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
-        output_file.write(f"apps_md_section_content<<{delimiter}\n")
-        output_file.write(final_apps_md_content) # Write content with literal newlines
-        output_file.write(f"{delimiter}\n")
-        output_file.write(f"apps_md_updated_flag={str(apps_updated_flag).lower()}\n")
+        output_file.write(f"apps_md_section_content<<{md_delimiter}\n")
+        output_file.write(final_apps_md_content)
+        output_file.write(f"{md_delimiter}\n")
+        output_file.write(f"apps_md_updated_flag={str(apps_updated_flag_md).lower()}\n")
+
+    # Output a flag for the apps.json generation status
+    with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
+        output_file.write(f"apps_json_updated_flag={str(apps_updated_flag_json).lower()}\n")
+
 
 if __name__ == "__main__":
     main()

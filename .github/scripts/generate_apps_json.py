@@ -3,10 +3,26 @@ import os
 import sys
 
 def main():
+    # --- Retrieve Writable Files Secret ---
+    rwt_writable_files_str = os.environ.get("RWT_WRITABLE_FILES")
+    allowed_write_paths = []
+    if rwt_writable_files_str:
+        allowed_write_paths = [os.path.normpath(p.strip()) for p in rwt_writable_files_str.split(',') if p.strip()]
+    
+    def is_write_allowed(target_path):
+        normalized_target_path = os.path.normpath(target_path)
+        for allowed_path in allowed_write_paths:
+            if normalized_target_path == allowed_path:
+                return True
+        print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in RWT_WRITABLE_FILES secret. Write operation skipped.", file=sys.stderr)
+        print(f"::warning::Please update the 'RWT_WRITABLE_FILES' secret with a comma-separated list of allowed file paths (e.g., 'apps.md,homepage-app/apps/apps.json') if this write is intended.", file=sys.stderr)
+        return False
+
+    # --- Data Collection Logic ---
     app_dirs_json = os.environ.get("APP_DIRS_JSON_FROM_FIND_APPS") 
     
     if not app_dirs_json:
-        print("::error::APP_DIRS_DIRS_JSON_FROM_FIND_APPS environment variable is missing.", file=sys.stderr)
+        print("::error::APP_DIRS_JSON_FROM_FIND_APPS environment variable is missing.", file=sys.stderr)
         sys.exit(1)
 
     try:
@@ -16,8 +32,8 @@ def main():
         sys.exit(1)
 
     apps_data = [] # List to hold dictionaries for each app
+    apps_updated_flag_json = False # Track if json content was generated
 
-    # Read package.json for each app to get its data
     for app_dir in app_dirs:
         app_folder_name = os.path.basename(app_dir)
         package_json_path = os.path.join(app_dir, "package.json")
@@ -41,26 +57,33 @@ def main():
                 "name": app_folder_name,
                 "url": app_url
             })
+            apps_updated_flag_json = True # Set to true if at least one app is added
 
         except Exception as e:
             print(f"::error::Error processing {package_json_path}: {e}", file=sys.stderr)
             continue
 
-    # Define the output file path within the 'homepage-app/apps' directory
-    output_dir = os.path.join("homepage-app", "apps")
-    output_file_path = os.path.join(output_dir, "apps.json")
+    # --- Generate apps.json File ---
+    json_output_dir = os.path.join("homepage-app", "apps")
+    json_output_file_path = os.path.join(json_output_dir, "apps.json")
 
-    # Create the directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
+    # Only write if permission is granted via secret
+    if is_write_allowed(json_output_file_path):
+        os.makedirs(json_output_dir, exist_ok=True) # Ensure directory exists
+        try:
+            with open(json_output_file_path, "w") as f:
+                json.dump(apps_data, f, indent=2) # Use indent=2 for pretty-printing
+            print(f"::notice::Successfully generated {json_output_file_path}")
+        except Exception as e:
+            print(f"::error::Failed to write {json_output_file_path}: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        apps_updated_flag_json = False # Mark as not updated if write was skipped
 
-    # Write the data to the JSON file
-    try:
-        with open(output_file_path, "w") as f:
-            json.dump(apps_data, f, indent=2) # Use indent=2 for pretty-printing
-        print(f"::notice::Successfully generated {output_file_path}")
-    except Exception as e:
-        print(f"::error::Failed to write {output_file_path}: {e}", file=sys.stderr)
-        sys.exit(1)
+    # Output a flag for the apps.json generation status
+    with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
+        output_file.write(f"apps_json_updated_flag={str(apps_updated_flag_json).lower()}\n")
+
 
 if __name__ == "__main__":
     main()
