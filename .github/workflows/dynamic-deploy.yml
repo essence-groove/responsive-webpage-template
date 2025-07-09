@@ -1,0 +1,74 @@
+name: Dynamic Multi-App Heroku Deploy
+
+on:
+  push:
+    branches:
+      - main # Or 'master'
+    paths:
+      - 'express/**' # Trigger if anything in the 'express' folder changes
+      - '.github/workflows/dynamic-deploy.yml' # Trigger if this workflow changes
+
+jobs:
+  deploy_apps:
+    runs-on: ubuntu-latest
+    env:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+      BASE_APPS_DIR: 'express' # Base directory where all your apps reside
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Find and Deploy Apps
+        id: deployer # Assign an ID to this step to reference its outputs
+        run: |
+          # --- Script to find and deploy applications ---
+          set -e # Exit immediately if a command exits with a non-zero status
+
+          # Find all package.json files in subdirectories of BASE_APPS_DIR
+          # and get their parent directory paths
+          APP_DIRS=$(find "$BASE_APPS_DIR" -type f -name "package.json" -exec dirname {} \;)
+
+          echo "Found applications in directories:"
+          echo "$APP_DIRS"
+
+          # Loop through each found application directory
+          for APP_DIR in $APP_DIRS; do
+            echo "--- Processing app in: $APP_DIR ---"
+
+            # Extract the app name for Heroku (e.g., 'todo-app' from 'express/public/todo-app')
+            # This assumes your Heroku app names are based on the folder name.
+            # You'll need a naming convention for your Heroku apps.
+            # For example, if app folder is 'todo-app', Heroku app is 'my-repo-todo-app'
+            APP_FOLDER_NAME=$(basename "$APP_DIR")
+            HEROKU_APP_VAR_NAME="HEROKU_$(echo ${APP_FOLDER_NAME} | tr '[:lower:]-' '[:upper:]_')_APP_NAME" # HEROKU_TODO_APP_NAME
+            HEROKU_APP_NAME=${!HEROKU_APP_VAR_NAME:-} # Get value of environment variable, e.g., ${{ secrets.HEROKU_TODO_APP_NAME }}
+
+            if [ -z "$HEROKU_APP_NAME" ]; then
+              echo "::warning::Heroku app name secret not found for ${APP_FOLDER_NAME} (expected ${HEROKU_APP_VAR_NAME}). Skipping deployment for this app."
+              continue # Skip to the next app
+            fi
+
+            echo "Installing dependencies for ${APP_FOLDER_NAME}..."
+            npm install --prefix "$APP_DIR"
+
+            echo "Attempting to deploy ${APP_FOLDER_NAME} to Heroku app: ${HEROKU_APP_NAME}"
+            akhileshns/heroku-deploy@v3.13.15 # Using the action directly within the script
+              heroku_api_key: "$HEROKU_API_KEY"
+              heroku_app_name: "$HEROKU_APP_NAME"
+              heroku_email: "$HEROKU_EMAIL"
+              appdir: "$APP_DIR" # Pass the current app directory
+
+            echo "--- Finished processing app in: $APP_DIR ---"
+          done
+        shell: bash # Ensure bash is used for advanced shell scripting
