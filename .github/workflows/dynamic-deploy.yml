@@ -56,14 +56,16 @@ jobs:
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
         
+
+
   deploy_each_app: # Job 2: Deploys each app found in the previous job
-    needs: find_apps # This job depends on 'find_apps' job
+    needs: find_apps
     runs-on: ubuntu-latest
-    if: ${{ needs.find_apps.outputs.app_dirs_json != '[]' }} # Only run if apps were found
+    if: ${{ needs.find_apps.outputs.app_dirs_json != '[]' }}
     strategy:
-      fail-fast: false # Allow other apps to deploy even if one fails
+      fail-fast: false
       matrix:
-        app_dir: ${{ fromJson(needs.find_apps.outputs.app_dirs_json) }} # Loop through each app directory
+        app_dir: ${{ fromJson(needs.find_apps.outputs.app_dirs_json) }}
 
     env:
       HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
@@ -78,71 +80,17 @@ jobs:
         with:
           node-version: '20'
 
+      # --- ADD THIS STEP ---
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+      # ---------------------
+
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Read App Config and Deploy
-        run: |
-          set -e
-
-          APP_DIR="${{ matrix.app_dir }}" # Get the current app directory from the matrix
-          echo "--- Processing app in: $APP_DIR ---"
-
-          APP_FOLDER_NAME=$(basename "$APP_DIR") # e.g., 'homepage-app' or 'to_do_list'
-
-          # Read the 'name' and 'herokuAppName' from package.json
-          PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
-          HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
-
-          # --- Consistency Check: Folder Name vs. package.json 'name' ---
-          if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
-            echo "::error::Inconsistency detected for app '${APP_FOLDER_NAME}' (path: '${APP_DIR}'):"
-            echo "::error::Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${PACKAGE_JSON_APP_NAME}')."
-            echo "::error::Please **rename either the folder or the 'name' in package.json to match**, then commit and re-run. Deployment failed for this app."
-            exit 1 # Fail this specific matrix job if consistency check fails
-          fi
-
-          # --- Heroku App Name Check ---
-          if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
-            echo "::error::'herokuAppName' field not found or is empty in '$APP_DIR/package.json'."
-            echo "::error::Please add '\"herokuAppName\": \"YOUR_HEROKU_APP_NAME\"' to this package.json file."
-            exit 1 # Fail this specific matrix job
-          fi
-          
-          echo "Installing dependencies for ${APP_FOLDER_NAME} (path: '${APP_DIR}')..."
-          npm install --prefix "$APP_DIR" || {
-              echo "::error::npm install failed for app in '${APP_DIR}'. Deployment failed for this app."
-              exit 1 # Fail this specific matrix job
-          }
-
-          echo "Attempting to deploy ${APP_FOLDER_NAME} to Heroku app: ${HEROKU_APP_TARGET_NAME}"
-        shell: bash
-
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.13.15 # Using the action directly as intended
-        with:
-          heroku_api_key: ${{ env.HEROKU_API_KEY }} # Passed from job env
-          heroku_email: ${{ env.HEROKU_EMAIL }}     # Passed from job env
-          heroku_app_name: ${{ steps.read-config.outputs.heroku_app_name }} # Get from previous step's output
-          appdir: ${{ matrix.app_dir }} # Passed from matrix
-
-        # This part requires the output of the previous 'Read App Config and Deploy' step
-        # to expose 'heroku_app_name'. Let's refactor the 'Read App Config and Deploy' step
-        # to output these values.
-
-      - name: Deploy to Heroku - Actual Action
-        uses: akhileshns/heroku-deploy@v3.13.15 # This is the best way to use the action
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          heroku_app_name: ${{ env.HEROKU_APP_TARGET_NAME }} # Directly use env var from the current job scope
-          appdir: ${{ matrix.app_dir }}
-        # The variables HEROKU_APP_TARGET_NAME and APP_DIR are NOT directly available from the previous 'run' step to this 'uses' step.
-        # This is another GitHub Actions subtlety. We need to set them as outputs from the previous RUN step,
-        # and then access them using steps.step_id.outputs.variable_name within this 'uses' step.
-
       - name: Read App Config and Prepare Deploy Variables
-        id: prepare_vars # ID this step
+        id: prepare_vars
         run: |
           set -e
           APP_DIR="${{ matrix.app_dir }}"
@@ -150,7 +98,6 @@ jobs:
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
           HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
 
-          # Consistency Check (repeated here for direct feedback in this step)
           if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
             echo "::error::Inconsistency: Folder name ('${APP_FOLDER_NAME}') != package.json name ('${PACKAGE_JSON_APP_NAME}')."
             exit 1
@@ -166,16 +113,15 @@ jobs:
               exit 1
           }
 
-          # Output variables that the subsequent 'uses' step can consume
           echo "heroku_app_name=$HEROKU_APP_TARGET_NAME" >> "$GITHUB_OUTPUT"
-          echo "app_folder_name=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT" # Also output for cleaner logging
+          echo "app_folder_name=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
 
         shell: bash
 
-      - name: Deploy to Heroku
+      - name: Deploy to Heroku - Actual Action
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name }} # Access output from previous step
-          appdir: ${{ matrix.app_dir }} # Access matrix value directly
+          heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name }}
+          appdir: ${{ matrix.app_dir }}
