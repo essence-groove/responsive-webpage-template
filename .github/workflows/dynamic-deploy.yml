@@ -255,30 +255,76 @@ jobs:
           echo "readme_updated_flag=$README_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
         shell: bash
 
-      - name: Update README.md
-        if: ${{ steps.extract_info.outputs.readme_updated_flag == 'true' }}
-        run: |
+      update_readme: # Job 3: Updates README.md after all deployments
+    needs: deploy_each_app # This job depends on the successful completion of the deploy_each_app job
+    runs-on: ubuntu-latest
+    if: |
+      always() &&
+      needs.deploy_each_app.result == 'success' &&
+      needs.find_apps.outputs.app_dirs_json != '[]'
+
+    steps: # <--- This 'steps' should be indented by 2 spaces from 'update_readme'
+      - name: Checkout code # <--- This '- name' should be indented by 4 spaces
+        uses: actions/checkout@v4 # <--- This 'uses' should be indented by 6 spaces
+
+      - name: Install jq # <--- This '- name' should be indented by 4 spaces
+        run: sudo apt-get update && sudo apt-get install -y jq # <--- This 'run' should be indented by 6 spaces
+
+      - name: Extract Deployed App Info # <--- This '- name' should be indented by 4 spaces
+        id: extract_info # <--- This 'id' should be indented by 6 spaces
+        run: | # <--- This 'run' should be indented by 6 spaces
+          set -e
+          echo "Extracting information from completed deploy_each_app jobs..."
+          
+          # Re-fetch the app directories from find_apps job output
+          APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}"
+          APP_DIRS=$(echo "$APP_DIRS_JSON" | jq -r '.[]') # Convert JSON array back to newline-separated strings
+
+          README_CONTENT="## 🚀 Live Demos\n\n"
+          README_UPDATED_FLAG=false
+
+          for APP_DIR in $APP_DIRS; do
+            APP_FOLDER_NAME=$(basename "$APP_DIR")
+            
+            # Re-read package.json to get herokuAppName as it's not passed directly from matrix
+            HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "") 
+            
+            if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
+                echo "::warning::Skipping README update for '${APP_FOLDER_NAME}' as 'herokuAppName' is missing in its package.json."
+                continue
+            fi
+            
+            APP_URL="https://${HEROKU_APP_TARGET_NAME}.herokuapp.com/"
+            README_CONTENT+="* **${APP_FOLDER_NAME}:** [${APP_URL}](${APP_URL})\n"
+            README_UPDATED_FLAG=true
+          done
+
+          # Output the generated content and a flag indicating if there's anything to write
+          echo "readme_section_content=$(echo -e "$README_CONTENT" | sed 's/%/%25/g;s/\n/%0A/g;s/\r/%0D/g')" >> "$GITHUB_OUTPUT"
+          echo "readme_updated_flag=$README_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Update README.md # <--- This '- name' should be indented by 4 spaces
+        if: ${{ steps.extract_info.outputs.readme_updated_flag == 'true' }} # <--- This 'if' should be indented by 6 spaces
+        run: | # <--- This 'run' should be indented by 6 spaces
           # Decode the content
           README_SECTION_CONTENT=$(echo "${{ steps.extract_info.outputs.readme_section_content }}" | sed 's/%0A/\n/g;s/%0D/\r/g;s/%25/%/g')
 
           # Define start and end markers in your README.md
-          # Make sure these exact markers exist in your README.md file
           START_MARKER=""
           END_MARKER=""
 
           # Use awk for a more robust way to replace content between markers
-          # This command creates the new README.md content without direct in-place editing issues
           awk -v start="$START_MARKER" -v end="$END_MARKER" -v content="$README_SECTION_CONTENT" '
               $0 ~ start { print; print content; in_block=1; next }
               $0 ~ end { print; in_block=0; next }
               !in_block { print }
           ' README.md > README.md.tmp && mv README.md.tmp README.md
         shell: bash
-        # Replacing the sed with awk for robustness.
 
-      - name: Commit and Push README.md
-        if: ${{ steps.extract_info.outputs.readme_updated_flag == 'true' }}
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Docs: Update deployed app links in README.md"
+      - name: Commit and Push README.md # <--- This '- name' should be indented by 4 spaces
+        if: ${{ steps.extract_info.outputs.readme_updated_flag == 'true' }} # <--- This 'if' should be indented by 6 spaces
+        uses: stefanzweifel/git-auto-commit-action@v5 # <--- This 'uses' should be indented by 6 spaces
+        with: # <--- This 'with' should be indented by 8 spaces
+          commit_message: "Docs: Update deployed app links in README.md" # <--- This 'commit_message' should be indented by 10 spaces
           branch: main
