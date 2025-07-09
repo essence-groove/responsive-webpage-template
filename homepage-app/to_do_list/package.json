@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple to-do list application",
   "main": "server.js",
+  "herokuAppName": "your-todolist-app-name-on-heroku",
   "scripts": {
     "start": "node server.js"
   },
