@@ -1,2 +1,2 @@
 # responsive-webpage-template
-[Deployed apps](apps.md)
+[Deployed Applications](apps.md)
