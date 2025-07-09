@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Homepage</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Optional: Add a dedicated CSS file for modal if style.css gets too big -->
+    <!-- <link rel="stylesheet" href="apps/modal.css"> -->
 </head>
 <body>
 
@@ -16,6 +18,8 @@
                 <li class="nav-item"><a href="#" class="nav-link">About</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">Services</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
+                <!-- NEW: Apps Navigation Item -->
+                <li class="nav-item"><a href="#" class="nav-link" id="nav-apps-link">Apps</a></li>
             </ul>
             <div class="hamburger">
                 <span class="bar"></span>
@@ -44,6 +48,20 @@
         <p>&copy; 2025 [Name Here]. All Rights Reserved.</p>
     </footer>
 
+    <!-- NEW: Apps Modal Structure -->
+    <div id="apps-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Deployed Applications</h2>
+            <div id="apps-list-container">
+                <!-- App links will be loaded here by apps-list.js -->
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <!-- NEW: Link to apps-list.js -->
+    <!-- This script should be loaded after the DOM elements it interacts with -->
+    <script src="apps/apps-list.js"></script> 
 </body>
 </html>
