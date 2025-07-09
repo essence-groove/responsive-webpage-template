@@ -211,25 +211,33 @@ jobs:
           # Decode the content
           README_SECTION_CONTENT=$(echo "${{ steps.generate_content.outputs.readme_section_content }}" | sed 's/%0A/\n/g;s/%0D/\r/g;s/%25/%/g')
 
+          echo "--- Current README.md BEFORE awk ---"
+          cat README.md
+          echo "------------------------------------"
+          echo "Content to insert:"
+          echo "$README_SECTION_CONTENT"
+          echo "------------------------------------"
+
           # Define start and end markers in your README.md
           START_MARKER=""
           END_MARKER=""
 
           # Use awk for a more robust way to replace content between markers
-          # This command creates the new README.md content without direct in-place editing issues
+          # Adding '1' to print all lines, and ensuring the content is passed correctly
           awk -v start="$START_MARKER" -v end="$END_MARKER" -v content="$README_SECTION_CONTENT" '
               $0 ~ start { print; print content; in_block=1; next }
               $0 ~ end { print; in_block=0; next }
               !in_block { print }
-          ' README.md > README.md.tmp && mv README.md.tmp README.md
-        shell: bash
+          ' README.md > README.md.tmp
 
-      - name: Commit and Push README.md
-        if: ${{ steps.generate_content.outputs.readme_updated_flag == 'true' }}
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Docs: Update deployed app links in README.md"
-          branch: main # Or your default branch
-          # Ensure this token has write access to contents.
-          # The default GITHUB_TOKEN has it if "Read and write permissions" is set above.
-          token: ${{ secrets.GITHUB_TOKEN }} # Explicitly provide the token
+          echo "--- Contents of README.md.tmp AFTER awk ---"
+          cat README.md.tmp
+          echo "-------------------------------------------"
+
+          mv README.md.tmp README.md
+          echo "README.md moved successfully."
+
+          echo "--- Contents of README.md AFTER mv ---"
+          cat README.md
+          echo "--------------------------------------"
+        shell: bash
