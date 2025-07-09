@@ -1,7 +1,4 @@
-# This is a new comment to force workflow re-evaluation
 name: Dynamic Multi-App Heroku Deploy
-# ... rest of your workflow ...
-
 
 on:
   push:
@@ -91,6 +88,7 @@ jobs:
         run: |
           set -e
           APP_DIR="${{ matrix.app_dir }}"
+          echo "Current APP_DIR: $APP_DIR" # Debugging line
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
           HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
@@ -131,90 +129,105 @@ jobs:
           heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name }}
           appdir: ${{ matrix.app_dir }}
 
-  # generate_app_list_file: # Job 3: Generates apps.md file
-#   needs: [find_apps, deploy_each_app] 
-#   runs-on: ubuntu-latest
-#   if: |
-#     always() &&
-#     needs.find_apps.outputs.app_dirs_json != '[]'
+  generate_app_list_file: # Job 3: Generates apps.md file using Python
+    needs: [find_apps, deploy_each_app] # This job needs both previous jobs
+    runs-on: ubuntu-latest
+    if: |
+      always() && # Always run so we can report status regardless of previous job's individual matrix failures
+      needs.find_apps.outputs.app_dirs_json != '[]' # Only run if apps were found to deploy
 
-#   steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v4
-#       with:
-#         ref: ${{ github.ref }} # Checkout the branch we're working on
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }} # Checkout the branch we're working on
 
-#     - name: Install jq
-#       run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use a recent Python version
 
-#     - name: Generate apps.md Content
-#       id: generate_content
-#       run: |
-#         set -e # This ensures script exits on first error
+      - name: Generate apps.md Content with Python
+        id: generate_content_py
+        run: |
+          python -c '
+import json
+import os
+import sys
 
-#         echo "Generating apps.md content..."
+# Get app directories JSON from the previous job's output
+app_dirs_json = os.environ.get("APP_DIRS_JSON_FROM_FIND_APPS") # Received via env var
+if not app_dirs_json:
+    print("::error::APP_DIRS_JSON_FROM_FIND_APPS environment variable is missing.", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    app_dirs = json.loads(app_dirs_json)
+except json.JSONDecodeError:
+    print(f"::error::Failed to parse JSON: {app_dirs_json}", file=sys.stderr)
+    sys.exit(1)
+
+apps_md_content = "# 🚀 Deployed Applications\\n\\n"
+apps_md_content += "This file lists the applications deployed from this repository to Heroku.\\n\\n"
+apps_md_content += "## App List\\n\\n"
+apps_updated_flag = False
+
+# Read package.json for each app to get herokuAppName
+# This requires re-reading the files from the checked out repository.
+for app_dir in app_dirs:
+    app_folder_name = os.path.basename(app_dir)
+    package_json_path = os.path.join(app_dir, "package.json")
+    
+    if not os.path.exists(package_json_path):
+        print(f"::warning::package.json not found for {app_folder_name} at {app_dir}. Skipping.", file=sys.stderr)
+        continue
+
+    try:
+        with open(package_json_path, "r") as f:
+            package_json_data = json.load(f)
         
-#         # This section is now commented out.
-#         APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}" 
+        heroku_app_target_name = package_json_data.get("herokuAppName")
+        
+        if not heroku_app_target_name:
+            print(f"::warning::Skipping apps.md entry for \'{app_folder_name}\' as \'herokuAppName\' is missing or empty in its package.json.", file=sys.stderr)
+            continue
+        
+        app_url = f"https://{heroku_app_target_name}.herokuapp.com/"
+        apps_md_content += f"* **{app_folder_name}:** [{app_url}]({app_url})\\n"
+        apps_updated_flag = True
 
-#         if [ -z "$APP_DIRS_JSON" ] || [ "$APP_DIRS_JSON" == "null" ] || [ "$APP_DIRS_JSON" == "[]" ]; then
-#             echo "No valid app directories JSON received from find_apps job. Skipping apps.md generation."
-#             echo "apps_md_section_content=" >> "$GITHUB_OUTPUT"
-#             echo "apps_md_updated_flag=false" >> "$GITHUB_OUTPUT"
-#             exit 0
-#         fi
+    except Exception as e:
+        print(f"::error::Error processing {package_json_path}: {e}", file=sys.stderr)
+        continue
 
-#         APP_DIRS=$(echo "$APP_DIRS_JSON" | jq -r '.[]') 
-        
-#         if [ "$APP_DIRS" == "jq_parse_error" ]; then
-#             echo "::error::Failed to parse app directories JSON: '$APP_DIRS_JSON'."
-#             echo "::error::This indicates an issue with the JSON output from the 'find_apps' job."
-#             exit 1
-#         fi
-        
-#         if [ -z "$APP_DIRS" ]; then 
-#             echo "No app directories found after JSON parsing. Skipping apps.md content generation."
-#             echo "apps_md_section_content=" >> "$GITHUB_OUTPUT"
-#             echo "apps_md_updated_flag=false" >> "$GITHUB_OUTPUT"
-#             exit 0
-#         fi
-        
-#         APPS_MD_CONTENT="# 🚀 Deployed Applications\n\n"
-#         APPS_MD_CONTENT+="This file lists the applications deployed from this repository to Heroku.\n\n"
-#         APPS_MD_CONTENT+="## App List\n\n"
-#         APPS_UPDATED_FLAG=false 
-        
-#         for APP_DIR in $APP_DIRS; do
-#           APP_FOLDER_NAME=$(basename "$APP_DIR")
-          
-#           HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "") 
-          
-#           if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
-#               echo "::warning::Skipping apps.md entry for '${APP_FOLDER_NAME}' as 'herokuAppName' is missing in its package.json."
-#               continue
-#           fi
-          
-#           APP_URL="https://${HEROKU_APP_TARGET_NAME}.herokuapp.com/"
-#           APPS_MD_CONTENT+="* **${APP_FOLDER_NAME}:** [${APP_URL}](${APP_URL})\n"
-#           APPS_UPDATED_FLAG=true
-#         done
-        
-#         APPS_MD_CONTENT_ESCAPED=$(echo -e "$APPS_MD_CONTENT" | sed -E ':a;N;$!ba;s/\n/%0A/g;s/\r/%0D/g;s/%/%25/g')
-#         echo "apps_md_section_content=$APPS_MD_CONTENT_ESCAPED" >> "$GITHUB_OUTPUT"
-#         echo "apps_md_updated_flag=$APPS_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
-#       shell: bash
-      
-#     - name: Write apps.md File
-#       if: ${{ steps.generate_content.outputs.apps_md_updated_flag == 'true' }}
-#       run: |
-#         APPS_MD_SECTION_CONTENT=$(echo "${{ steps.generate_content.outputs.apps_md_section_content }}" | sed 's/%0A/\n/g;s/%0D/\r/g;s/%25/%/g')
-#         echo "$APPS_MD_SECTION_CONTENT" > apps.md
-#       shell: bash
+# Output the generated content and a flag indicating if there\'s anything to write
+# Encode newlines for GITHUB_OUTPUT as it expects a single-line string
+# (GitHub Actions automatically decodes %0A back to newline for subsequent steps)
+escaped_content = apps_md_content.replace("\\n", "%0A").replace("\\r", "%0D").replace("%", "%25")
+print(f"apps_md_section_content={escaped_content}")
+print(f"apps_md_updated_flag={str(apps_updated_flag).lower()}")
+# Write directly to $GITHUB_OUTPUT file
+print(f"apps_md_section_content={escaped_content}", file=open(os.environ["GITHUB_OUTPUT"], "a"))
+print(f"apps_md_updated_flag={str(apps_updated_flag).lower()}", file=open(os.environ["GITHUB_OUTPUT"], "a"))
+          '
+        env:
+          # Pass the JSON list of app directories as an environment variable to the Python script
+          APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
+        shell: bash # Use bash to run the python command
 
-#     - name: Commit and Push apps.md
-#       if: ${{ steps.generate_content.outputs.apps_md_updated_flag == 'true' }}
-#       uses: stefanzweifel/git-auto-commit-action@v5
-#       with:
-#         commit_message: "Docs: Update deployed app links in apps.md"
-#         branch: main
-#         token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Write apps.md File
+        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
+        run: |
+          # Decode the content (Python script should have already escaped it)
+          APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
+
+          echo "$APPS_MD_SECTION_CONTENT" > apps.md # Write directly to apps.md
+        shell: bash
+
+      - name: Commit and Push apps.md
+        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Docs: Update deployed app links in apps.md"
+          branch: main
+          token: ${{ secrets.GITHUB_TOKEN }}
