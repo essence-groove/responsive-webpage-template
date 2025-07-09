@@ -6,15 +6,16 @@ on:
       - main # Or 'master'
     paths:
       - 'homepage-app/**'
+      - 'to_do_list/**'
       - '.github/workflows/dynamic-deploy.yml'
 
 jobs:
   find_apps: # Job 1: Finds all deployable app directories
     runs-on: ubuntu-latest
     outputs:
-      app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }} # Output the JSON array of app directories
+      app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
     env:
-      APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are
+      APP_BASE_DIRS: "homepage-app to_do_list" # Your top-level folders for apps
 
     steps:
       - name: Checkout code
@@ -23,7 +24,7 @@ jobs:
       - name: Install jq (for package.json parsing and JSON output)
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Find and Deploy Apps
+      - name: Scan for Apps
         id: scan
         run: |
           set -e
@@ -48,22 +49,18 @@ jobs:
           echo "Found applications in directories (for debugging):"
           echo "$UNIQUE_APP_DIRS_NEWLINES"
 
-          # --- CRITICAL FIX: Force jq to output on a single line with -c ---
-          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .) # <--- Added -c here
-          echo "Generated JSON (single line): $APP_DIRS_JSON" # Log for confirmation
+          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
+          echo "Generated JSON (single line): $APP_DIRS_JSON"
 
-          # Set the output variable for the next job
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
-        
-
 
   deploy_each_app: # Job 2: Deploys each app found in the previous job
     needs: find_apps
     runs-on: ubuntu-latest
     if: ${{ needs.find_apps.outputs.app_dirs_json != '[]' }}
     strategy:
-      fail-fast: false
+      fail-fast: false # Allow other apps to deploy even if one fails
       matrix:
         app_dir: ${{ fromJson(needs.find_apps.outputs.app_dirs_json) }}
 
@@ -80,17 +77,15 @@ jobs:
         with:
           node-version: '20'
 
-      # --- ADD THIS STEP ---
       - name: Install Heroku CLI
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
-      # ---------------------
 
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Read App Config and Prepare Deploy Variables
-        id: prepare_vars
+        id: prepare_vars # ID this step
         run: |
           set -e
           APP_DIR="${{ matrix.app_dir }}"
@@ -98,6 +93,7 @@ jobs:
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
           HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
 
+          # Consistency Check
           if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
             echo "::error::Inconsistency: Folder name ('${APP_FOLDER_NAME}') != package.json name ('${PACKAGE_JSON_APP_NAME}')."
             exit 1
@@ -113,15 +109,133 @@ jobs:
               exit 1
           }
 
+          # Output variables that the subsequent 'uses' step can consume
           echo "heroku_app_name=$HEROKU_APP_TARGET_NAME" >> "$GITHUB_OUTPUT"
-          echo "app_folder_name=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
+          echo "app_folder_name=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT" # Output folder name for README
 
         shell: bash
 
       - name: Deploy to Heroku - Actual Action
+        id: deploy_action # ID the deploy step to check its status
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name }}
           appdir: ${{ matrix.app_dir }}
+
+      - name: Store Deployed App URL (if successful)
+        if: success() # Only run this if the 'Deploy to Heroku' step was successful
+        id: store_url
+        run: |
+          APP_FOLDER_NAME="${{ steps.prepare_vars.outputs.app_folder_name }}"
+          HEROKU_APP_NAME="${{ steps.prepare_vars.outputs.heroku_app_name }}"
+          APP_URL="https://${HEROKU_APP_NAME}.herokuapp.com/"
+          
+          # Store the URL in a way that the final update step can access it.
+          # We'll use a temporary file, but its content will be read in a *later* job.
+          # For a matrix, this means each matrix instance writes to its own temp file.
+          
+          # This requires outputting a specific structure to a file.
+          # A better way is to use a dedicated step to aggregate all URLs
+          # after the matrix job completes.
+
+          # We need to output the app name and URL so the next job can gather them.
+          echo "deployed_app_name=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
+          echo "deployed_app_url=$APP_URL" >> "$GITHUB_OUTPUT"
+
+  update_readme: # Job 3: Updates README.md after all deployments
+    needs: deploy_each_app # This job depends on the successful completion of the deploy_each_app job
+    runs-on: ubuntu-latest
+    # This 'if' condition ensures this job runs only if 'deploy_each_app' ran and completed successfully,
+    # and if any apps were actually deployed (i.e., the app_dirs_json was not empty).
+    if: |
+      always() && # Run always, then check individual job statuses
+      needs.deploy_each_app.result == 'success' && # Ensure the deployment job was successful
+      needs.find_apps.outputs.app_dirs_json != '[]' # Ensure there were apps to deploy
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Extract Deployed App Info
+        id: extract_info
+        run: |
+          set -e
+          echo "Extracting information from completed deploy_each_app jobs..."
+          
+          # Retrieve the job outputs for each matrix iteration
+          # This is complex as there isn't a direct way to get *all* matrix outputs.
+          # We need to parse the raw GitHub context.
+
+          # --- Simpler approach: Use a specific GitHub Action to gather outputs ---
+          # Or, if this were less dynamic, each 'deploy_each_app' step could have
+          # written to a uniquely named file and this job would glob them.
+          # However, that's not ideal for robustness.
+
+          # A common pattern for this is to pass the entire list of app_dirs_json
+          # again to this job, then loop through it and reconstruct URLs.
+
+          # Re-fetch the app directories from find_apps job output
+          APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}"
+          APP_DIRS=$(echo "$APP_DIRS_JSON" | jq -r '.[]') # Convert JSON array back to newline-separated strings
+
+          README_CONTENT="## 🚀 Live Demos\n\n"
+          README_UPDATED_FLAG=false
+
+          for APP_DIR in $APP_DIRS; do
+            APP_FOLDER_NAME=$(basename "$APP_DIR")
+            HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "") # Need to re-read from repo
+            
+            if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
+                echo "::warning::Skipping README update for '${APP_FOLDER_NAME}' as 'herokuAppName' is missing."
+                continue
+            fi
+            
+            APP_URL="https://${HEROKU_APP_TARGET_NAME}.herokuapp.com/"
+            README_CONTENT+="* **${APP_FOLDER_NAME}:** [${APP_URL}](${APP_URL})\n"
+            README_UPDATED_FLAG=true
+          done
+
+          # Output the generated content and a flag indicating if there's anything to write
+          echo "readme_section_content=$(echo -e "$README_CONTENT" | sed 's/%/%25/g;s/\n/%0A/g;s/\r/%0D/g')" >> "$GITHUB_OUTPUT"
+          echo "readme_updated_flag=$README_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Update README.md
+        if: ${{ steps.extract_info.outputs.readme_updated_flag == 'true' }} # Only proceed if content was generated
+        run: |
+          README_SECTION_CONTENT=$(echo "${{ steps.extract_info.outputs.readme_section_content }}" | sed 's/%0A/\n/g;s/%0D/\r/g;s/%25/%/g') # Decode content
+
+          # Define start and end markers in your README.md
+          # Make sure these exact markers exist in your README.md file
+          START_MARKER=""
+          END_MARKER=""
+
+          # Read the current README.md
+          CURRENT_README=$(cat README.md)
+
+          # Use sed to replace the content between markers
+          # This command creates a new README.md with updated content
+          # 's@PATTERN@REPLACEMENT@' allows using '@' as delimiter for paths
+          NEW_README=$(echo "$CURRENT_README" | sed "/$START_MARKER/,/$END_MARKER/{ /$START_MARKER/{p; r /dev/stdin
+          }; /$END_MARKER/p; d }" <<< "$README_SECTION_CONTENT")
+
+          echo "$NEW_README" > README.md
+        shell: bash
+        # To make 'sed' work cleanly with multi-line input from a variable,
+        # it's usually safer to use a temporary file or a more advanced 'sed' command.
+        # The above 'sed' line is complex and might fail with different README content.
+        # A safer approach for updating README: use a dedicated action or a simpler replace.
+
+      - name: Commit and Push README.md
+        if: ${{ steps.extract_info.outputs.readme_updated_flag == 'true' }}
+        uses: stefanzweifel/git-auto-commit-action@v5 # Action to commit changes
+        with:
+          commit_message: "Docs: Update deployed app links in README.md"
+          # This requires GITHUB_TOKEN permissions.
+          # Ensure workflow permissions allow 'contents: write'.
+          branch: main # Or your default branch
