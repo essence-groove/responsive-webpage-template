@@ -131,11 +131,12 @@ jobs:
 
           if [ ! -f "$APPS_JSON_PATH" ] || [ ! -s "$APPS_JSON_PATH" ]; then
             echo "::warning::${APPS_JSON_PATH} not found or is empty. Skipping deployment matrix generation."
-            echo "app_data_json=[]" >> "$GITHUB_OUTPUT"
+            echo "app_data_json=[]" >> "$GITHUB_OUTPUT" # Output empty array for matrix
             exit 0
           fi
 
-          APP_DATA_JSON=$(jq -c '[.[] | {"app_dir": .name, "heroku_app_name": (.url | split("/") | .[2] | split(".")[0])}]' "$APPS_JSON_PATH")
+          # FIX: Include the full relative path for 'app_dir' in the matrix
+          APP_DATA_JSON=$(jq -c '[.[] | {"app_dir": (if .name == "homepage-app" then "homepage-app" else "homepage-app/" + .name end), "heroku_app_name": (.url | split("/") | .[2] | split(".")[0])}]' "$APPS_JSON_PATH")
 
           if [ "$APP_DATA_JSON" == "[]" ]; then
             echo "::warning::${APPS_JSON_PATH} contains no valid app data. Skipping deployment matrix generation."
@@ -160,7 +161,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js # <--- Change v5 to v4 here
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -179,12 +180,16 @@ jobs:
         id: prepare_vars
         run: |
           set -e
-          APP_DIR="${{ matrix.app_data.app_dir }}"
-          echo "Current APP_DIR: $APP_DIR"
-          APP_FOLDER_NAME=$(basename "$APP_DIR")
-          PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
-          HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
+          APP_DIR="${{ matrix.app_data.app_dir }}" # Access data from the matrix item
+          HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}"
 
+          echo "Current APP_DIR: $APP_DIR" # Debugging line
+          APP_FOLDER_NAME=$(basename "$APP_DIR")
+          
+          # Re-read package.json to get its 'name' for consistency check
+          PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
+
+          # Consistency Check: Folder Name vs. package.json 'name'
           if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
             echo "::error::Inconsistency detected for app '${APP_FOLDER_NAME}' (path: '${APP_DIR}'):"
             echo "::error::Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${PACKAGE_JSON_APP_NAME}')."
@@ -192,6 +197,8 @@ jobs:
             exit 1
           fi
 
+          # The herokuAppName check is implicitly handled by the apps.json generation,
+          # but we still need to ensure the HEROKU_APP_TARGET_NAME from matrix is valid.
           if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
             echo "::error::Heroku app name (derived from URL in apps.json) is empty for app '${APP_FOLDER_NAME}'."
             echo "::error::Please ensure 'deployedUrl' is correctly set in '$APP_DIR/package.json' and points to a valid Heroku app URL."
@@ -204,6 +211,7 @@ jobs:
               exit 1
           }
 
+          # Output variables for the deploy action
           echo "heroku_app_name_for_deploy=$HEROKU_APP_TARGET_NAME" >> "$GITHUB_OUTPUT"
           echo "app_folder_name_for_deploy=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
 
