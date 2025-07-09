@@ -1,16 +1,19 @@
 {
   "name": "homepage-app",
   "version": "1.0.0",
-  "description": "A simple backend for our homepage.",
+  "description": "Your portfolio homepage.",
   "main": "server.js",
-  "herokuAppName": "apm-essence-groove-h002",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.19.2"
   },
   "engines": {
     "node": "20.x"
-  }
+  },
+  "herokuAppName": "apm-essence-groove-h002",
+  "deployedUrl": "https://apm-essence-groove-h002-7cc826ef4a8c.herokuapp.com/"
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // ADD THIS LINE with the full, correct URL for your homepage app
 }
