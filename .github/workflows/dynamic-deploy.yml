@@ -36,68 +36,34 @@ jobs:
             FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
             for DIR in $FOUND_DIRS; do
               ALL_APP_DIRS_ARRAY+=("$DIR")
-            done
-          done
-
-          UNIQUE_APP_DIRS_NEWLINES=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u)
-
-          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
-            echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
-            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Found applications in directories (for debugging):"
-          echo "$UNIQUE_APP_DIRS_NEWLINES"
-
-          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
-          echo "Generated JSON (single line): $APP_DIRS_JSON"
-
+            @ -60,6 +60,54 @@
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
-  deploy_all_apps: # Job: Orchestrates deployment of all apps using reusable workflow
-    needs: find_apps
-    runs-on: ubuntu-latest
-    if: ${{ needs.find_apps.outputs.app_dirs_json != '[]' }}
-    strategy:
-      fail-fast: false # Allow other apps to deploy even if one fails
-      matrix:
-        app_dir: ${{ fromJson(needs.find_apps.outputs.app_dirs_json) }}
-
-    steps:
-      - name: Deploy App - ${{ matrix.app_dir }}
-        uses: ./.github/workflows/deploy-app-reusable.yml
-        with:
-          app_dir: ${{ matrix.app_dir }}
-        secrets:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-
-  generate_app_list_file: # Job: Generates apps.md and apps.json files using Python
-    needs: [find_apps, deploy_all_apps]
+  generate_docs_files: # NEW Job: Generates apps.md and apps.json files using Python (runs before deploy)
+    needs: find_apps # Only needs 'find_apps' to get the list of apps
     runs-on: ubuntu-latest
     if: |
       always() &&
-      needs.find_apps.outputs.app_dirs_json != '[]'
+      needs.find_apps.outputs.app_dirs_json != '[]' # Only run if apps were found to generate docs for
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.ref }} # Checkout the branch we're working on
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.x' # Use a recent Python version
 
       - name: Generate apps.md and apps.json Content with Python Script
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          # NEW: Pass individual writable file secrets to the Python script
+          # Pass individual writable file secrets to the Python script
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
           RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
         shell: bash
@@ -120,3 +86,21 @@ jobs:
           branch: main
           token: ${{ secrets.GITHUB_TOKEN }}
           add_options: "apps.md homepage-app/apps/apps.json"
+
+  deploy_all_apps: # Job: Orchestrates deployment of all apps using reusable workflow (now runs after docs generation)
+    needs: [find_apps, generate_docs_files] # Now depends on docs generation completing
+    runs-on: ubuntu-latest
+    if: ${{ needs.find_apps.outputs.app_dirs_json != '[]' }}
+    strategy:
+      fail-fast: false # Allow other apps to deploy even if one fails
+      matrix:
+        app_dir: ${{ fromJson(needs.find_apps.outputs.app_dirs_json) }}
+
+    steps:
+      - name: Deploy App - ${{ matrix.app_dir }}
+        uses: ./.github/workflows/deploy-app-reusable.yml
+        with:
+          app_dir: ${{ matrix.app_dir }}
+        secrets:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
