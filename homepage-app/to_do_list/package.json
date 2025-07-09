@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A simple to-do list application",
   "main": "server.js",
-  "herokuAppName": "your-todolist-app-name-on-heroku",
+  "herokuAppName": "apm-essence-groove-h004",
   "scripts": {
     "start": "node server.js"
   },
