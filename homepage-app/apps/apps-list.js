@@ -1,65 +1,63 @@
 document.addEventListener('DOMContentLoaded', () => {
     const appsJsonPath = 'apps.json'; // apps.json is in the same directory
+    const appsListContainer = document.getElementById('app-links-container');
 
     // Function to safely fetch and parse JSON
     async function fetchAppsData() {
         try {
             const response = await fetch(appsJsonPath);
 
-            // Check if the response was successful (e.g., status 200-299)
             if (!response.ok) {
-                // Log the network error internally but produce no output to the user
                 console.error(`Error fetching ${appsJsonPath}: ${response.status} ${response.statusText}`);
-                return null; // Return null on network or HTTP error
+                return null; 
             }
 
-            const data = await response.json(); // Parse the JSON data
+            const data = await response.json();
 
-            // Basic validation: ensure data is an array
             if (!Array.isArray(data)) {
                 console.error(`Error: ${appsJsonPath} does not contain a valid JSON array.`, data);
-                return null; // Return null if data is not an array
+                return null;
             }
 
-            return data; // Return the parsed array
+            return data;
         } catch (error) {
-            // Catch any other errors (e.g., network issues, malformed JSON)
             console.error(`An unexpected error occurred while processing ${appsJsonPath}:`, error);
-            return null; // Return null on any exception
+            return null;
         }
     }
 
     // Function to generate and append the app list
     async function displayAppLinks() {
-        const apps = await fetchAppsData(); // Attempt to fetch data
+        const apps = await fetchAppsData();
+
+        // Clear previous content (if any)
+        appsListContainer.innerHTML = ''; 
 
         if (apps && apps.length > 0) { // Only proceed if data is valid and not empty
-            const articleElement = document.createElement('article');
-            articleElement.id = 'app-links-container'; // Optional: add an ID for styling/selection
+            const listElement = document.createElement('ul');
+            listElement.className = 'app-links-list'; // For potential future styling
 
             apps.forEach(app => {
-                // Basic validation for each app object
                 if (app && typeof app === 'object' && app.name && app.url) {
-                    const paragraph = document.createElement('p');
+                    const listItem = document.createElement('li');
                     const link = document.createElement('a');
                     link.href = app.url;
                     link.textContent = app.name;
                     link.target = '_blank'; // Open link in a new tab
-                    link.rel = 'noopener noreferrer'; // Security best practice for target='_blank'
+                    link.rel = 'noopener noreferrer'; // Security best practice
 
-                    paragraph.appendChild(link);
-                    articleElement.appendChild(paragraph);
+                    listItem.appendChild(link);
+                    listElement.appendChild(listItem);
                 } else {
                     console.warn('Skipping malformed app entry:', app);
                 }
             });
-
-            // Append the article element to the body or a specific container
-            // For a robust solution, you might want a specific element on your HTML page
-            // to append to, e.g., document.getElementById('main-content').appendChild(articleElement);
-            document.body.appendChild(articleElement);
+            appsListContainer.appendChild(listElement);
+        } else {
+            // If apps is null or empty, no output is done to the page,
+            // fulfilling the silent error handling requirement.
+            console.log('No apps to display or an error occurred during fetch.');
         }
-        // If apps is null or empty, no output is done, fulfilling the requirement.
     }
 
     displayAppLinks(); // Call the function to display links when the DOM is loaded
