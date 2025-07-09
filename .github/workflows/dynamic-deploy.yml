@@ -132,11 +132,10 @@ jobs:
     # This job needs 'find_apps' for the list of apps, but only runs after ALL matrix deployments are attempted
     needs: [find_apps, deploy_each_app] 
     runs-on: ubuntu-latest
-    # This 'if' condition ensures this job runs if 'deploy_each_app' completed (success or failure)
-    # and if apps were actually found in the first place.
+    # FIX: Removed comments from the 'if:' condition
     if: |
-      always() && # Always run so we can report status regardless of previous job's individual matrix failures
-      needs.find_apps.outputs.app_dirs_json != '[]' # Only run if apps were found to deploy
+      always() &&
+      needs.find_apps.outputs.app_dirs_json != '[]'
 
     steps:
       - name: Checkout code
@@ -160,21 +159,6 @@ jobs:
           APPS_MD_CONTENT+="This file lists the applications deployed from this repository to Heroku.\n\n"
           APPS_MD_CONTENT+="## App List\n\n"
           APPS_UPDATED_FLAG=false # To track if any app details were successfully added
-
-          # Aggregate deployment statuses from the deploy_each_app job
-          # This is the tricky part: accessing results from all matrix jobs.
-          # The result of `needs.deploy_each_app.result` is overall success/failure of the job.
-          # We need to manually iterate and check individual job steps.
-          # This requires using the GitHub API or a more advanced action to parse outcomes.
-
-          # --- Simplified: We'll assume if the app was processed by 'deploy_each_app',
-          #    its config was valid, and we'll link it.
-          #    If 'deploy_each_app' had a full fail, this job wouldn't have run anyway if `needs.deploy_each_app.result == 'success'` was there.
-          #    Since we removed that for `always()`, we need to check if individual steps succeeded.
-
-          # A simpler strategy: Iterate through the original list of apps,
-          # and if the previous job didn't fail *that app's instance*, assume it deployed.
-          # For a more precise status check per app, you'd need the GitHub API or a custom action.
           
           # Iterate through apps and construct content
           for APP_DIR in $APP_DIRS; do
@@ -195,7 +179,7 @@ jobs:
 
           # Output the generated content and a flag indicating if there's anything to write
           # Escape for GITHUB_OUTPUT multi-line string
-          APPS_MD_CONTENT_ESCAPED=$(echo -e "$APPS_MD_CONTENT" | sed -E ':a;N;$!ba;s/\n/%0A/g' | sed -E 's/\r/%0D/g' | sed -E 's/%/%25/g')
+          APPS_MD_CONTENT_ESCAPED=$(echo -e "$APPS_MD_CONTENT" | sed -E ':a;N;$!ba;s/\n/%0A/g;s/\r/%0D/g;s/%/%25/g')
           echo "apps_md_section_content=$APPS_MD_CONTENT_ESCAPED" >> "$GITHUB_OUTPUT"
           echo "apps_md_updated_flag=$APPS_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
         shell: bash
