@@ -60,7 +60,6 @@ jobs:
   generate_docs_files: # Job: Generates apps.md and apps.json files using Python (runs before deploy)
     needs: find_apps # Only needs 'find_apps' to get the list of apps
     runs-on: ubuntu-latest
-    # FIX: Removed comment from the 'if:' condition
     if: |
       always() &&
       needs.find_apps.outputs.app_dirs_json != '[]'
@@ -132,9 +131,13 @@ jobs:
         with:
           node-version: '20'
 
+      # FIX: More robust Heroku CLI installation
       - name: Install Heroku CLI
         run: |
-          curl https://cli-assets.heroku.com | sh
+          curl -L https://cli-assets.heroku.com/install.sh -o /tmp/heroku-install.sh
+          chmod +x /tmp/heroku-install.sh
+          /tmp/heroku-install.sh
+        shell: bash # Ensure bash is used for this script
 
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
