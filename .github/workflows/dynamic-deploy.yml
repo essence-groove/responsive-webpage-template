@@ -159,10 +159,12 @@ jobs:
       - name: Write apps.md File
         if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
         run: |
-          # Decode the content (Python script should have already escaped it)
+          # The Python script has already done the necessary escaping for output.
+          # We just need to read the variable and write it.
+          # GitHub Actions will automatically decode the %0A back to newlines.
           APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
-
-          echo "$APPS_MD_SECTION_CONTENT" > apps.md # Write directly to apps.md
+          
+          echo -e "$APPS_MD_SECTION_CONTENT" > apps.md # Use echo -e to interpret escape sequences
         shell: bash
 
       - name: Commit and Push apps.md
