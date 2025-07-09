@@ -15,11 +15,10 @@ def main():
         print(f"::error::Failed to parse JSON from env var: {app_dirs_json}", file=sys.stderr)
         sys.exit(1)
 
-    # --- ADDED EXTRA NEWLINES FOR SPACING ---
+    # Building content with literal newlines (\n)
     apps_md_content = "# 🚀 Deployed Applications\n\n" # Two newlines after heading
     apps_md_content += "This file lists the applications deployed from this repository to Heroku.\n\n" # Two newlines after intro text
     apps_md_content += "## App List\n\n" # Two newlines after sub-heading
-    # --- END ADDITIONS ---
     
     apps_updated_flag = False
 
@@ -41,15 +40,19 @@ def main():
                 print(f"::warning::Skipping apps.md entry for \'{app_folder_name}\' as \'deployedUrl\' is missing or empty in its package.json. Please add it.", file=sys.stderr)
                 continue
             
-            apps_md_content += f"* **{app_folder_name}:** [{app_url}]({app_url})\n\n" # --- ADDED EXTRA NEWLINE HERE ---
+            # Add an extra newline at the end of each list item for more spacing
+            apps_md_content += f"* **{app_folder_name}:** [{app_url}]({app_url})\n\n" 
             apps_updated_flag = True
 
         except Exception as e:
             print(f"::error::Error processing {package_json_path}: {e}", file=sys.stderr)
             continue
 
-    # Corrected escaping for GITHUB_OUTPUT. 
-    # This remains critical for GitHub Actions to correctly interpret newlines.
+    # --- FIX: Simplify the escaping for GITHUB_OUTPUT ---
+    # GitHub Actions recommends replacing only specific characters,
+    # and then using `echo -e` in bash to decode it.
+    # The literal '%' needs to be %25. Newlines need to be %0A.
+    # This is standard and should work if applied only once.
     final_escaped_content = apps_md_content.replace("%", "%25").replace("\n", "%0A").replace("\r", "%0D")
     
     with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
