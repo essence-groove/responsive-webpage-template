@@ -1,1 +1,0 @@
-# responsive-webpage-template
