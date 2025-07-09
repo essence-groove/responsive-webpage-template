@@ -3,24 +3,32 @@ import os
 import sys
 
 def main():
-    # --- Retrieve Writable Files Secret ---
-    rwt_writable_files_str = os.environ.get("RWT_WRITABLE_FILES")
+    # --- Retrieve Writable Files Secrets (Individual) ---
     allowed_write_paths = []
-    if rwt_writable_files_str:
-        allowed_write_paths = [os.path.normpath(p.strip()) for p in rwt_writable_files_str.split(',') if p.strip()]
     
+    # Check for apps.md secret
+    apps_md_path = os.environ.get("RWT_WRITABLE_FILE_APPS_MD")
+    if apps_md_path:
+        allowed_write_paths.append(os.path.normpath(apps_md_path.strip()))
+    
+    # Check for homepage-app/apps/apps.json secret
+    homepage_apps_json_path = os.environ.get("RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON")
+    if homepage_apps_json_path:
+        allowed_write_paths.append(os.path.normpath(homepage_apps_json_path.strip()))
+
+    # Function to check if a target path is allowed
     def is_write_allowed(target_path):
         normalized_target_path = os.path.normpath(target_path)
-        for allowed_path in allowed_write_paths:
-            if normalized_target_path == allowed_path:
-                return True
-        # --- REFINED WARNING MESSAGE HERE ---
-        print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in RWT_WRITABLE_FILES secret. Write operation skipped.", file=sys.stderr)
-        print(f"::warning::Please update the 'RWT_WRITABLE_FILES' secret with a comma-separated list of allowed file paths (e.g., 'apps.md,homepage-app/apps/apps.json') if this write is intended.", file=sys.stderr)
+        if normalized_target_path in allowed_write_paths:
+            return True
+        
+        # --- REFINED WARNING MESSAGE for individual secrets ---
+        print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in RWT_WRITABLE_FILES secrets. Write operation skipped.", file=sys.stderr)
+        print(f"::warning::Please ensure the corresponding secret (e.g., 'RWT_WRITABLE_FILE_APPS_MD' or 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON') is correctly set with the exact path '{target_path}' if this write is intended.", file=sys.stderr)
         # --- END REFINED WARNING MESSAGE ---
         return False
 
-    # --- Data Collection Logic ---
+    # --- Data Collection Logic (Remains unchanged) ---
     app_dirs_json = os.environ.get("APP_DIRS_JSON_FROM_FIND_APPS") 
     
     if not app_dirs_json:
@@ -33,12 +41,11 @@ def main():
         print(f"::error::Failed to parse JSON from env var: {app_dirs_json}", file=sys.stderr)
         sys.exit(1)
 
-    # Prepare data for both apps.md and apps.json
-    apps_for_md_content = [] # List of formatted strings for Markdown
-    apps_for_json_data = []  # List of dictionaries for JSON
+    apps_for_md_content = [] 
+    apps_for_json_data = []  
 
-    apps_updated_flag_md = False # Track if markdown content was generated
-    apps_updated_flag_json = False # Track if json content was generated
+    apps_updated_flag_md = False 
+    apps_updated_flag_json = False 
 
     for app_dir in app_dirs:
         app_folder_name = os.path.basename(app_dir)
@@ -58,11 +65,9 @@ def main():
                 print(f"::warning::Skipping entry for \'{app_folder_name}\' as \'deployedUrl\' is missing or empty in its package.json.", file=sys.stderr)
                 continue
             
-            # Prepare data for apps.md
             apps_for_md_content.append(f"* **{app_folder_name}:** [{app_url}]({app_url})")
             apps_updated_flag_md = True
 
-            # Prepare data for apps.json
             apps_for_json_data.append({
                 "name": app_folder_name,
                 "url": app_url
@@ -77,7 +82,7 @@ def main():
     md_header = "# 🚀 Deployed Applications\n\n"
     md_intro = "This file lists the applications deployed from this repository to Heroku.\n\n"
     md_list_heading = "## App List\n\n"
-    md_app_list_str = "\n\n".join(apps_for_md_content) + "\n\n" if apps_for_md_content else "" # Add two newlines after last item
+    md_app_list_str = "\n\n".join(apps_for_md_content) + "\n\n" if apps_for_md_content else ""
 
     final_apps_md_content = md_header + md_intro + md_list_heading + md_app_list_str
 
@@ -87,10 +92,10 @@ def main():
 
     # Only write if permission is granted via secret
     if is_write_allowed(json_output_file_path):
-        os.makedirs(json_output_dir, exist_ok=True) # Ensure directory exists
+        os.makedirs(json_output_dir, exist_ok=True)
         try:
             with open(json_output_file_path, "w") as f:
-                json.dump(apps_for_json_data, f, indent=2) # Use indent=2 for pretty-printing
+                json.dump(apps_for_json_data, f, indent=2)
             print(f"::notice::Successfully generated {json_output_file_path}")
         except Exception as e:
             print(f"::error::Failed to write {json_output_file_path}: {e}", file=sys.stderr)
@@ -98,9 +103,7 @@ def main():
     else:
         apps_updated_flag_json = False # Mark as not updated if write was skipped
 
-    # --- Write to GITHUB_OUTPUT for apps.md (for the next step in YAML) ---
-    # This uses GitHub Actions' native multi-line output variable syntax.
-    # The content is written with literal newlines, and GHA handles the parsing.
+    # --- Write to GITHUB_OUTPUT for apps.md ---
     md_delimiter = "EOF_APPS_MD_CONTENT"
     with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
         output_file.write(f"apps_md_section_content<<{md_delimiter}\n")
@@ -108,8 +111,7 @@ def main():
         output_file.write(f"{md_delimiter}\n")
         output_file.write(f"apps_md_updated_flag={str(apps_updated_flag_md).lower()}\n")
 
-    # Output a flag for the apps.json generation status (optional, but good for fine-grained control in YAML)
-    # This is used by the 'Commit and Push' step's 'if' condition.
+    # Output a flag for the apps.json generation status
     with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
         output_file.write(f"apps_json_updated_flag={str(apps_updated_flag_json).lower()}\n")
 
