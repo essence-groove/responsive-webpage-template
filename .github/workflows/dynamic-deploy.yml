@@ -11,11 +11,8 @@ on:
       - '.github/workflows/deploy-app-reusable.yml'
       - '.github/workflows/utils-1.yml'
 
-
 jobs:
   prepare_deploy_matrix: # NEW JOB: Reads apps.json and outputs the matrix data for deploy_all_apps (now runs first)
-    # This job no longer needs 'find_apps' or 'generate_docs_files' for its execution order.
-    # It will run first to prepare the deployment matrix from the existing apps.json.
     runs-on: ubuntu-latest
     outputs:
       app_data_json: ${{ steps.read_json.outputs.app_data_json }}
@@ -61,7 +58,6 @@ jobs:
       matrix:
         app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
 
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,14 +67,12 @@ jobs:
         with:
           node-version: '20'
 
-      # FIX: More robust Heroku CLI installation
       - name: Install Heroku CLI
         run: |
           curl -L https://cli-assets.heroku.com/install.sh -o /tmp/heroku-install.sh
           chmod +x /tmp/heroku-install.sh
           /tmp/heroku-install.sh
         shell: bash
-
 
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -89,7 +83,6 @@ jobs:
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
           echo "Current APP_DIR: $APP_DIR"
-
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           
           # Re-read package.json to get its 'name' for consistency check
@@ -122,7 +115,6 @@ jobs:
 
       - name: Deploy to Heroku - Actual Action
         id: deploy_action
-        # This step is now directly within deploy_all_apps, accessing secrets from job scope
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
@@ -131,8 +123,7 @@ jobs:
           appdir: ${{ matrix.app_data.app_dir }}
 
   find_apps: # Job 2: Finds all deployable app directories (now runs after deploy_all_apps, or in parallel)
-    # No 'needs' here if you want it to run in parallel with deploy_all_apps.
-    # If it needs to run AFTER deploy_all_apps, you'd add needs: deploy_all_apps
+    needs: deploy_all_apps # This ensures it runs AFTER deploy_all_apps
     runs-on: ubuntu-latest
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
@@ -195,13 +186,17 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Check Writable File Secrets
+      - name: Check Writable File Secrets # Updated warning message
         run: |
+          # Check for apps.md secret
           if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
-            echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty. Writing to apps.md might be skipped by the script."
+            echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty."
+            echo "::warning::To enable writing to 'apps.md', create a repository secret named 'RWT_WRITABLE_FILE_APPS_MD' with the value 'apps.md'."
           fi
+          # Check for homepage-app/apps/apps.json secret
           if [ -z "${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}" ]; then
-            echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty. Writing to homepage-app/apps/apps.json might be skipped by the script."
+            echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty."
+            echo "::warning::To enable writing to 'homepage-app/apps/apps.json', create a repository secret named 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON' with the value 'homepage-app/apps/apps.json'."
           fi
         shell: bash
 
@@ -210,7 +205,10 @@ jobs:
         run: python .github/scripts/generate_app_list.py
         env:
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # This is for the old comma-separated secret, should be removed
+          # Fix: Pass individual secrets explicitly to the Python script
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
         shell: bash
 
       - name: Write apps.md File
@@ -231,4 +229,3 @@ jobs:
           branch: main
           token: ${{ secrets.GITHUB_TOKEN }}
           add_options: "apps.md homepage-app/apps/apps.json"
-
