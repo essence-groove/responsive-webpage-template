@@ -1,0 +1,88 @@
+name: Find Apps in Monorepo (Reusable - v1)
+
+# This workflow can be called by other workflows
+on:
+  workflow_call:
+    inputs:
+      app_base_dirs:
+        required: true
+        type: string
+        description: 'Space-separated string of top-level directories to scan for apps.'
+      scan_depth:
+        required: false
+        type: string
+        default: '' # Default to empty string, meaning no -maxdepth, thus infinite depth
+        description: 'Max depth for scanning directories for package.json. Use "0" for current dir only, "1" for direct subdirs, "2" for sub-subdirs, etc. Use empty string for infinite depth.'
+      # NEW INPUT: A placeholder parameter for future extensibility
+      extra_options:
+        required: false
+        type: string
+        default: '' # Default to empty string, meaning it does nothing by default
+        description: 'Reserved for future extensions. Any non-empty value will currently be ignored.'
+    outputs:
+      app_dirs_json:
+        description: 'JSON array of found app directory paths.'
+        value: ${{ jobs.scan_job.outputs.app_dirs_json }} # Output from the job
+
+jobs:
+  scan_job: # This job contains the app scanning logic
+    runs-on: ubuntu-latest
+    outputs:
+      app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }} # Step output becomes job output
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install jq (for package.json parsing and JSON output)
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Scan for Apps
+        id: scan # Step ID to reference output
+        run: |
+          set -e
+          # Access inputs from the workflow_call
+          APP_BASE_DIRS="${{ inputs.app_base_dirs }}" 
+          SCAN_DEPTH="${{ inputs.scan_depth }}"
+          EXTRA_OPTIONS="${{ inputs.extra_options }}" # NEW: Access the extra_options input
+
+          # Placeholder for future extensibility with extra_options
+          if [ -n "$EXTRA_OPTIONS" ]; then
+            echo "::notice::Extra options provided: '$EXTRA_OPTIONS'. Currently, this parameter does nothing."
+            # Future: Add logic here based on EXTRA_OPTIONS
+          fi
+
+          # Start with a basic find command
+          FIND_CMD="find \"$BASE_DIR\" -type f -name \"package.json\""
+
+          # Add maxdepth if scan_depth is provided and is NOT an empty string
+          if [ -n "$SCAN_DEPTH" ]; then
+            FIND_CMD="find \"$BASE_DIR\" -maxdepth \"$SCAN_DEPTH\" -type f -name \"package.json\""
+          fi
+
+          ALL_APP_DIRS_ARRAY=()
+          echo "Scanning for apps in: $APP_BASE_DIRS with max depth: ${SCAN_DEPTH:-'infinite'}"
+          for BASE_DIR in $APP_BASE_DIRS; do
+            # Execute the dynamically constructed find command
+            FOUND_DIRS=$(eval "$FIND_CMD -exec dirname {} \;")
+            for DIR in $FOUND_DIRS; do
+              ALL_APP_DIRS_ARRAY+=("$DIR")
+            done
+          done
+
+          UNIQUE_APP_DIRS_NEWLINES=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u)
+
+          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
+            echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
+            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Found applications in directories (for debugging):"
+          echo "$UNIQUE_APP_DIRS_NEWLINES"
+
+          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
+          echo "Generated JSON (single line): $APP_DIRS_JSON"
+
+          # Set the output variable for the calling workflow
+          printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
+        shell: bash
