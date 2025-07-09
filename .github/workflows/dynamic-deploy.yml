@@ -8,7 +8,8 @@ on:
     paths:
       - 'homepage-app/**'
       - '.github/workflows/dynamic-deploy.yml'
-      - '.github/workflows/deploy-app-reusable.yml' # Trigger if the reusable workflow changes
+      # Removed deploy-app-reusable.yml from paths as it's no longer called directly
+      # - '.github/workflows/deploy-app-reusable.yml' # No longer needed here
 
 jobs:
   find_apps: # Job 1: Finds all deployable app directories
@@ -112,7 +113,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           add_options: "apps.md homepage-app/apps/apps.json"
 
-  deploy_all_apps: # Job: Orchestrates deployment of all apps using reusable workflow (now runs after docs generation)
+  deploy_all_apps: # Job: Orchestrates deployment of all apps (now self-contained)
     needs: [find_apps, generate_docs_files] # Now depends on docs generation completing
     runs-on: ubuntu-latest
     if: ${{ needs.find_apps.outputs.app_dirs_json != '[]' }}
@@ -122,10 +123,64 @@ jobs:
         app_dir: ${{ fromJson(needs.find_apps.outputs.app_dirs_json) }}
 
     steps:
-      - name: Deploy App - ${{ matrix.app_dir }}
-        uses: ./.github/workflows/deploy-app-reusable.yml
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          app_dir: ${{ matrix.app_dir }}
-        secrets:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+          node-version: '20'
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com | sh
+
+      - name: Install jq (for package.json parsing)
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Read App Config and Prepare Deploy Variables
+        id: prepare_vars
+        run: |
+          set -e
+          APP_DIR="${{ matrix.app_dir }}"
+          echo "Current APP_DIR: $APP_DIR" # Debugging line
+          APP_FOLDER_NAME=$(basename "$APP_DIR")
+          PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
+          HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
+
+          # Consistency Check: Folder Name vs. package.json 'name'
+          if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
+            echo "::error::Inconsistency detected for app '${APP_FOLDER_NAME}' (path: '${APP_DIR}'):"
+            echo "::error::Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${PACKAGE_JSON_APP_NAME}')."
+            echo "::error::Please **rename either the folder or the 'name' in package.json to match**, then commit and re-run."
+            exit 1 # Fail this specific matrix job
+          fi
+
+          # Heroku App Name Check
+          if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
+            echo "::error::'herokuAppName' field not found or is empty in '$APP_DIR/package.json'."
+            echo "::error::Please add '\"herokuAppName\": \"YOUR_HEROKU_APP_NAME\"' to this package.json file."
+            exit 1 # Fail this specific matrix job
+          fi
+          
+          echo "Installing dependencies for ${APP_FOLDER_NAME} (path: '${APP_DIR}')..."
+          npm install --prefix "$APP_DIR" || {
+              echo "::error::npm install failed for app in '${APP_DIR}'. Deployment failed for this app."
+              exit 1 # Fail this specific matrix job
+          }
+
+          # Output variables that the subsequent 'uses' step can consume
+          echo "heroku_app_name=$HEROKU_APP_TARGET_NAME" >> "$GITHUB_OUTPUT"
+          echo "app_folder_name=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
+
+        shell: bash
+
+      - name: Deploy to Heroku - Actual Action
+        id: deploy_action
+        # This step is now directly within deploy_all_apps, accessing secrets from job scope
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }} # Access directly from repository secrets
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}     # Access directly from repository secrets
+          heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name }}
+          appdir: ${{ matrix.app_dir }}
