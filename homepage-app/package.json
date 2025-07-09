@@ -12,6 +12,6 @@
   "engines": {
     "node": "20.x"
   },
-  "herokuAppName": "my-ml-portfolio-homepage-app",
+  "herokuAppName": "apm-essence-groove-h002",
   "deployedUrl": "https://apm-essence-groove-h002-7cc826ef4a8c.herokuapp.com/"
 }
