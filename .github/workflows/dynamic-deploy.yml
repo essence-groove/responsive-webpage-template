@@ -5,8 +5,8 @@ on:
     branches:
       - main # Or 'master'
     paths:
-      - 'express/**' # Trigger if anything in the 'express' folder changes
-      - '.github/workflows/dynamic-deploy.yml' # Trigger if this workflow changes
+      - 'express/**'
+      - '.github/workflows/dynamic-deploy.yml'
 
 jobs:
   deploy_apps:
@@ -14,9 +14,8 @@ jobs:
     env:
       HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-      BASE_APPS_DIR: 'express' # Base directory where all your apps reside
-      # Define a prefix for your app name secrets
-      HEROKU_APP_SECRET_PREFIX: 'HEROKU_APP_NAME_' # <--- NEW: Naming standard prefix
+      BASE_APPS_DIR: 'express'
+      HEROKU_APP_SECRET_PREFIX: 'HEROKU_APP_NAME_' # Naming standard prefix
 
     steps:
       - name: Checkout code
@@ -33,6 +32,11 @@ jobs:
 
       - name: Find and Deploy Apps
         id: deployer
+        # We need to explicitly pass secrets as environment variables here
+        # so they can be accessed dynamically by the script.
+        # This requires adding each potential secret name to the 'env' block
+        # within this specific step if we want to retrieve them dynamically.
+        # However, a cleaner solution is to let the loop build the full command.
         run: |
           set -e # Exit immediately if a command exits with a non-zero status
 
@@ -51,40 +55,45 @@ jobs:
 
             APP_FOLDER_NAME=$(basename "$APP_DIR") # e.g., 'to_do_list'
 
-            # Construct the secret name based on the standard: HEROKU_APP_NAME_SUBDIRECTORY
+            # Construct the secret name based on the standard
             SECRET_KEY_NAME="${HEROKU_APP_SECRET_PREFIX}$(echo ${APP_FOLDER_NAME} | tr '[:lower:]-' '[:upper:]_')"
-            
-            # Access the secret value using indirect expansion
-            HEROKU_APP_NAME_VALUE="${!SECRET_KEY_NAME}" 
 
-            if [ -z "$HEROKU_APP_NAME_VALUE" ]; then
-              echo "::error::Heroku app name secret '${SECRET_KEY_NAME}' not found for app '${APP_FOLDER_NAME}'. Please create this secret in GitHub."
-              exit 1 # Fail the workflow if a secret is missing
+            # Validate that the secret *exists* before attempting to use it
+            # This check is more robust and won't throw a Bash error if the secret isn't defined.
+            if [[ -z "${!SECRET_KEY_NAME}" && -z "${!SECRET_KEY_NAME@E}" ]]; then # Check if variable is unset or empty
+                echo "::error::Heroku app name secret '${SECRET_KEY_NAME}' not found for app '${APP_FOLDER_NAME}'. Please create this secret in GitHub."
+                exit 1 # Fail the workflow
             fi
 
             # Read app name from package.json for consistency check
-            PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json")
+            # Add error handling for jq if package.json is malformed
+            PACKAGE_JSON_APP_NAME=""
+            if command -v jq &> /dev/null; then
+                PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
+            else
+                echo "::warning::jq not found. Cannot perform package.json name consistency check."
+            fi
 
-            if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
+
+            if [ -n "$PACKAGE_JSON_APP_NAME" ] && [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
               echo "::warning::Inconsistency detected for app '${APP_FOLDER_NAME}':"
               echo "::warning::Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${PACKAGE_JSON_APP_NAME}')."
-              echo "::warning::Using folder name to construct Heroku secret, ensure your Heroku app name matches folder name for this workflow."
-              # Optionally, you could exit 1 here if you want to enforce strict consistency
+              echo "::warning::**IMPORTANT:** The Heroku app name secret should be based on the **FOLDER NAME** (e.g., '${SECRET_KEY_NAME}'). Ensure your Heroku app is named consistently with the folder."
+              # You could add 'exit 1' here if you want to enforce strict consistency and fail the build.
             fi
             
             echo "Installing dependencies for ${APP_FOLDER_NAME}..."
             npm install --prefix "$APP_DIR"
 
-            echo "Attempting to deploy ${APP_FOLDER_NAME} to Heroku app: ${HEROKU_APP_NAME_VALUE}"
-            
-            # Run the deployment action
+            # Execute the deployment action with explicit parameters
+            # This is the most reliable way to pass secrets and dynamic values to the action.
             /usr/bin/docker run --rm \
               -e HEROKU_API_KEY="$HEROKU_API_KEY" \
-              -e HEROKU_APP_NAME="$HEROKU_APP_NAME_VALUE" \
               -e HEROKU_EMAIL="$HEROKU_EMAIL" \
+              -e HEROKU_APP_NAME="${!SECRET_KEY_NAME}" \ # <--- This is the key change!
               -e APPDIR="$APP_DIR" \
-              akhileshns/heroku-deploy:v3.13.15 # Specify the image and tag
+              akhileshns/heroku-deploy:v3.13.15
           
             echo "--- Finished processing app in: $APP_DIR ---"
           done
-        shell: bash # Ensure bash is used for advanced shell scripting
+        shell: bash
