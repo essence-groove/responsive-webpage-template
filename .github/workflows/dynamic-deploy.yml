@@ -60,9 +60,10 @@ jobs:
   generate_docs_files: # Job: Generates apps.md and apps.json files using Python (runs before deploy)
     needs: find_apps # Only needs 'find_apps' to get the list of apps
     runs-on: ubuntu-latest
+    # FIX: Removed comment from the 'if:' condition
     if: |
       always() &&
-      needs.find_apps.outputs.app_dirs_json != '[]' # Only run if apps were found to generate docs for
+      needs.find_apps.outputs.app_dirs_json != '[]'
 
     steps:
       - name: Checkout code
