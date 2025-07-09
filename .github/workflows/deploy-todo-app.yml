@@ -1,0 +1,36 @@
+name: Deploy To-Do App to Heroku
+
+on:
+  push:
+    branches:
+      - main # Or 'master'
+    paths:
+      - 'todo-app/**' # Only trigger for changes in the todo-app folder
+      - '.github/workflows/deploy-todo-app.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Install dependencies (for todo-app)
+        run: npm install --prefix todo-app # Install only todo-app's dependencies
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_TODO_APP_NAME }} # Separate Heroku app name for To-Do
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          appdir: 'todo-app' # Deploy this subdirectory as the app root
