@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple backend for our homepage.",
   "main": "server.js",
+    "herokuAppName": "your-homepage-app-name-on-heroku",
   "scripts": {
     "start": "node server.js"
   },
