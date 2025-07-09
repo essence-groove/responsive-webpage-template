@@ -1,9 +1,8 @@
 {
   "name": "to_do_list",
   "version": "1.0.0",
-  "description": "A simple to-do list application",
+  "description": "A simple to-do list application.",
   "main": "server.js",
-  "herokuAppName": "apm-essence-groove-h004",
   "scripts": {
     "start": "node server.js"
   },
@@ -12,5 +11,9 @@
   },
   "engines": {
     "node": "20.x"
-  }
+  },
+  "herokuAppName": "apm-essence-groove-h004",
+  "deployedUrl": "https://apm-essence-groove-h004-fc1ff5ff5de7.herokuapp.com/"
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // ADD THIS LINE with the full, correct URL for your to-do list app
 }
