@@ -149,10 +149,8 @@ jobs:
           echo "deployed_app_url=$APP_URL" >> "$GITHUB_OUTPUT"
 
   update_readme: # Job 3: Updates README.md after all deployments
-    needs: deploy_each_app # This job depends on the successful completion of the deploy_each_app job
+    needs: [deploy_each_app, find_apps] # <--- ADD 'find_apps' to needs
     runs-on: ubuntu-latest
-    # This 'if' condition ensures this job runs only if 'deploy_each_app' ran and completed successfully,
-    # and if any apps were actually deployed (i.e., the app_dirs_json was not empty).
     if: |
       always() &&
       needs.deploy_each_app.result == 'success' &&
@@ -162,23 +160,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Crucial: Checkout the branch to ensure we're on 'main'
-          # and have permission to push back to it.
           ref: ${{ github.ref }}
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Generate README Content
-        id: generate_content # ID this step
+        id: generate_content
         run: |
           set -e
           echo "Generating README content..."
           
+          # --- FIX: Access app_dirs_json from 'find_apps' job output ---
           APP_DIRS_JSON="${{ needs.find_apps.outputs.app_dirs_json }}"
           APP_DIRS=$(echo "$APP_DIRS_JSON" | jq -r '.[]') # Convert JSON array back to newline-separated strings
 
-          README_SECTION_CONTENT="## 🚀 Live Demos\n\n"
+          if [ -z "$APP_DIRS" ]; then # Add a check here just in case
+            echo "No app directories received from find_apps job. Skipping README content generation."
+            echo "readme_section_content=" >> "$GITHUB_OUTPUT"
+            echo "readme_updated_flag=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          README_CONTENT="## 🚀 Live Demos\n\n"
           README_UPDATED_FLAG=false
 
           for APP_DIR in $APP_DIRS; do
@@ -199,7 +203,6 @@ jobs:
           done
 
           # Output the generated content and a flag indicating if there's anything to write
-          # Need to escape correctly for GITHUB_OUTPUT multi-line string
           README_SECTION_CONTENT_ESCAPED=$(echo -e "$README_CONTENT" | sed -E ':a;N;$!ba;s/\n/%0A/g' | sed -E 's/\r/%0D/g' | sed -E 's/%/%25/g')
           echo "readme_section_content=$README_SECTION_CONTENT_ESCAPED" >> "$GITHUB_OUTPUT"
           echo "readme_updated_flag=$README_UPDATED_FLAG" >> "$GITHUB_OUTPUT"
@@ -211,33 +214,22 @@ jobs:
           # Decode the content
           README_SECTION_CONTENT=$(echo "${{ steps.generate_content.outputs.readme_section_content }}" | sed 's/%0A/\n/g;s/%0D/\r/g;s/%25/%/g')
 
-          echo "--- Current README.md BEFORE awk ---"
-          cat README.md
-          echo "------------------------------------"
-          echo "Content to insert:"
-          echo "$README_SECTION_CONTENT"
-          echo "------------------------------------"
-
           # Define start and end markers in your README.md
-          START_MARKER=""
-          END_MARKER=""
+          START_MARKER="<!-- START_APP_LINKS -->"
+          END_MARKER="<!-- END_APP_LINKS -->"
 
           # Use awk for a more robust way to replace content between markers
-          # Adding '1' to print all lines, and ensuring the content is passed correctly
           awk -v start="$START_MARKER" -v end="$END_MARKER" -v content="$README_SECTION_CONTENT" '
               $0 ~ start { print; print content; in_block=1; next }
               $0 ~ end { print; in_block=0; next }
               !in_block { print }
-          ' README.md > README.md.tmp
-
-          echo "--- Contents of README.md.tmp AFTER awk ---"
-          cat README.md.tmp
-          echo "-------------------------------------------"
-
-          mv README.md.tmp README.md
-          echo "README.md moved successfully."
-
-          echo "--- Contents of README.md AFTER mv ---"
-          cat README.md
-          echo "--------------------------------------"
+          ' README.md > README.md.tmp && mv README.md.tmp README.md
         shell: bash
+
+      - name: Commit and Push README.md
+        if: ${{ steps.generate_content.outputs.readme_updated_flag == 'true' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Docs: Update deployed app links in README.md"
+          branch: main
+          token: ${{ secrets.GITHUB_TOKEN }}
