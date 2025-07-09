@@ -36,11 +36,27 @@ jobs:
             FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
             for DIR in $FOUND_DIRS; do
               ALL_APP_DIRS_ARRAY+=("$DIR")
-            @ -60,6 +60,54 @@
+            done
+          done
+
+          UNIQUE_APP_DIRS_NEWLINES=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u)
+
+          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
+            echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
+            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Found applications in directories (for debugging):"
+          echo "$UNIQUE_APP_DIRS_NEWLINES"
+
+          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
+          echo "Generated JSON (single line): $APP_DIRS_JSON"
+
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
-  generate_docs_files: # NEW Job: Generates apps.md and apps.json files using Python (runs before deploy)
+  generate_docs_files: # Job: Generates apps.md and apps.json files using Python (runs before deploy)
     needs: find_apps # Only needs 'find_apps' to get the list of apps
     runs-on: ubuntu-latest
     if: |
@@ -58,14 +74,23 @@ jobs:
         with:
           python-version: '3.x' # Use a recent Python version
 
+      # NEW STEP: Check for presence of writable file secrets
+      - name: Check Writable File Secrets
+        run: |
+          if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
+            echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty. Writing to apps.md might be skipped by the script."
+          fi
+          if [ -z "${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}" ]; then
+            echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty. Writing to homepage-app/apps/apps.json might be skipped by the script."
+          fi
+        shell: bash
+
       - name: Generate apps.md and apps.json Content with Python Script
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          # Pass individual writable file secrets to the Python script
-          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
-          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # Passed to the Python script
         shell: bash
 
       - name: Write apps.md File
