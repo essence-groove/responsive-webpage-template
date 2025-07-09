@@ -24,43 +24,40 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Find and Deploy Apps
-        id: scan # Give this step an ID to reference its output
+        id: scan
         run: |
           set -e
 
-          ALL_APP_DIRS_ARRAY=() # Bash array to store app directory paths
-
+          ALL_APP_DIRS_ARRAY=()
           echo "Scanning for apps in: $APP_BASE_DIRS"
           for BASE_DIR in $APP_BASE_DIRS; do
-            # Find package.json files and get their parent directories
             FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
             for DIR in $FOUND_DIRS; do
               ALL_APP_DIRS_ARRAY+=("$DIR")
             done
           done
 
-          # Remove duplicates and ensure each unique directory is on a new line
-          # This is the key change: we need newlines for jq to parse as separate items.
           UNIQUE_APP_DIRS_NEWLINES=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u)
 
-          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then # Check for emptiness based on newline separated string
+          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
             echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
             echo "app_dirs_json=[]" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           echo "Found applications in directories (for debugging):"
-          echo "$UNIQUE_APP_DIRS_NEWLINES" # Print for clarity in logs
+          echo "$UNIQUE_APP_DIRS_NEWLINES"
 
-          # Convert the newline-separated string of directories into a valid JSON array
-          # jq -R creates raw strings from each line.
-          # jq -s . combines these into a single array.
           APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s .)
           echo "Generated JSON: $APP_DIRS_JSON"
 
-          # Set the output variable for the next job
-          echo "app_dirs_json=$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
-        shell: bash # Ensure bash is used for advanced shell scripting
+          # --- CRITICAL FIX: Ensure no extra whitespace around the variable ---
+          # Use 'echo -n' to prevent an extra newline, and assign directly.
+          echo "app_dirs_json=$APP_DIRS_JSON" >> "$GITHUB_OUTPUT" # This line is usually fine, but let's confirm no hidden chars.
+
+          # Alternative more robust way (if the above still fails due to hidden chars):
+          # printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
+        shell: bash
         
   deploy_each_app: # Job 2: Deploys each app found in the previous job
     needs: find_apps # This job depends on 'find_apps' job
