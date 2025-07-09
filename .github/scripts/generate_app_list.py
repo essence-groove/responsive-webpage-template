@@ -16,10 +16,12 @@ def main():
         sys.exit(1)
 
     # Building content with literal newlines (\n)
-    apps_md_content = "# 🚀 Deployed Applications\n\n" # Two newlines after heading
-    apps_md_content += "This file lists the applications deployed from this repository to Heroku.\n\n" # Two newlines after intro text
-    apps_md_content += "## App List\n\n" # Two newlines after sub-heading
+    header = "# 🚀 Deployed Applications\n\n"
+    intro_text = "This file lists the applications deployed from this repository to Heroku.\n\n"
+    app_list_heading = "## App List\n\n"
     
+    app_items = [] # Use a list to build individual app entries
+
     apps_updated_flag = False
 
     for app_dir in app_dirs:
@@ -41,22 +43,32 @@ def main():
                 continue
             
             # Add an extra newline at the end of each list item for more spacing
-            apps_md_content += f"* **{app_folder_name}:** [{app_url}]({app_url})\n\n" 
+            app_items.append(f"* **{app_folder_name}:** [{app_url}]({app_url})") # No trailing \n here yet
             apps_updated_flag = True
 
         except Exception as e:
             print(f"::error::Error processing {package_json_path}: {e}", file=sys.stderr)
             continue
 
-    # --- FIX: Simplify the escaping for GITHUB_OUTPUT ---
-    # GitHub Actions recommends replacing only specific characters,
-    # and then using `echo -e` in bash to decode it.
-    # The literal '%' needs to be %25. Newlines need to be %0A.
-    # This is standard and should work if applied only once.
-    final_escaped_content = apps_md_content.replace("%", "%25").replace("\n", "%0A").replace("\r", "%0D")
+    # Join the app items with double newlines for spacing
+    app_list_content = "\n\n".join(app_items) + "\n\n" if app_items else "" # Add two newlines after last item
+
+    # Concatenate all parts into the final content
+    final_apps_md_content = header + intro_text + app_list_heading + app_list_content
+
+    # --- CRITICAL FIX: Write to GITHUB_OUTPUT using native multi-line variable syntax ---
+    # This involves setting a custom delimiter.
+    # We'll print a special marker, then the content, then the marker again.
+    # This tells GHA that the variable spans multiple lines.
     
+    # Generate a unique delimiter
+    delimiter = "EOF_APPS_MD" 
+    
+    # Write to $GITHUB_OUTPUT file using the multi-line format
     with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
-        output_file.write(f"apps_md_section_content={final_escaped_content}\n")
+        output_file.write(f"apps_md_section_content<<{delimiter}\n")
+        output_file.write(final_apps_md_content) # Write content with literal newlines
+        output_file.write(f"{delimiter}\n")
         output_file.write(f"apps_md_updated_flag={str(apps_updated_flag).lower()}\n")
 
 if __name__ == "__main__":
