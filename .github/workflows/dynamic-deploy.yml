@@ -1,4 +1,7 @@
+# This is a new comment to force workflow re-evaluation
 name: Dynamic Multi-App Heroku Deploy
+# ... rest of your workflow ...
+
 
 on:
   push:
