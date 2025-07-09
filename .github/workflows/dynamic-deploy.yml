@@ -6,7 +6,6 @@ on:
       - main # Or 'master'
     paths:
       - 'homepage-app/**'
-      - 'to_do_list/**' # Ensure this is correct if to_do_list is also top-level. If nested, homepage-app/** covers it.
       - '.github/workflows/dynamic-deploy.yml'
 
 jobs:
