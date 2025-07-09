@@ -171,4 +171,3 @@ jobs:
         with:
           commit_message: "Docs: Update deployed app links in apps.md"
           branch: main
-          token: ${{ secrets.GITHUB_TOKEN }}
