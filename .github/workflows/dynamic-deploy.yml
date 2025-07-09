@@ -79,7 +79,7 @@ jobs:
 
       - name: Install Heroku CLI
         run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
+          curl https://cli-assets.heroku.com | sh
 
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -163,21 +163,11 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
       
-      # --- NEW STEP: Generate apps.json file by calling its dedicated Python script ---
-      - name: Generate apps.json File with Python
-        id: generate_json_py # Give it an ID
-        run: python .github/scripts/generate_apps_json.py # Call the correct script
-        env:
-          APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # Pass the secret to this script too
-        shell: bash
-      # --------------------------------------------------------------------------------
-
       - name: Commit and Push generated files
         if: |
           always() &&
           (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || 
-           steps.generate_json_py.outputs.apps_json_updated_flag == 'true') # Check output from generate_json_py
+           steps.generate_content_py.outputs.apps_json_updated_flag == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list"
