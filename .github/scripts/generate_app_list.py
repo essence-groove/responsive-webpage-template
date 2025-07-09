@@ -14,8 +14,10 @@ def main():
         for allowed_path in allowed_write_paths:
             if normalized_target_path == allowed_path:
                 return True
+        # --- REFINED WARNING MESSAGE HERE ---
         print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in RWT_WRITABLE_FILES secret. Write operation skipped.", file=sys.stderr)
-        print(f"::warning::Please update the 'RWT_WRITABLE_FILES' secret with '{target_path}' if this write is intended.", file=sys.stderr)
+        print(f"::warning::Please update the 'RWT_WRITABLE_FILES' secret with a comma-separated list of allowed file paths (e.g., 'apps.md,homepage-app/apps/apps.json') if this write is intended.", file=sys.stderr)
+        # --- END REFINED WARNING MESSAGE ---
         return False
 
     # --- Data Collection Logic ---
