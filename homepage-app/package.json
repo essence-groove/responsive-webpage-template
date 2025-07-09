@@ -12,8 +12,6 @@
   "engines": {
     "node": "20.x"
   },
-  "herokuAppName": "apm-essence-groove-h002",
-  "deployedUrl": "https://apm-essence-groove-h002-7cc826ef4a8c.herokuapp.com/"
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  // ADD THIS LINE with the full, correct URL for your homepage app
+  "herokuAppName": "my-ml-portfolio-homepage-app",
+  "deployedUrl": "https://my-ml-portfolio-homepage-app-RANDOMCHARS.herokuapp.com/"
 }
