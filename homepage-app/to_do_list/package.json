@@ -12,6 +12,6 @@
   "engines": {
     "node": "20.x"
   },
-  "herokuAppName": "my-ml-portfolio-todolist-app",
+  "herokuAppName": "apm-essence-groove-h004",
   "deployedUrl": "https://apm-essence-groove-h004-fc1ff5ff5de7.herokuapp.com/"
 }
