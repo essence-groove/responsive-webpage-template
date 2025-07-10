@@ -31,7 +31,7 @@ def main():
     allowed_write_paths = set()
     if apps_md_secret_path: allowed_write_paths.add(os.path.normpath(apps_md_secret_path.strip()))
     if homepage_apps_json_secret_path: allowed_write_paths.add(os.path.normpath(homepage_apps_json_secret_path.strip()))
-    if workflow_state_secret_path: allowed_write_paths.add(os.path.normpath(workflow_state_secret_path.strip())) # Add state file path
+    if workflow_state_secret_path: allowed_write_paths.add(os.path.normpath(workflow_state_secret_path.strip()))
 
     def is_write_allowed(target_path):
         normalized_target_path = os.path.normpath(target_path)
@@ -40,11 +40,11 @@ def main():
         print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in allowed secrets. Write operation skipped.", file=sys.stderr)
         return False
 
-    # --- Get current run info and force flag ---
+    # --- Get current run info and force flag from environment ---
     current_workflow_run_id = os.environ.get("GITHUB_RUN_ID")
-    force_upload_from_find_apps = os.environ.get("FORCE_APPS_JSON_UPLOAD_FLAG") == "true" # Get flag from find_apps
+    force_upload_from_find_apps = os.environ.get("FORCE_APPS_JSON_UPLOAD_FLAG") == "true"
 
-    print(f"::debug::Force upload flag from find_apps: {force_upload_from_find_apps}")
+    print(f"::debug::FORCE_APPS_JSON_UPLOAD_FLAG received: {force_upload_from_find_apps}")
 
     # --- Data Collection Logic (unchanged) ---
     app_data_from_find_apps_json = os.environ.get("APP_DATA_FROM_FIND_APPS")
@@ -82,7 +82,7 @@ def main():
     dynamic_json_data = {
         "apps": sorted(apps_for_json_data, key=lambda x: x.get('name', '')),
         "metadata": {
-            "last_generated_run_id": current_workflow_run_id, # Always unique
+            "last_generated_run_id": current_workflow_run_id,
             "generated_at": os.environ.get("GITHUB_SHA"),
             "timestamp": os.environ.get("GITHUB_DATE") or os.environ.get("BUILD_DATE") or "",
             "workflow_name": os.environ.get("GITHUB_WORKFLOW"),
@@ -94,7 +94,7 @@ def main():
     # --- Determine if files were updated and write if allowed ---
     apps_md_updated_flag = False
     apps_json_updated_flag = False
-    last_uploaded_run_id_output = "" # Default to empty
+    last_uploaded_run_id_output = "" # Will be current_workflow_run_id if uploaded
 
     # Check and set flag for apps.md
     current_md_content = ""
@@ -144,7 +144,7 @@ def main():
         
         output_file.write(f"apps_md_updated_flag={str(apps_md_updated_flag).lower()}\n")
         output_file.write(f"apps_json_updated_flag={str(apps_json_updated_flag).lower()}\n")
-        # NEW OUTPUT: Output the run ID if this job successfully updated apps.json
+        # Output the run ID if this job successfully updated apps.json, otherwise empty string
         output_file.write(f"last_uploaded_run_id={last_uploaded_run_id_output}\n")
 
 if __name__ == "__main__":
