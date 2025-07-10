@@ -37,7 +37,8 @@ jobs:
           # The matrix needs a list of dictionaries, each containing 'app_dir' and 'heroku_app_name'
           # 'app_dir' is derived from the 'name' field in apps.json, constructing the full path.
           # 'heroku_app_name' is derived from the 'url' field.
-          APP_DATA_JSON=$(jq -c '[.[] | {"app_dir": (if .name == "homepage-app" then "homepage-app" else "homepage-app/" + .name end), "heroku_app_name": (.url | split("/") | .[2] | split(".")[0])}]' "$APPS_JSON_PATH")
+          # FIX: Extract 'herokuAppName' for heroku_app_name, and 'deployedUrl' for url.
+          APP_DATA_JSON=$(jq -c '[.[] | {"app_dir": (if .name == "homepage-app" then "homepage-app" else "homepage-app/" + .name end), "heroku_app_name": .herokuAppName, "url": .deployedUrl}]' "$APPS_JSON_PATH")
 
           if [ "$APP_DATA_JSON" == "[]" ]; then
             echo "::warning::${APPS_JSON_PATH} contains no valid app data. Skipping deployment matrix generation."
@@ -82,7 +83,7 @@ jobs:
         run: |
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
-          # FIX: Assign HEROKU_APP_TARGET_NAME from matrix data
+          # FIX: Get heroku_app_name from matrix.app_data.heroku_app_name
           HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}" 
 
           echo "Current APP_DIR: $APP_DIR"
@@ -99,8 +100,8 @@ jobs:
           fi
 
           if [ -z "$HEROKU_APP_TARGET_NAME" ] || [ "$HEROKU_APP_TARGET_NAME" == "null" ]; then
-            echo "::error::Heroku app name (derived from URL in apps.json) is empty for app '${APP_FOLDER_NAME}'."
-            echo "::error::Please ensure 'deployedUrl' is correctly set in '$APP_DIR/package.json' and points to a valid Heroku app URL."
+            echo "::error::Heroku app name (from 'herokuAppName' in package.json) is empty for app '${APP_FOLDER_NAME}'."
+            echo "::error::Please ensure 'herokuAppName' is correctly set in '$APP_DIR/package.json'."
             exit 1
           fi
           
