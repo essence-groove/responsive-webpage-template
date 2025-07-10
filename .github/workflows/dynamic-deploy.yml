@@ -387,7 +387,7 @@ jobs:
                 repo: context.repo.repo,
                 workflow_id: workflowFileName,
                 branch: branch,
-                status: 'completed', # Check for 'completed' runs, which includes success/failure
+                status: 'completed', // Check for 'completed' runs, which includes success/failure
                 per_page: 20
               });
 
