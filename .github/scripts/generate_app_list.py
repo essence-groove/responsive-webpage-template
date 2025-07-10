@@ -4,42 +4,42 @@ import sys
 
 def main():
     # --- Retrieve Writable Files Secrets (Individual) ---
+    rwt_writable_files_str = os.environ.get("RWT_WRITABLE_FILES")
     allowed_write_paths = []
     
-    # Check for apps.md secret
     apps_md_path = os.environ.get("RWT_WRITABLE_FILE_APPS_MD")
     if apps_md_path:
         allowed_write_paths.append(os.path.normpath(apps_md_path.strip()))
     
-    # Check for homepage-app/apps/apps.json secret
     homepage_apps_json_path = os.environ.get("RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON")
     if homepage_apps_json_path:
         allowed_write_paths.append(os.path.normpath(homepage_apps_json_path.strip()))
 
-    # Function to check if a target path is allowed
     def is_write_allowed(target_path):
         normalized_target_path = os.path.normpath(target_path)
-        if normalized_target_path in allowed_write_paths:
-            return True
+        for allowed_path in allowed_write_paths:
+            if normalized_target_path == allowed_path:
+                return True
         
-        # --- REFINED WARNING MESSAGE for individual secrets ---
         print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in RWT_WRITABLE_FILES secrets. Write operation skipped.", file=sys.stderr)
         print(f"::warning::Please ensure the corresponding secret (e.g., 'RWT_WRITABLE_FILE_APPS_MD' or 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON') is correctly set with the exact path '{target_path}' if this write is intended.", file=sys.stderr)
-        # --- END REFINED WARNING MESSAGE ---
         return False
 
-    # --- Data Collection Logic (Remains unchanged) ---
-    app_dirs_json = os.environ.get("APP_DIRS_JSON_FROM_FIND_APPS") 
+    # --- Data Collection Logic ---
+    # FIX: Change variable name from APP_DIRS_JSON_FROM_FIND_APPS to APP_DATA_FROM_FIND_APPS
+    app_data_from_find_apps_json = os.environ.get("APP_DATA_FROM_FIND_APPS") 
     
-    if not app_dirs_json:
-        print("::error::APP_DIRS_JSON_FROM_FIND_APPS environment variable is missing.", file=sys.stderr)
+    if not app_data_from_find_apps_json: # Check for the correct variable name
+        print("::error::APP_DATA_FROM_FIND_APPS environment variable is missing.", file=sys.stderr)
         sys.exit(1)
 
     try:
-        app_dirs = json.loads(app_dirs_json)
+        app_details_list = json.loads(app_data_from_find_apps_json)
     except json.JSONDecodeError:
-        print(f"::error::Failed to parse JSON from env var: {app_dirs_json}", file=sys.stderr)
+        print(f"::error::Failed to parse JSON from APP_DATA_FROM_FIND_APPS: {app_data_from_find_apps_json}", file=sys.stderr)
         sys.exit(1)
+
+    app_data_lookup = {item["app_dir"]: item for item in app_details_list}
 
     apps_for_md_content = [] 
     apps_for_json_data = []  
@@ -47,36 +47,24 @@ def main():
     apps_updated_flag_md = False 
     apps_updated_flag_json = False 
 
-    for app_dir in app_dirs:
-        app_folder_name = os.path.basename(app_dir)
-        package_json_path = os.path.join(app_dir, "package.json")
+    # Iterate over the original app directories list from find_apps' output.
+    # The `find_apps` job's output `app_details_json` now contains the full app details.
+    # So we don't need `app_dirs_raw` anymore. We just iterate over `app_details_list`.
+    for app_info in app_details_list: 
+        app_dir = app_info.get("app_dir")
+        app_folder_name = app_info.get("name") 
+        app_url = app_info.get("url")
+        heroku_app_name = app_info.get("herokuAppName") 
+
+        if not app_dir or not app_folder_name or not app_url or not heroku_app_name:
+            print(f"::warning::Skipping entry due to missing data in app_info: {app_info}. Ensure all required fields (app_dir, name, url, herokuAppName) are present.", file=sys.stderr)
+            continue
         
-        if not os.path.exists(package_json_path):
-            print(f"::warning::package.json not found for {app_folder_name} at {app_dir}. Skipping.", file=sys.stderr)
-            continue
+        apps_for_md_content.append(f"* **{app_folder_name}:** [{app_url}]({app_url})")
+        apps_updated_flag_md = True
 
-        try:
-            with open(package_json_path, "r") as f:
-                package_json_data = json.load(f)
-            
-            app_url = package_json_data.get("deployedUrl") 
-            
-            if not app_url: 
-                print(f"::warning::Skipping entry for \'{app_folder_name}\' as \'deployedUrl\' is missing or empty in its package.json.", file=sys.stderr)
-                continue
-            
-            apps_for_md_content.append(f"* **{app_folder_name}:** [{app_url}]({app_url})")
-            apps_updated_flag_md = True
-
-            apps_for_json_data.append({
-                "name": app_folder_name,
-                "url": app_url
-            })
-            apps_updated_flag_json = True
-
-        except Exception as e:
-            print(f"::error::Error processing {package_json_path}: {e}", file=sys.stderr)
-            continue
+        apps_for_json_data.append(app_info) 
+        apps_updated_flag_json = True
 
     # --- Generate apps.md Content ---
     md_header = "# 🚀 Deployed Applications\n\n"
@@ -90,7 +78,6 @@ def main():
     json_output_dir = os.path.join("homepage-app", "apps")
     json_output_file_path = os.path.join(json_output_dir, "apps.json")
 
-    # Only write if permission is granted via secret
     if is_write_allowed(json_output_file_path):
         os.makedirs(json_output_dir, exist_ok=True)
         try:
@@ -101,7 +88,7 @@ def main():
             print(f"::error::Failed to write {json_output_file_path}: {e}", file=sys.stderr)
             sys.exit(1)
     else:
-        apps_updated_flag_json = False # Mark as not updated if write was skipped
+        apps_updated_flag_json = False
 
     # --- Write to GITHUB_OUTPUT for apps.md ---
     md_delimiter = "EOF_APPS_MD_CONTENT"
