@@ -105,9 +105,10 @@ jobs:
     # THIS LINE IS CRUCIAL. It ensures 'find_apps' runs and completes BEFORE this job starts.
     needs: find_apps
     runs-on: ubuntu-latest
+    # Ensure this condition is met (if find_apps had data)
     if: |
       always() &&
-      needs.find_apps.outputs.app_details_json != '[]' # Ensure this condition is met (if find_apps had data)
+      needs.find_apps.outputs.app_details_json != '[]' 
 
     steps:
       - name: Checkout code
