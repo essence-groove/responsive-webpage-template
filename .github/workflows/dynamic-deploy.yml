@@ -354,7 +354,7 @@ jobs:
         shell: bash
 
   update_workflow_state:
-    needs: [find_apps, generate_docs_files, prepare_deploy_matrix] # Ensure it waits for all relevant jobs
+    needs: find_apps # Ensure it waits for all relevant jobs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
