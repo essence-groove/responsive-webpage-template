@@ -95,30 +95,26 @@ jobs:
           printf "app_details_json=%s\n" "$APP_DETAILS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
-  generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
-    needs: find_apps # This job now only needs 'find_apps' to get all app details
-    runs-on: ubuntu-latest
-    if: |
-      always() &&
-      needs.find_apps.outputs.app_details_json != '[]'
+generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
+    needs: find_apps
+    runs-on: ubuntu-latest
+    if: |
+      always() &&
+      needs.find_apps.outputs.app_details_json != '[]'
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }} # For PRs, this is the merge commit. For push, it's the head.
-          # For workflow_dispatch, this should be the branch specified in input.
-          # We'll use github.ref which is the branch the workflow is running on.
-          # If triggered by workflow_dispatch, github.ref will be the branch it was run from.
-          # If you want the *input* branch, you need: ref: ${{ github.event.inputs.branch }}
-          # Let's use the input branch if available, otherwise github.ref.
-          ref: ${{ github.event.inputs.branch || github.ref }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Corrected line: Use the input branch if available, otherwise github.ref
+          ref: ${{ github.event.inputs.branch || github.ref }} # Keep this line
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+# ... (rest of your workflow remains the same)
 
       - name: Check Writable File Secrets # Updated warning message
         run: |
