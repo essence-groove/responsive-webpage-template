@@ -56,7 +56,6 @@ jobs:
     strategy:
       fail-fast: false # Allow other apps to deploy even if one fails
       matrix:
-        # FIX: Correctly reference the output from the 'prepare_deploy_matrix' job
         app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
 
     steps:
@@ -83,6 +82,9 @@ jobs:
         run: |
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
+          # FIX: Assign HEROKU_APP_TARGET_NAME from matrix data
+          HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}" 
+
           echo "Current APP_DIR: $APP_DIR"
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           
