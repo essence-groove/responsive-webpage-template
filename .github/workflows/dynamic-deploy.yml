@@ -89,7 +89,7 @@ jobs:
         shell: bash
 
   generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
-    needs: find_apps # This job now only needs 'find_apps' to get all app details
+    needs: find_apps # FIX: Only needs 'find_apps' now
     runs-on: ubuntu-latest
     if: |
       always() &&
@@ -106,7 +106,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Check Writable File Secrets
+      - name: Check Writable File Secrets # Updated warning message
         run: |
           if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
             echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty."
@@ -122,7 +122,9 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }} # Pass rich app details
+          # Pass the rich app details JSON from find_apps directly
+          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+          # Removed APP_DATA_MATRIX_JSON as it's no longer needed for this script
           RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
           RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
