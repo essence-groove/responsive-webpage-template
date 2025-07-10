@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main # Or 'master'
-      - new-build-scripting
+      - new-build-scripting-2
 
 
 jobs:
