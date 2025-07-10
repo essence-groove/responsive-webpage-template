@@ -1,4 +1,4 @@
-name: Dynamic Multi-App Heroku Deploy
+name: Dynamic Multi-App Discovery
 
 on:
   # FIX: Add workflow_dispatch for manual triggering
