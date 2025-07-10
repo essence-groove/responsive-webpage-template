@@ -183,10 +183,11 @@ jobs:
         # or if we explicitly output a flag for state file changes from Python.
         # For now, let's rely on apps_json_updated_flag for simplicity.
         # If you need a separate commit specifically for state file, add a separate output flag in Python script.
+        # (Contains: Also commit if JSON updated (which includes metadata change))
         if: |
           always() &&
           (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
-           steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || # Also commit if JSON updated (which includes metadata change)
+           steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || 
            !cancelled() # Ensure this always runs if a force upload needs state update
           )
         uses: stefanzweifel/git-auto-commit-action@v5
