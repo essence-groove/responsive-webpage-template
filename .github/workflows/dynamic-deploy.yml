@@ -278,10 +278,10 @@ jobs:
             core.setOutput('run_id', runToDownloadId);
           # Corrected indentation for result-encoding
           result-encoding: json # <--- Moved here, aligned with 'script'
-          env: # Pass state outputs as env vars to github-script
-            DOWNLOAD_COUNT_FROM_STATE: ${{ steps.get_download_state.outputs.download_count }}
-            LAST_ARTIFACT_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_run_id }}
-            FORCE_NEXT_UPLOAD_FROM_STATE: ${{ steps.get_download_state.outputs.force_next_upload }}
+        env: # Pass state outputs as env vars to github-script
+          DOWNLOAD_COUNT_FROM_STATE: ${{ steps.get_download_state.outputs.download_count }}
+          LAST_ARTIFACT_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_run_id }}
+          FORCE_NEXT_UPLOAD_FROM_STATE: ${{ steps.get_download_state.outputs.force_next_upload }}
 
       - name: Download latest-apps-json Artifact
         uses: actions/download-artifact@v4
