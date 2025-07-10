@@ -151,15 +151,15 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
+          # THIS MAPPING IS ESSENTIAL:
           APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
           RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
-          RWT_WRITABLE_FILE_WORKFLOW_STATE: ${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }} # Pass the state file secret
-          GITHUB_RUN_ID: ${{ github.run_id }} # Pass current run ID
+          RWT_WRITABLE_FILE_WORKFLOW_STATE: ${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          # You might want to generate GITHUB_DATE/BUILD_DATE in the script if precise time is needed.
         shell: bash
 
       - name: Write apps.md File
