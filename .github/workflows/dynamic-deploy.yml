@@ -126,7 +126,7 @@ jobs:
           appdir: ${{ matrix.app_data.app_dir }}
 
   find_apps: # Job 2: Finds all deployable app directories (now runs after deploy_all_apps, or in parallel)
-    needs: deploy_all_apps # This ensures it runs AFTER deploy_all_apps
+    needs: prepare_deploy_matrix # FIX: Changed dependency to prepare_deploy_matrix
     runs-on: ubuntu-latest
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
@@ -169,7 +169,7 @@ jobs:
           echo "Generated JSON (single line): $APP_DIRS_JSON"
 
           # Echo app_dirs_json before exiting
-          echo "Final app_dirs_json before exit: $APP_DIRS_JSON" # <--- Added echo here
+          echo "Final app_dirs_json before exit: $APP_DIRS_JSON"
 
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
