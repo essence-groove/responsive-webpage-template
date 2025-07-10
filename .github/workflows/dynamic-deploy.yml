@@ -447,8 +447,8 @@ jobs:
             }
           result-encoding: json
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          env:
-            LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_uploaded_run_id }}
+        env:
+          LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_uploaded_run_id }}
 
 
       - name: Download latest-apps-json Artifact
