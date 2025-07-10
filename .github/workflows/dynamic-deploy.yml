@@ -3,7 +3,7 @@ name: Dynamic Multi-App Heroku Deploy
 on:
   push:
     branches:
-      - new-apps # Or 'master'
+      - new-apps
     paths:
       - '**'
 
@@ -12,7 +12,6 @@ jobs:
   find_apps: # Job 1: Finds all deployable app directories and their details (no needs)
     runs-on: ubuntu-latest
     outputs:
-      # Output a JSON array of objects, each with app_dir, name, herokuAppName, and deployedUrl
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
     env:
       APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are
@@ -86,7 +85,7 @@ jobs:
         shell: bash
 
   generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
-    needs: find_apps # FIX: Only needs 'find_apps' now
+    needs: find_apps # FIX: This job now only needs 'find_apps' to get all app details
     runs-on: ubuntu-latest
     if: |
       always() &&
@@ -119,12 +118,10 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
-          # Pass the rich app details JSON from find_apps directly
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
-          # Removed APP_DATA_MATRIX_JSON as it's no longer needed for this script
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
-          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
-          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
+          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }} # Pass rich app details
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # This is for the old comma-separated secret, should be removed
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }} # Passed to the Python script
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }} # Passed to the Python script
         shell: bash
 
       - name: Write apps.md File
@@ -144,6 +141,5 @@ jobs:
           commit_message: "Docs: Update deployed app links and JSON list"
           branch: main
           token: ${{ secrets.GITHUB_TOKEN }}
-          add_options: "apps.md homepage-app/apps/apps.json"
-
- 
+          add_options: "apps.md homepage-app/apps/apps.json" # Explicitly add files
+          skip_dirty_check: true # <--- CRITICAL FIX: Force commit even if repo is dirty
