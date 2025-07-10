@@ -367,7 +367,7 @@ jobs:
           script: |
             const artifactName = 'latest-apps-json';
             const workflowFileName = 'dynamic-deploy.yml';
-            const searchBranches = ['main', 'new-workflow', 'new-workflow-2']; 
+            const searchBranches = ['main']; 
             
             console.log(`Searching for latest artifact '${artifactName}' from workflow '${workflowFileName}' across branches: ${searchBranches.join(', ')}.`);
 
