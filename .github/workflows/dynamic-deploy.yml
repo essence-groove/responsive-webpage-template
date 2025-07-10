@@ -38,7 +38,6 @@ jobs:
           # 'app_dir' is derived from the 'name' field in apps.json, constructing the full path.
           # 'heroku_app_name' is derived from the the 'herokuAppName' field.
           # 'url' is derived from the 'deployedUrl' field.
-          # FIX: Directly use .herokuAppName and .deployedUrl from apps.json
           APP_DATA_JSON=$(jq -c '[.[] | {"app_dir": (if .name == "homepage-app" then "homepage-app" else "homepage-app/" + .name end), "heroku_app_name": .herokuAppName, "url": .deployedUrl}]' "$APPS_JSON_PATH")
 
           if [ "$APP_DATA_JSON" == "[]" ]; then
@@ -128,7 +127,7 @@ jobs:
           appdir: ${{ matrix.app_data.app_dir }}
 
   find_apps: # Job 2: Finds all deployable app directories
-    needs: prepare_deploy_matrix # <--- FIX: Changed dependency to prepare_deploy_matrix
+    needs: prepare_deploy_matrix # This ensures it runs AFTER prepare_deploy_matrix
     runs-on: ubuntu-latest
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
@@ -170,13 +169,13 @@ jobs:
           APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
           echo "Generated JSON (single line): $APP_DIRS_JSON"
 
-          echo "Final app_dirs_json before exit: $APP_DIRS_JSON" # <--- Added echo here
+          echo "Final app_dirs_json before exit: $APP_DIRS_JSON"
 
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
   generate_docs_files: # Job 3: Generates apps.md and apps.json files using Python
-    needs: find_apps # This job needs find_apps to get the list of apps
+    needs: [prepare_deploy_matrix, find_apps] # FIX: Needs both prepare_deploy_matrix AND find_apps
     runs-on: ubuntu-latest
     if: |
       always() &&
@@ -209,8 +208,11 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
+          # FIX: Correctly pass APP_DIRS_JSON_FROM_FIND_APPS from the 'find_apps' job
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # This is for the old comma-separated secret, should be removed
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }} # Passed to the Python script
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }} # Passed to the Python script
         shell: bash
 
       - name: Write apps.md File
