@@ -493,70 +493,32 @@ jobs:
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
-    # This 'if' condition will ensure the job is skipped if app_data_json is '[]'.
-    # This is still the primary way to skip the entire job when no real apps are found.
+    # The 'if' condition on the job level still serves to skip the entire job if the output is specifically '[]'
+    # This prevents the matrix evaluation entirely in that specific case.
     if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }} 
     strategy:
       fail-fast: false
       matrix:
-        # CRITICAL CHANGE: Always ensure fromJson gets a non-empty list of items for 'app_data'.
-        # If the output from prepare_deploy_matrix is '[]', fromJson will produce an empty list.
-        # This is where the error 'Matrix vector does not contain any values' occurs.
-        # To fix this, if the output is '[]', we force it to be a list containing a single dummy object.
-        # Otherwise, use the real app_data.
+        # This defines the primary axis of your matrix, taking its value from prepare_deploy_matrix.
+        # This will be either your real app data or '[{"dummy_run": true, "deploy_app": false}]'
         app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
         
-        # We need to ensure that if fromJson(outputs) results in an *empty array*,
-        # the matrix strategy doesn't fail.
-        # A common workaround for "Matrix vector does not contain any values" is:
-        # 1. Have a dummy matrix variable that always has at least one value.
-        # 2. Conditionally generate the app_data, and then filter in steps.
-
-        # Let's simplify the matrix to *always* contain at least one element for 'app_data' if it's empty,
-        # and filter it out in the steps.
-        # This makes the matrix creation robust to an empty array.
-        include:
-          # If the actual app_data_json is '[]', this 'include' ensures a single dummy run.
-          # We check if the fromJson(output) creates an empty array using a nested condition.
-          # This is complex in YAML. A simpler approach is to modify the output of 'prepare_deploy_matrix'.
-
-          # *** Alternative simpler fix for 'Matrix vector does not contain any values' ***
-          # Modify prepare_deploy_matrix to output: '[{"dummy_run": true}]' if no apps are found.
-          # Then, filter this in the steps. This avoids the matrix include complexity.
-          # But for now, let's keep the existing matrix structure and fix the parsing.
-
-          # The issue is specifically when fromJson returns an empty list, matrix fails.
-          # We need to guarantee matrix has at least one value *or* skip the job entirely.
-          # Your 'if: needs.prepare_deploy_matrix.outputs.app_data_json != '[]'' should work.
-          # Let's assume the 'fromJson' is getting `[]` and failing.
-
-          # The most straightforward way to work around this specific error:
-          # `Matrix vector 'app_data' does not contain any values` is to *ensure*
-          # the JSON string passed to `fromJson` for `app_data` *always* represents
-          # an array with at least one element IF the job is to run.
-          # Since the job is already skipped by `if:`, this error means it's parsed *before* the skip.
-
-          # Let's use a simpler, more direct filter to ensure fromJson always gets something iterable.
-          # This should have been handled by the outer 'if'
-          # `if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }}`
-          # However, if this error still occurs, it implies that the matrix evaluation
-          # happens before the job's `if` condition can fully take effect with an empty result.
-
-          # To ensure it truly never gets an empty array for iteration:
-          # We must modify 'prepare_deploy_matrix' to output a dummy element if it's empty.
-          # This ensures fromJson always has *something* to iterate over.
-          app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
-          include:
-            - app_data: # If no apps, include a dummy element that will be filtered later
-                - dummy_entry: true
-              deploy_app: false # Flag this as a dummy run for filtering in steps
+        # You do NOT include the dummy logic here in 'matrix'.
+        # The 'prepare_deploy_matrix' job is *already* responsible for ensuring
+        # `app_data_json` is either real data OR '[{"dummy_run": true, "deploy_app": false}]'.
+        # The 'matrix' key should simply consume what's provided.
+        # The problematic lines should be removed:
+        # - app_data: # Duplicate and misindented
+        #     - dummy_entry: true
+        #   deploy_app: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        # Filter for dummy run:
+        if: ${{ matrix.app_data.deploy_app != false }} # Checks if the dummy_run flag is NOT false
         uses: actions/setup-node@v4
         with:
           node-version: '20'
