@@ -91,38 +91,55 @@ jobs:
           echo "--- App Scan Summary ---"
           if [ ${#APP_DETAILS_ARRAY[@]} -eq 0 ]; then
             echo "No valid applications found during scan."
-            printf "app_details_json=[]\n" >> "$GITHUB_OUTPUT"
-            exit 0
+            APP_DETAILS_JSON_OUTPUT="[]" # Assign to a variable before output
           else
             echo "Total valid applications found: ${#APP_DETAILS_ARRAY[@]}"
-            APP_DETAILS_JSON=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
-            echo "Generated App Details JSON: $APP_DETAILS_JSON"
-            printf "app_details_json=%s\n" "$GITHUB_OUTPUT"
+            APP_DETAILS_JSON_OUTPUT=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .) # Assign to a variable
           fi
+          echo "Final app_details_json output from find_apps: $APP_DETAILS_JSON_OUTPUT" # DEBUG: Show final output
+          printf "app_details_json=%s\n" "$APP_DETAILS_JSON_OUTPUT" >> "$GITHUB_OUTPUT" # Use the variable
+          
+          # Exit 0 here if no valid apps, to allow downstream jobs with 'always()' to run for other reasons
+          # If this job needs to explicitly fail if no apps are found, change exit 0 to exit 1
+          if [ ${#APP_DETAILS_ARRAY[@]} -eq 0 ]; then
+             exit 0 # Exit with success if no apps are found but process completes
+          fi
+
         shell: bash
 
   generate_docs_files:
-    # THIS LINE IS CRUCIAL. It ensures 'find_apps' runs and completes BEFORE this job starts.
     needs: find_apps
     runs-on: ubuntu-latest
-    # Ensure this condition is met (if find_apps had data)
     if: |
       always() &&
-      needs.find_apps.outputs.app_details_json != '[]' 
+      needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
+      - name: Debug APP_DATA_FROM_FIND_APPS Input # NEW DEBUG STEP
+        run: |
+          echo "--- Debugging APP_DATA_FROM_FIND_APPS ---"
+          echo "Checking if 'find_apps' job ran: ${{ needs.find_apps.result }}" # Should be 'success' or 'skipped'
+          echo "Output from 'find_apps.outputs.app_details_json': ${{ needs.find_apps.outputs.app_details_json }}" # Check direct output
+          echo "Environment variable APP_DATA_FROM_FIND_APPS: '$APP_DATA_FROM_FIND_APPS'" # Check environment variable
+          if [ -z "$APP_DATA_FROM_FIND_APPS" ]; then
+            echo "::error::APP_DATA_FROM_FIND_APPS is indeed empty or not set in this job's environment."
+          fi
+          echo "--- End Debug APP_DATA_FROM_FIND_APPS ---"
+        shell: bash
+        env: # This env is specifically for this debug step, needs to mirror the Python script's env
+          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref }} # Checkout the correct branch
+          ref: ${{ github.event.inputs.branch || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      # Get current workflow state for the Python script to read.
-      # This step should ensure the file is present if it exists in the repo.
       - name: Get current workflow state (if exists)
         run: |
           if [ -f ".github/workflow_state.json" ]; then
@@ -142,7 +159,6 @@ jobs:
             echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty."
             echo "::warning::To enable writing to 'homepage-app/apps/apps.json', create a repository secret named 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON' with the value 'homepage-app/apps/apps.json'."
           fi
-          # Ensure this secret is set for state file writing
           if [ "${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}" != ".github/workflow_state.json" ]; then
             echo "::warning::RWT_WRITABLE_FILE_WORKFLOW_STATE secret should be set to '.github/workflow_state.json' for proper state management."
           fi
@@ -151,9 +167,8 @@ jobs:
       - name: Generate apps.md and apps.json Content with Python Script
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
-        # THIS IS THE CRITICAL LINE for passing output from 'find_apps'
         env:
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }} # CRITICAL LINE
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
           RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
           RWT_WRITABLE_FILE_WORKFLOW_STATE: ${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}
@@ -179,8 +194,6 @@ jobs:
           retention-days: 7
 
       - name: Commit and Push generated files (including state file)
-        # Simplified 'if' condition to avoid syntax issues.
-        # This will commit if the Python script flagged any file as updated.
         if: |
           steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
           steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
@@ -196,10 +209,9 @@ jobs:
     outputs:
       app_data_json: ${{ steps.read_json.outputs.app_data_json }}
     steps:
-      - name: Checkout code # This is just for base repo files, not for previous apps.json
+      - name: Checkout code
         uses: actions/checkout@v4
       
-      # NEW: Get the current workflow state file that track download count
       - name: Get workflow state for download auditing
         id: get_download_state
         run: |
@@ -208,7 +220,6 @@ jobs:
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
           
-          # Initialize state if file doesn't exist
           if [ ! -f "$STATE_FILE" ]; then
             echo "::warning::Workflow state file not found. Initializing download count."
             echo "download_count=0" >> "$GITHUB_OUTPUT"
@@ -242,14 +253,8 @@ jobs:
             const forceNextUpload = process.env.FORCE_NEXT_UPLOAD_FROM_STATE === 'true';
 
             let runToDownloadId = null;
-
-            // Priority 1: If forced upload or counter reset, always target the *current* run's artifact if it exists and completed.
-            // This is complex as it requires knowing the current run will produce it.
-            // For simplicity, we stick to finding *a* successful run.
-            // You might need a "dummy" successful run state to ensure the first download exists.
             
-            // Priority 2: Use the last known run ID from our state file
-            if (lastArtifactRunId && lastArtifactRunId !== "null") { // "null" might come from jq if key doesn't exist
+            if (lastArtifactRunId && lastArtifactRunId !== "null") {
                 runToDownloadId = lastArtifactRunId;
                 console.log(`Attempting to download artifact from last known run ID from state: ${runToDownloadId}`);
             } else {
@@ -257,8 +262,8 @@ jobs:
                 const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    workflow_id: 'dynamic-deploy.yml', // This MUST be your workflow file name (e.g., dynamic-deploy.yml)
-                    branch: 'main', // The branch where the successful artifact should exist
+                    workflow_id: 'dynamic-deploy.yml',
+                    branch: 'main',
                     status: 'success',
                     per_page: 1
                 });
@@ -267,23 +272,22 @@ jobs:
                     console.log(`Found latest successful run ID via API: ${runToDownloadId}`);
                 } else {
                     core.setFailed('No successful workflow run found on "main" to download artifacts from. Cannot proceed with deployment.');
-                    return; // Exit script if no run ID found
+                    return;
                 }
             }
             core.setOutput('run_id', runToDownloadId);
-          # Corrected indentation for result-encoding
-          result-encoding: json # <--- Moved here, aligned with 'script'
-        env: # Pass state outputs as env vars to github-script
+          result-encoding: json
+        env:
           DOWNLOAD_COUNT_FROM_STATE: ${{ steps.get_download_state.outputs.download_count }}
           LAST_ARTIFACT_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_run_id }}
           FORCE_NEXT_UPLOAD_FROM_STATE: ${{ steps.get_download_state.outputs.force_next_upload }}
 
       - name: Download latest-apps-json Artifact
         uses: actions/download-artifact@v4
-        if: ${{ steps.get_run_id.outputs.run_id }} # Only if a run ID was successfully found
+        if: ${{ steps.get_run_id.outputs.run_id }}
         with:
           name: latest-apps-json
-          path: homepage-app/apps/ # Download to this specific directory
+          path: homepage-app/apps/
           run-id: ${{ steps.get_run_id.outputs.run_id }}
 
       - name: Read apps.json for Matrix
@@ -292,31 +296,27 @@ jobs:
           set -e
           APPS_JSON_PATH="homepage-app/apps/apps.json"
           
-          # Check if the file was actually downloaded and exists.
-          # If not, it means the artifact didn't exist for the fetched run_id.
           if [ ! -f "$APPS_JSON_PATH" ] || [ ! -s "$APPS_JSON_PATH" ]; then
             echo "::error::${APPS_JSON_PATH} (downloaded artifact) not found or is empty, despite expecting it from run ID ${{ steps.get_run_id.outputs.run_id }}. This indicates a potential artifact expiry or upload issue."
             echo "::warning::Warning: The apps.json file said there is an artifact available, but it may not necessarily be true. Check previous workflow runs."
             
-            # Increment download count despite failure to find artifact for auditing
             NEW_DOWNLOAD_COUNT=$(( ${{ steps.get_download_state.outputs.download_count }} + 1 ))
             echo "::debug::Incrementing download count (even on download failure) to: $NEW_DOWNLOAD_COUNT"
             echo "download_count_updated=$NEW_DOWNLOAD_COUNT" >> "$GITHUB_OUTPUT"
-            echo "set_force_next_upload=false" >> "$GITHUB_OUTPUT" # Don't force next upload yet
+            echo "set_force_next_upload=false" >> "$GITHUB_OUTPUT"
 
-            echo "app_data_json=[]" >> "$GITHUB_OUTPUT" # Output empty array to skip deploy
-            exit 0 # Exit this step to prevent further errors
+            echo "app_data_json=[]" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           APP_DATA_JSON=$(jq -c '[.apps[] | {"app_dir": .app_dir, "heroku_app_name": .herokuAppName, "url": .url}]' "$APPS_JSON_PATH")
 
           if [ "$APP_DATA_JSON" == "[]" ]; then
             echo "::warning::${APPS_JSON_PATH} (downloaded artifact) contains no valid app data. Skipping deployment matrix generation."
-            # Still update count for auditing purposes even if data is empty
             NEW_DOWNLOAD_COUNT=$(( ${{ steps.get_download_state.outputs.download_count }} + 1 ))
             echo "::debug::Incrementing download count (on empty data) to: $NEW_DOWNLOAD_COUNT"
             echo "download_count_updated=$NEW_DOWNLOAD_COUNT" >> "$GITHUB_OUTPUT"
-            echo "set_force_next_upload=false" >> "$GITHUB_OUTPUT" # Don't force next upload yet
+            echo "set_force_next_upload=false" >> "$GITHUB_OUTPUT"
 
             echo "app_data_json=[]" >> "$GITHUB_OUTPUT"
             exit 0
@@ -325,7 +325,6 @@ jobs:
           echo "Generated app data for matrix: $APP_DATA_JSON"
           echo "app_data_json=$APP_DATA_JSON" >> "$GITHUB_OUTPUT"
 
-          # Logic for download count and forcing next upload
           CURRENT_DOWNLOAD_COUNT=${{ steps.get_download_state.outputs.download_count }}
           let NEW_DOWNLOAD_COUNT=$((CURRENT_DOWNLOAD_COUNT + 1))
           
@@ -335,7 +334,7 @@ jobs:
           FORCE_UPLOAD_FLAG="false"
           if [ "$NEW_DOWNLOAD_COUNT" -ge 5 ]; then
             FORCE_UPLOAD_FLAG="true"
-            NEW_DOWNLOAD_COUNT=0 # Reset count after forcing
+            NEW_DOWNLOAD_COUNT=0
             echo "::notice::Download count reached 5. Forcing next workflow run to upload a new artifact and resetting count."
           else
             echo "::notice::Artifact downloaded successfully. Download count: $NEW_DOWNLOAD_COUNT/5."
@@ -345,9 +344,8 @@ jobs:
           echo "set_force_next_upload=$FORCE_UPLOAD_FLAG" >> "$GITHUB_OUTPUT"
         shell: bash
 
-  # NEW JOB: Update Workflow State after Deployment (or after matrix prep if deploy is skipped)
   update_workflow_state:
-    needs: prepare_deploy_matrix # Depends on matrix job to get its outputs
+    needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -360,8 +358,7 @@ jobs:
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
 
-          # Read current state if exists (important if this job re-runs due to a failure)
-          CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}') # Handle empty/missing file
+          CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           
           # Get values from prepare_deploy_matrix job outputs
           DOWNLOAD_COUNT_FROM_PREP="${{ steps.prepare_matrix_output.outputs.download_count_updated }}"
@@ -370,7 +367,6 @@ jobs:
           echo "::debug::Updating state with download_count_updated: ${DOWNLOAD_COUNT_FROM_PREP}"
           echo "::debug::Updating state with set_force_next_upload: ${FORCE_UPLOAD_FROM_PREP}"
 
-          # Update the JSON structure
           UPDATED_STATE=$(echo "$CURRENT_STATE" | jq \
             --argjson count "$DOWNLOAD_COUNT_FROM_PREP" \
             --argjson force "$FORCE_UPLOAD_FROM_PREP" \
@@ -378,7 +374,6 @@ jobs:
 
           echo "::debug::New state to write: $UPDATED_STATE"
 
-          # Write updated state back to file
           mkdir -p $(dirname "$STATE_FILE")
           echo "$UPDATED_STATE" > "$STATE_FILE"
         shell: bash
@@ -386,7 +381,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Workflow: Update artifact download state [skip ci]"
-          branch: ${{ github.ref_name }} # Commit to the current branch
+          branch: ${{ github.ref_name }}
           add_options: ".github/workflow_state.json"
           skip_dirty_check: true
 
