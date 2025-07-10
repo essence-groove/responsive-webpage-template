@@ -90,7 +90,10 @@ jobs:
           echo "Current HEROKU_APP_TARGET_NAME: $HEROKU_APP_TARGET_NAME"
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           
+          # Re-read package.json to get its 'name' for consistency check
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
+          # Debugging: Echo the value read from package.json
+          echo "PACKAGE_JSON_APP_NAME read from package.json: $PACKAGE_JSON_APP_NAME"
 
           if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
             echo "::error::Inconsistency detected for app '${APP_FOLDER_NAME}' (path: '${APP_DIR}'):"
@@ -126,7 +129,7 @@ jobs:
           appdir: ${{ matrix.app_data.app_dir }}
 
   find_apps: # Job 2: Finds all deployable app directories (now runs after deploy_all_apps, or in parallel)
-    needs: prepare_deploy_matrix # FIX: Changed dependency to prepare_deploy_matrix
+    needs: deploy_all_apps # This ensures it runs AFTER deploy_all_apps
     runs-on: ubuntu-latest
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
@@ -167,9 +170,6 @@ jobs:
 
           APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
           echo "Generated JSON (single line): $APP_DIRS_JSON"
-
-          # Echo app_dirs_json before exiting
-          echo "Final app_dirs_json before exit: $APP_DIRS_JSON"
 
           printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
