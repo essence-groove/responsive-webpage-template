@@ -427,7 +427,7 @@ jobs:
             } else {
               // Instead of setFailed, just warn and output empty, so workflow can complete
               console.log(`::warning::No successful workflow run found across specified branches with artifact '${artifactName}'. Deployment matrix will be empty.`);
-              core.setOutput('artifact_run_id', ''); # Output empty string
+              core.setOutput('artifact_run_id', ''); // Output empty string
             }
           result-encoding: json
           github-token: ${{ secrets.GITHUB_TOKEN }}
