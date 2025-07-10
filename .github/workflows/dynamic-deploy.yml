@@ -262,7 +262,7 @@ jobs:
                 const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    workflow_id: 'dynamic-deploy.yml', # This MUST be your workflow file name (e.g., dynamic-deploy.yml)
+                    workflow_id: 'dynamic-deploy.yml', // This MUST be your workflow file name (e.g., dynamic-deploy.yml)
                     branch: 'main', # The branch where the successful artifact should exist
                     status: 'success',
                     per_page: 1
