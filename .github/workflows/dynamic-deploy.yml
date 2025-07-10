@@ -323,7 +323,7 @@ jobs:
     outputs:
       app_data_json: ${{ steps.extract_matrix_data.outputs.app_data_json }}
     steps:
-      - name: Checkout code # This is for accessing .github/workflow_state.json
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
@@ -333,9 +333,9 @@ jobs:
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
-          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id" # We won't use this directly for download, but keep for auditing
+          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
-          UPLOAD_COUNT_KEY="apps_json_upload_count" # For auditing
+          UPLOAD_COUNT_KEY="apps_json_upload_count"
 
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           
@@ -358,14 +358,14 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get Artifact Run ID for Download (State-first, then Tiered Search) # MODIFIED STEP
+      - name: Get Artifact Run ID for Download (State-first, then Tiered Search)
         id: get_latest_artifact_run_id
         uses: actions/github-script@v6
         with:
           script: |
             const artifactName = 'latest-apps-json';
             const workflowFileName = 'dynamic-deploy.yml';
-            const searchBranches = ['main']; // Assuming you've now centralized on main
+            const searchBranches = ['main']; // Centralized on main for now
             
             console.log(`Searching for latest artifact '${artifactName}' from workflow '${workflowFileName}' across branches: ${searchBranches.join(', ')}.`);
 
@@ -375,7 +375,6 @@ jobs:
             let runIdFromState = process.env.LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
             if (runIdFromState && runIdFromState !== "null" && runIdFromState !== "") {
               console.log(`Priority 1: Attempting to download artifact from recorded state run ID: ${runIdFromState}`);
-              // Check if artifact actually exists for this run ID via API
               try {
                 const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
                   owner: context.repo.owner,
@@ -448,8 +447,8 @@ jobs:
             }
           result-encoding: json
           github-token: ${{ secrets.GITHUB_TOKEN }}
-        env: # Pass state outputs as env vars to github-script
-          LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_uploaded_run_id }}
+          env:
+            LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_uploaded_run_id }}
 
 
       - name: Download latest-apps-json Artifact
@@ -459,7 +458,7 @@ jobs:
           name: latest-apps-json
           path: homepage-app/apps/
           run-id: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}
-        continue-on-error: true # CRITICAL: Continue on error if download fails (e.g., artifact not found/expired)
+        continue-on-error: true # CRITICAL: Continue on error if download fails
 
       - name: Read apps.json for Matrix
         id: extract_matrix_data # Renamed ID to avoid conflict, as previously discussed
@@ -467,34 +466,42 @@ jobs:
           set -e
           APPS_JSON_PATH="homepage-app/apps/apps.json"
           
-          # Initialize default output to the dummy run
-          # This ensures app_data_json_output always has a valid non-empty array string.
-          app_data_json_output="[{\"dummy_run\": true, \"deploy_app\": false}]" 
+          # Use a multi-line string with a delimiter for GITHUB_OUTPUT to handle JSON arrays.
+          DELIMITER="EOF_APP_DATA_JSON" 
+          
+          # Initialize app_data_json_output to an empty JSON array string
+          # This ensures that even if no apps are found or download fails,
+          # a valid JSON array is always output.
+          # IMPORTANT: This must be a single string without newlines for the default initialization.
+          app_data_json_output="[{\"dummy_run\":true,\"deploy_app\":false}]" # Default to dummy run if no real apps
 
-          # Check if the file was downloaded and exists
+          # Check if the file was actually downloaded and exists after the previous step.
           if [ -f "$APPS_JSON_PATH" ] && [ -s "$APPS_JSON_PATH" ]; then
-            APP_DATA_RAW=$(cat "$APPS_JSON_PATH")
-            # Parse and add deploy_app: true to real apps.
-            # Handle potential parsing errors with 2>/dev/null and check for non-null output.
+            APP_DATA_RAW=$(cat "$APPS_JSON_PATH") # Read file content
+            # Add deploy_app: true to each real app, and check if it's valid JSON for .apps[]
             PARSED_DATA=$(echo "$APP_DATA_RAW" | jq '[.apps[] | select(has("app_dir")) | . + {"deploy_app": true}]' 2>/dev/null)
 
-            if [ -n "$PARSED_DATA" ] && [ "$PARSED_DATA" != "null" ]; then # Check if parsing resulted in non-empty, non-null data
-              if [ "$(echo "$PARSED_DATA" | jq 'length')" -gt 0 ]; then # Check if the array is non-empty
+            if [ -n "$PARSED_DATA" ] && [ "$PARSED_DATA" != "null" ]; then
+              if [ "$(echo "$PARSED_DATA" | jq 'length')" -gt 0 ]; then
                 app_data_json_output="$PARSED_DATA" # Use real data if found
-                echo "Generated app data for matrix: $app_data_json_output"
+                echo "Generated app data for matrix:"
+                echo "$app_data_json_output" # Print for debugging
               else
                 echo "::warning::${APPS_JSON_PATH} (downloaded artifact) contains no valid app data after parsing. Using dummy matrix for empty deployment."
               fi
             else
               echo "::warning::Failed to parse valid app data from ${APPS_JSON_PATH} (downloaded artifact). Content might be invalid JSON or unexpected structure. Using dummy matrix for empty deployment."
-              echo "$APP_DATA_RAW" # Print raw content for debugging
+              echo "Raw content for debugging: $APP_DATA_RAW" # Print raw content for debugging
             fi
           else
             echo "::warning::${APPS_JSON_PATH} (source for deployment matrix) not found or is empty locally. Using dummy matrix for empty deployment."
           fi
 
-          echo "app_data_json=$app_data_json_output" >> "$GITHUB_OUTPUT"
-          # No exit 0 here; always output a valid matrix string.
+          # Output the JSON string using the delimiter for multi-line output
+          echo "app_data_json<<$DELIMITER" >> "$GITHUB_OUTPUT"
+          echo "$app_data_json_output" >> "$GITHUB_OUTPUT"
+          echo "$DELIMITER" >> "$GITHUB_OUTPUT"
+          # No exit 0 here; let the step complete based on its outputs.
         shell: bash
 
 
