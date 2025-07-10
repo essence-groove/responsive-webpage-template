@@ -81,9 +81,12 @@ jobs:
         id: prepare_vars
         run: |
           set -e
+          # Debugging: Echo the full matrix item for this iteration
+          echo "Matrix app_data for this iteration: ${{ toJson(matrix.app_data) }}"
+
           APP_DIR="${{ matrix.app_data.app_dir }}"
-          # FIX: Get heroku_app_name from matrix.app_data.heroku_app_name
-          HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}" # <--- This line needs to be correct
+          # FIX: Correctly assign HEROKU_APP_TARGET_NAME from matrix.app_data
+          HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}" 
 
           echo "Current APP_DIR: $APP_DIR"
           APP_FOLDER_NAME=$(basename "$APP_DIR")
