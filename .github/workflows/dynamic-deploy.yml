@@ -5,10 +5,7 @@ on:
     branches:
       - main # Or 'master'
       - new-build-scripting
-    paths:
-      - '.github/workflows/dynamic-deploy.yml'
-      - '.github/workflows/deploy-app-reusable.yml'
-      - '.github/workflows/utils-1.yml'
+
 
 jobs:
   
