@@ -185,12 +185,10 @@ jobs:
         # If you need a separate commit specifically for state file, add a separate output flag in Python script.
         # (Contains: Also commit if JSON updated (which includes metadata change) and 
         #            Ensure this always runs if a force upload needs state update)
+        # This job will commit only if the Python script indicates actual content changes.
         if: |
-          always() &&
-          (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
-           steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || 
-           !cancelled() 
-          )
+          steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
+          steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]" # Added [skip ci] to prevent infinite loops
