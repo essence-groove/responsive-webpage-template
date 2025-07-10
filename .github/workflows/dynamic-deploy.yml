@@ -149,67 +149,7 @@ jobs:
       needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
-      - name: Debug Inputs from Find Apps
-        run: |
-          echo "--- Debugging Inputs to generate_docs_files ---"
-          echo "Output from 'find_apps.outputs.app_details_json': ${{ needs.find_apps.outputs.app_details_json }}"
-          echo "Value of APP_DATA_FROM_FIND_APPS env var: '$APP_DATA_FROM_FIND_APPS'"
-          echo "Force apps.json upload flag from find_apps: ${{ needs.find_apps.outputs.force_apps_json_upload }}"
-          if [ -z "$APP_DATA_FROM_FIND_APPS" ]; then
-            echo "::error::APP_DATA_FROM_FIND_APPS is empty. This indicates a problem with output passing or 'find_apps' generating empty data."
-          fi
-          echo "--- End Debug Inputs ---"
-        shell: bash
-        env:
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
-          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Check Writable File Secrets
-        run: |
-          if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
-            echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty."
-            echo "::warning::To enable writing to 'apps.md', create a repository secret named 'RWT_WRITABLE_FILE_APPS_MD' with the value 'apps.md'."
-          fi
-          if [ -z "${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}" ]; then
-            echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty."
-            echo "::warning::To enable writing to 'homepage-app/apps/apps.json', create a repository secret named 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON' with the value 'homepage-app/apps/apps.json'."
-          fi
-          if [ "${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}" != ".github/workflow_state.json" ]; then
-            echo "::warning::RWT_WRITABLE_FILE_WORKFLOW_STATE secret should be set to '.github/workflow_state.json' for proper state management."
-          fi
-        shell: bash
-
-      - name: Generate apps.md and apps.json Content with Python Script
-        id: generate_content_py
-        run: python .github/scripts/generate_app_list.py
-        env:
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
-          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
-          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
-          RWT_WRITABLE_FILE_WORKFLOW_STATE: ${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_WORKFLOW: ${{ github.workflow }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
-        shell: bash
-
-      - name: Write apps.md File
-        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
-        run: |
-          APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
-          echo "$APPS_MD_SECTION_CONTENT" > apps.md
-        shell: bash
+      # ... (existing steps like Checkout code, Set up Python, Check Writable File Secrets) ...
 
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
@@ -222,8 +162,8 @@ jobs:
           UPLOAD_COUNT_KEY="apps_json_upload_count"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
-          CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
-          echo "::debug::Current state (generate_docs_files): $CURRENT_STATE_FROM_FILE"
+          CURRENT_STATE_FROM_FILE=$(jq '.' "$STATE_FILE" || echo '{}')
+          echo "::debug::Current state (generate_docs_files) read from file: $CURRENT_STATE_FROM_FILE"
           
           APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
           CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
@@ -239,31 +179,27 @@ jobs:
             echo "::notice::Initializing '${DOWNLOAD_THRESHOLD_KEY}' in state file to ${DOWNLOAD_THRESHOLD}. Setting force_next_upload to true for next run."
           else
             DOWNLOAD_THRESHOLD=$(echo "$DOWNLOAD_THRESHOLD" | tr -d '\r')
-            NEW_FORCE_UPLOAD_FLAG="false" # Default, overridden if initialized or by find_apps' decision
+            NEW_FORCE_UPLOAD_FLAG="false"
           fi
 
-          # Initialize and update current/last artifact IDs
           OLD_LAST_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"")
-          OLD_CURRENT_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${CURRENT_ARTIFACT_RUN_ID_KEY}") # Get raw value for null check
+          OLD_CURRENT_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${CURRENT_ARTIFACT_RUN_ID_KEY}")
 
           NEW_LAST_ARTIFACT_RUN_ID="$OLD_LAST_ARTIFACT_RUN_ID"
           NEW_CURRENT_ARTIFACT_RUN_ID="$OLD_CURRENT_ARTIFACT_RUN_ID"
 
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
-            NEW_LAST_ARTIFACT_RUN_ID="$OLD_CURRENT_ARTIFACT_RUN_ID" # Old current becomes last
-            NEW_CURRENT_ARTIFACT_RUN_ID="$CURRENT_WORKFLOW_RUN_ID" # New current is this run
+            NEW_LAST_ARTIFACT_RUN_ID="$OLD_CURRENT_ARTIFACT_RUN_ID"
+            NEW_CURRENT_ARTIFACT_RUN_ID="$CURRENT_WORKFLOW_RUN_ID"
             echo "::debug::apps.json was updated this run. Updating current_apps_json_artifact_run_id to ${NEW_CURRENT_ARTIFACT_RUN_ID}."
             echo "::debug::Moving old current_apps_json_artifact_run_id (${OLD_CURRENT_ARTIFACT_RUN_ID}) to last_successful_apps_json_artifact_run_id."
           elif [ "$OLD_CURRENT_ARTIFACT_RUN_ID" == "null" ] || [ -z "$OLD_CURRENT_ARTIFACT_RUN_ID" ]; then
-            # If current_apps_json_artifact_run_id is missing (first run after adding the field)
-            # and no new artifact was uploaded in *this* run, initialize it from last_successful_apps_json_artifact_run_id
             if [ -n "$OLD_LAST_ARTIFACT_RUN_ID" ]; then
                 NEW_CURRENT_ARTIFACT_RUN_ID="$OLD_LAST_ARTIFACT_RUN_ID"
                 echo "::notice::Initialized '${CURRENT_ARTIFACT_RUN_ID_KEY}' from existing '${LAST_ARTIFACT_RUN_ID_KEY}'."
             fi
           fi
 
-          # Determine NEW_DOWNLOAD_COUNT
           NEW_DOWNLOAD_COUNT=$INITIAL_DOWNLOAD_COUNT 
           if [ "$DOWNLOAD_THRESHOLD" -eq 0 ]; then
             NEW_DOWNLOAD_COUNT=0
@@ -276,7 +212,6 @@ jobs:
             echo "::debug::apps.json was NOT updated this run. Download count incremented to: $NEW_DOWNLOAD_COUNT"
           fi
 
-          # Increment upload count ONLY if apps.json was updated in this run
           NEW_UPLOAD_COUNT="$CURRENT_UPLOAD_COUNT"
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
             NEW_UPLOAD_COUNT=$((CURRENT_UPLOAD_COUNT + 1))
@@ -285,7 +220,6 @@ jobs:
             echo "::debug::apps.json was NOT updated this run. Upload count remains: $CURRENT_UPLOAD_COUNT"
           fi
 
-          # Build the new state JSON structure including all fields
           UPDATED_STATE=$(jq -n \
             --argjson download_count "$NEW_DOWNLOAD_COUNT" \
             --argjson force "$NEW_FORCE_UPLOAD_FLAG" \
@@ -316,26 +250,18 @@ jobs:
           fi
         shell: bash
 
-      - name: Upload homepage-app/apps/apps.json as Artifact
-        id: upload_artifact_result
-        if: ${{ steps.generate_content_py.outputs.apps_json_updated_flag == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: latest-apps-json
-          path: homepage-app/apps/apps.json
-          retention-days: 7
-      
-      - name: Set Last Uploaded Run ID Output
-        id: set_uploaded_run_id
-        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }}
-        run: echo "id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+      # Add this step exactly here:
+      - name: Debug Git Status Before Commit
+        run: |
+          echo "--- Git Status Debug Start ---"
+          git status --porcelain=v1 # Shows modified files succinctly
+          git diff                  # Shows content differences
+          ls -la .github/workflow_state.json # List file with details (permissions, size, timestamp)
+          cat .github/workflow_state.json    # Show the content of the file on disk
+          echo "--- Git Status Debug End ---"
         shell: bash
 
-      - name: Set Current Uploaded Run ID Output
-        id: set_current_uploaded_run_id
-        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }}
-        run: echo "id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
-        shell: bash
+      # ... (rest of your steps, including Upload homepage-app/apps/apps.json as Artifact and the auto-commit action) ...
 
       - name: Commit and Push generated files (including state file)
         if: |
@@ -345,12 +271,10 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
-          # Removed 'branch' input to avoid detached HEAD
-          # branch: ${{ github.event.inputs.branch || github.ref }} 
-          # Correctly specify files to add using file_pattern
           file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json" 
           skip_dirty_check: true
           push_options: "--force"
+
 
           
   prepare_deploy_matrix:
