@@ -5,7 +5,7 @@ import sys
 # --- Constants ---
 GITHUB_WORKFLOW_STATE_FILE = ".github/workflow_state.json"
 HOMEPAGE_APPS_JSON_PATH = os.path.join("homepage-app", "apps", "apps.json")
-APPS_MD_PATH = "apps.md" # Assuming apps.md is in the root
+APPS_MD_PATH = "apps.md"
 
 def read_json_file(file_path):
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
@@ -18,7 +18,7 @@ def read_json_file(file_path):
     return {}
 
 def write_json_file(file_path, data, indent=2):
-    os.makedirs(os.path.dirname(file_path) or '.', exist_ok=True) # Ensure directory exists
+    os.makedirs(os.path.dirname(file_path) or '.', exist_ok=True)
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=indent)
 
@@ -26,14 +26,12 @@ def main():
     # --- Retrieve Writable Files Secrets ---
     apps_md_secret_path = os.environ.get("RWT_WRITABLE_FILE_APPS_MD")
     homepage_apps_json_secret_path = os.environ.get("RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON")
+    workflow_state_secret_path = os.environ.get("RWT_WRITABLE_FILE_WORKFLOW_STATE")
     
     allowed_write_paths = set()
-    if apps_md_secret_path:
-        allowed_write_paths.add(os.path.normpath(apps_md_secret_path.strip()))
-    if homepage_apps_json_secret_path:
-        allowed_write_paths.add(os.path.normpath(homepage_apps_json_secret_path.strip()))
-    # Also add the state file to allowed writes for the git-auto-commit-action
-    allowed_write_paths.add(os.path.normpath(GITHUB_WORKFLOW_STATE_FILE))
+    if apps_md_secret_path: allowed_write_paths.add(os.path.normpath(apps_md_secret_path.strip()))
+    if homepage_apps_json_secret_path: allowed_write_paths.add(os.path.normpath(homepage_apps_json_secret_path.strip()))
+    if workflow_state_secret_path: allowed_write_paths.add(os.path.normpath(workflow_state_secret_path.strip())) # Add state file path
 
     def is_write_allowed(target_path):
         normalized_target_path = os.path.normpath(target_path)
@@ -42,15 +40,13 @@ def main():
         print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in allowed secrets. Write operation skipped.", file=sys.stderr)
         return False
 
-    # --- Read Workflow State ---
-    workflow_state = read_json_file(GITHUB_WORKFLOW_STATE_FILE)
-    force_next_upload = workflow_state.get("force_next_upload", False) # Flag to force upload
-    current_workflow_run_id = os.environ.get("GITHUB_RUN_ID") # Get current run ID
+    # --- Get current run info and force flag ---
+    current_workflow_run_id = os.environ.get("GITHUB_RUN_ID")
+    force_upload_from_find_apps = os.environ.get("FORCE_APPS_JSON_UPLOAD_FLAG") == "true" # Get flag from find_apps
 
-    print(f"::debug::Initial workflow_state: {workflow_state}")
-    print(f"::debug::Force next upload flag: {force_next_upload}")
+    print(f"::debug::Force upload flag from find_apps: {force_upload_from_find_apps}")
 
-    # --- Data Collection Logic (same as before) ---
+    # --- Data Collection Logic (unchanged) ---
     app_data_from_find_apps_json = os.environ.get("APP_DATA_FROM_FIND_APPS")
     if not app_data_from_find_apps_json:
         print("::error::APP_DATA_FROM_FIND_APPS environment variable is missing. It should be provided by the 'find_apps' job.", file=sys.stderr)
@@ -74,7 +70,7 @@ def main():
         apps_for_md_content.append(f"* **{app_name}:** [{heroku_app_name}]({app_url})")
         apps_for_json_data.append(app_info)
 
-    # --- Prepare apps.md Content ---
+    # --- Prepare apps.md Content (unchanged) ---
     md_header = "# 🚀 Deployed Applications\n\n"
     md_intro = "This file lists the applications deployed from this repository to Heroku.\n\n"
     md_list_heading = "## App List\n\n"
@@ -83,13 +79,12 @@ def main():
     final_apps_md_content = md_header + md_intro + md_list_heading + md_app_list_str
 
     # --- Prepare apps.json Content ---
-    # Add workflow metadata to the JSON for explicit change detection
     dynamic_json_data = {
         "apps": sorted(apps_for_json_data, key=lambda x: x.get('name', '')),
         "metadata": {
-            "last_generated_run_id": current_workflow_run_id,
-            "generated_at": os.environ.get("GITHUB_SHA"), # SHA of the commit
-            "timestamp": os.environ.get("GITHUB_DATE") or os.environ.get("BUILD_DATE") or "", # Or generate it here
+            "last_generated_run_id": current_workflow_run_id, # Always unique
+            "generated_at": os.environ.get("GITHUB_SHA"),
+            "timestamp": os.environ.get("GITHUB_DATE") or os.environ.get("BUILD_DATE") or "",
             "workflow_name": os.environ.get("GITHUB_WORKFLOW"),
             "workflow_run_url": f"https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/{current_workflow_run_id}"
         }
@@ -99,6 +94,7 @@ def main():
     # --- Determine if files were updated and write if allowed ---
     apps_md_updated_flag = False
     apps_json_updated_flag = False
+    last_uploaded_run_id_output = "" # Default to empty
 
     # Check and set flag for apps.md
     current_md_content = ""
@@ -119,17 +115,17 @@ def main():
             with open(HOMEPAGE_APPS_JSON_PATH, "r") as f:
                 current_json_content = f.read()
         
-        # Force update if the flag from workflow_state is true, OR if content differs
-        if new_json_content != current_json_content or force_next_upload:
+        # Logic: Force update if flag from find_apps is true, OR if content naturally differs
+        if new_json_content != current_json_content or force_upload_from_find_apps:
             os.makedirs(os.path.dirname(HOMEPAGE_APPS_JSON_PATH), exist_ok=True)
             try:
                 with open(HOMEPAGE_APPS_JSON_PATH, "w") as f:
                     f.write(new_json_content)
                 apps_json_updated_flag = True
+                last_uploaded_run_id_output = current_workflow_run_id # Set output if uploaded
                 print(f"::notice::Successfully updated {HOMEPAGE_APPS_JSON_PATH}")
-                # Reset force_next_upload after a successful forced upload
-                workflow_state["force_next_upload"] = False 
-                print("::debug::Resetting force_next_upload to False in state.")
+                if force_upload_from_find_apps:
+                    print("::notice::apps.json was updated due to force_upload_from_find_apps flag.")
             except Exception as e:
                 print(f"::error::Failed to write {HOMEPAGE_APPS_JSON_PATH}: {e}", file=sys.stderr)
                 sys.exit(1)
@@ -138,19 +134,6 @@ def main():
     else:
         apps_json_updated_flag = False
         print(f"::warning::{HOMEPAGE_APPS_JSON_PATH} not allowed to be written. 'apps_json_updated_flag' set to false.")
-
-    # --- Update Workflow State for the next run ---
-    # Store the current run ID as the one that successfully uploaded an artifact
-    if apps_json_updated_flag:
-        workflow_state["last_successful_apps_json_artifact_run_id"] = current_workflow_run_id
-        print(f"::debug::Updated last_successful_apps_json_artifact_run_id in state to {current_workflow_run_id}")
-    
-    # Save the updated state
-    if is_write_allowed(GITHUB_WORKFLOW_STATE_FILE):
-        write_json_file(GITHUB_WORKFLOW_STATE_FILE, workflow_state)
-        print("::notice::Updated workflow state file.")
-    else:
-        print(f"::warning::Could not write to workflow state file '{GITHUB_WORKFLOW_STATE_FILE}'. Ensure it's allowed by secrets.")
 
     # --- Output flags and content to GITHUB_OUTPUT ---
     with open(os.environ["GITHUB_OUTPUT"], "a") as output_file:
@@ -161,6 +144,8 @@ def main():
         
         output_file.write(f"apps_md_updated_flag={str(apps_md_updated_flag).lower()}\n")
         output_file.write(f"apps_json_updated_flag={str(apps_json_updated_flag).lower()}\n")
+        # NEW OUTPUT: Output the run ID if this job successfully updated apps.json
+        output_file.write(f"last_uploaded_run_id={last_uploaded_run_id_output}\n")
 
 if __name__ == "__main__":
     main()
