@@ -443,7 +443,7 @@ jobs:
           run-id: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}
 
       - name: Read apps.json for Matrix
-        id: read_json_for_matrix
+        id: read_json
         run: |
           set -e
           APPS_JSON_PATH="homepage-app/apps/apps.json"
