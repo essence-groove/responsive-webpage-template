@@ -56,7 +56,8 @@ jobs:
     strategy:
       fail-fast: false # Allow other apps to deploy even if one fails
       matrix:
-        app_data: ${{ fromJson(steps.read_apps_json_for_matrix.outputs.app_data_json) }}
+        # FIX: Correctly reference the output from the 'prepare_deploy_matrix' job
+        app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
 
     steps:
       - name: Checkout code
@@ -87,7 +88,6 @@ jobs:
           
           # Re-read package.json to get its 'name' for consistency check
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
-          HEROKU_APP_TARGET_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
 
           if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
             echo "::error::Inconsistency detected for app '${APP_FOLDER_NAME}' (path: '${APP_DIR}'):"
@@ -188,12 +188,10 @@ jobs:
 
       - name: Check Writable File Secrets # Updated warning message
         run: |
-          # Check for apps.md secret
           if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
             echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty."
             echo "::warning::To enable writing to 'apps.md', create a repository secret named 'RWT_WRITABLE_FILE_APPS_MD' with the value 'apps.md'."
           fi
-          # Check for homepage-app/apps/apps.json secret
           if [ -z "${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}" ]; then
             echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty."
             echo "::warning::To enable writing to 'homepage-app/apps/apps.json', create a repository secret named 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON' with the value 'homepage-app/apps/apps.json'."
@@ -205,9 +203,7 @@ jobs:
         run: python .github/scripts/generate_app_list.py
         env:
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # This is for the old comma-separated secret, should be removed
-          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }} # Passed to the Python script
-          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }} # Passed to the Python script
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
         shell: bash
 
       - name: Write apps.md File
