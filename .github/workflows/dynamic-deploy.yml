@@ -20,10 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
-      # NEW OUTPUTS: Pass the updated state data to the update_workflow_state job
+      # Pass the updated state data to update_workflow_state job directly from find_apps's state management
       updated_download_count: ${{ steps.manage_workflow_state.outputs.new_download_count }}
       updated_force_upload_flag: ${{ steps.manage_workflow_state.outputs.new_force_upload_flag }}
-      force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }} # Flag for generate_docs_files
+      force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }}
     env:
       APP_BASE_DIRS: "homepage-app"
 
@@ -33,15 +33,14 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
-      # NEW STEP: Read and manage the workflow state file
       - name: Manage Workflow State for Artifact Logic
         id: manage_workflow_state
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
-          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
-          FORCE_UPLOAD_KEY="force_next_upload" # This flag signals for the next run to force upload
-
+          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id" # This will be set by update_workflow_state later
+          FORCE_UPLOAD_KEY="force_next_upload"
+          
           # Read current state or initialize
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
@@ -49,12 +48,11 @@ jobs:
 
           echo "::debug::Initial state - Download Count: $CURRENT_DOWNLOAD_COUNT, Force Flag: $CURRENT_FORCE_FLAG"
 
-          # Increment download count for this run (representing one attempt to get the artifact)
+          # Increment download count for this run (represents an attempt to use the artifact)
           NEW_DOWNLOAD_COUNT=$((CURRENT_DOWNLOAD_COUNT + 1))
-          FORCE_UPLOAD_FOR_GENERATOR="false" # Default to false for the generator
+          FORCE_UPLOAD_FOR_GENERATOR="false" # Default for generate_docs_files in this run
 
           # Determine if we need to force an upload in THIS run of generate_docs_files
-          # if count reaches 5, OR if the previous run explicitly set force_next_upload to true.
           if [ "$NEW_DOWNLOAD_COUNT" -ge 5 ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then
             FORCE_UPLOAD_FOR_GENERATOR="true"
             NEW_DOWNLOAD_COUNT=0 # Reset count after forcing an upload
@@ -63,14 +61,14 @@ jobs:
             echo "::notice::Download count: $NEW_DOWNLOAD_COUNT/5. No force upload this run (yet)."
           fi
 
-          # Output these new values for the next job (generate_docs_files)
-          # And also for the update_workflow_state job at the end of the workflow
+          # Output these new values for subsequent jobs (generate_docs_files)
+          # And for the update_workflow_state job at the end of the workflow
           echo "new_download_count=$NEW_DOWNLOAD_COUNT" >> "$GITHUB_OUTPUT"
-          echo "new_force_upload_flag=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT" # This is the flag for the *next* cycle's find_apps
-          echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT" # Flag for *current* generate_docs_files
+          # The 'new_force_upload_flag' is the state to be *persisted* for the *next* run's decision.
+          # It should be true only if we just triggered a force upload, otherwise false.
+          echo "new_force_upload_flag=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT" 
+          echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT"
         shell: bash
-        # This step doesn't require secrets for reading, but the Python script will later.
-        # Ensure .github/workflow_state.json is checked out for this step to read.
 
       - name: Install jq (for package.json parsing and JSON output)
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -151,6 +149,9 @@ jobs:
   generate_docs_files:
     needs: find_apps
     runs-on: ubuntu-latest
+    outputs:
+      # NEW OUTPUT: Indicate the run_id if apps.json was successfully uploaded
+      last_uploaded_run_id: ${{ steps.upload_artifact_result.outputs.last_uploaded_run_id }}
     if: |
       always() &&
       needs.find_apps.outputs.app_details_json != '[]'
@@ -170,7 +171,7 @@ jobs:
         shell: bash
         env:
           APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
-          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }} # Pass force flag to environment for Python script
+          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -209,7 +210,7 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }} # Passed from find_apps
+          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
         shell: bash
 
       - name: Write apps.md File
@@ -220,12 +221,17 @@ jobs:
         shell: bash
 
       - name: Upload homepage-app/apps/apps.json as Artifact
+        id: upload_artifact_result # Give this step an ID to output whether it uploaded
         if: ${{ steps.generate_content_py.outputs.apps_json_updated_flag == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: latest-apps-json
           path: homepage-app/apps/apps.json
           retention-days: 7
+      - name: Set Last Uploaded Run ID Output # NEW STEP: Set output after artifact upload
+        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }} # Only if upload step ran and succeeded
+        run: echo "last_uploaded_run_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+        shell: bash
 
       - name: Commit and Push generated files (including state file)
         if: |
@@ -354,7 +360,11 @@ jobs:
         shell: bash
 
   update_workflow_state:
-    needs: find_apps # Ensure it waits for all relevant jobs
+    # Now needs both find_apps and generate_docs_files to get relevant outputs
+    # It does NOT need prepare_deploy_matrix anymore for count/force, but might for overall workflow structure.
+    # If deploy_all_apps always needs to run after this, you might need deploy_all_apps in needs.
+    # For now, let's just use find_apps and generate_docs_files for state logic.
+    needs: [find_apps, generate_docs_files]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -369,28 +379,29 @@ jobs:
 
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           
-          # Get values from find_apps job outputs
+          # Get values from find_apps job outputs (the new source for these)
           DOWNLOAD_COUNT_FROM_FIND_APPS="${{ needs.find_apps.outputs.updated_download_count }}"
           FORCE_UPLOAD_FROM_FIND_APPS="${{ needs.find_apps.outputs.updated_force_upload_flag }}"
           
-          # Get last uploaded artifact run ID from generate_docs_files (if it succeeded in uploading)
-          LAST_UPLOADED_RUN_ID="${{ needs.generate_docs_files.outputs.last_uploaded_run_id }}" # New output from generate_docs_files
+          # Get last uploaded artifact run ID from generate_docs_files
+          LAST_UPLOADED_RUN_ID="${{ needs.generate_docs_files.outputs.last_uploaded_run_id }}"
           
           echo "::debug::Updating state with download_count: ${DOWNLOAD_COUNT_FROM_FIND_APPS}"
           echo "::debug::Updating state with force_next_upload: ${FORCE_UPLOAD_FROM_FIND_APPS}"
-          echo "::debug::Updating state with last_uploaded_run_id: ${LAST_UPLOADED_RUN_ID}"
+          echo "::debug::Last uploaded run ID from generate_docs_files: ${LAST_UPLOADED_RUN_ID}"
 
-          # Update the JSON structure
+          # Update the JSON structure for count and force flag
           UPDATED_STATE=$(echo "$CURRENT_STATE" | jq \
             --argjson count "$DOWNLOAD_COUNT_FROM_FIND_APPS" \
             --argjson force "$FORCE_UPLOAD_FROM_FIND_APPS" \
             ".${DOWNLOAD_COUNT_KEY} = \$count | .${FORCE_UPLOAD_KEY} = \$force")
           
-          # Only update last_successful_apps_json_artifact_run_id if generate_docs_files actually uploaded
+          # Only update last_successful_apps_json_artifact_run_id if generate_docs_files actually uploaded it
           if [ -n "$LAST_UPLOADED_RUN_ID" ] && [ "$LAST_UPLOADED_RUN_ID" != "null" ]; then
               UPDATED_STATE=$(echo "$UPDATED_STATE" | jq \
                 --argjson last_run_id "$LAST_UPLOADED_RUN_ID" \
                 ".${LAST_ARTIFACT_RUN_ID_KEY} = \$last_run_id")
+              echo "::debug::Updated last_successful_apps_json_artifact_run_id in state to $LAST_UPLOADED_RUN_ID"
           fi
 
           echo "::debug::New state to write: $UPDATED_STATE"
@@ -405,6 +416,7 @@ jobs:
           branch: ${{ github.ref_name }}
           add_options: ".github/workflow_state.json"
           skip_dirty_check: true
+
 
   deploy_all_apps:
     needs: prepare_deploy_matrix
