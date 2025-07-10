@@ -150,14 +150,12 @@ jobs:
     needs: find_apps
     runs-on: ubuntu-latest
     outputs:
-      # Output the run_id if apps.json was successfully uploaded by this job
       last_uploaded_run_id: ${{ steps.set_uploaded_run_id.outputs.id }}
     if: |
       always() &&
       needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
-      # Debug APP_DATA_FROM_FIND_APPS Input: Now more focused on inputs from 'find_apps'
       - name: Debug Inputs from Find Apps
         run: |
           echo "--- Debugging Inputs to generate_docs_files ---"
@@ -210,8 +208,31 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          # This flag is what tells the Python script to force the JSON update
           FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
+        shell: bash
+
+      - name: Debug Python Script Outputs and File States # NEW DEBUG STEP
+        run: |
+          echo "--- Debugging Python Script Outputs and File States ---"
+          echo "apps_md_updated_flag from Python: ${{ steps.generate_content_py.outputs.apps_md_updated_flag }}"
+          echo "apps_json_updated_flag from Python: ${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
+          echo "last_uploaded_run_id from Python (should be set by Python if it updated JSON): ${{ steps.generate_content_py.outputs.last_uploaded_run_id }}"
+          
+          # Check states of files intended for commit
+          echo "--- File Status (Pre-Commit) ---"
+          echo "Status of apps.md: $(git status --porcelain apps.md)"
+          echo "Status of homepage-app/apps/apps.json: $(git status --porcelain homepage-app/apps/apps.json)"
+          echo "Status of .github/workflow_state.json: $(git status --porcelain .github/workflow_state.json)"
+          
+          echo "--- Diff Check (Pre-Commit) ---"
+          echo "Diff for apps.md:"
+          git diff apps.md || true # Use || true to prevent script from exiting if no diff
+          echo "Diff for homepage-app/apps/apps.json:"
+          git diff homepage-app/apps/apps.json || true
+          echo "Diff for .github/workflow_state.json:"
+          git diff .github/workflow_state.json || true
+
+          echo "--- End Debug Python Script Outputs and File States ---"
         shell: bash
 
       - name: Write apps.md File
@@ -230,7 +251,6 @@ jobs:
           path: homepage-app/apps/apps.json
           retention-days: 7
       
-      # NEW STEP: Conditionally set the 'last_uploaded_run_id' output
       - name: Set Last Uploaded Run ID Output
         id: set_uploaded_run_id
         if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }}
@@ -247,7 +267,7 @@ jobs:
           branch: ${{ github.event.inputs.branch || github.ref }}
           add_options: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
           skip_dirty_check: true
-          push_options: "--force" # Ensure state file updates land, as discussed
+          push_options: "--force"
 
 
 
