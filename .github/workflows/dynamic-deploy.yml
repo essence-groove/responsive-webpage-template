@@ -126,60 +126,21 @@ jobs:
           heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name_for_deploy }}
           appdir: ${{ matrix.app_data.app_dir }}
 
-  find_apps: # Job 2: Finds all deployable app directories (now dynamic again)
+  find_apps: # Job 2: Finds all deployable app directories (now uses utils-1.yml with algorithm)
     runs-on: ubuntu-latest
     outputs:
-      app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
-    env:
-      APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install jq (for package.json parsing and JSON output)
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Scan for Apps
-        id: scan
-        run: |
-          set -e
-
-          ALL_APP_DIRS_ARRAY=()
-          echo "Scanning for apps in: $APP_BASE_DIRS"
-          for BASE_DIR in $APP_BASE_DIRS; do
-            # Revert to dynamic find command
-            FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
-            for DIR in $FOUND_DIRS; do
-              ALL_APP_DIRS_ARRAY+=("$DIR")
-            done
-          done
-
-          UNIQUE_APP_DIRS_NEWLINES=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u)
-
-          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
-            echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
-            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Found applications in directories (dynamic scan):" # Updated message
-          echo "$UNIQUE_APP_DIRS_NEWLINES"
-
-          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
-          echo "Generated JSON (single line): $APP_DIRS_JSON"
-
-          echo "Final app_dirs_json before exit: $APP_DIRS_JSON"
-
-          printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
-        shell: bash
+      app_details_json: ${{ jobs.find_apps.outputs.app_details_json }} # Output from the reusable workflow call
+    uses: ./.github/workflows/utils-1.yml # Path to the reusable workflow
+    with:
+      app_base_dirs: "homepage-app" # Scan this top-level folder
+      algorithm: "scan_package_json" # <--- Pass the algorithm parameter here
 
   generate_docs_files: # Job 3: Generates apps.md and apps.json files using Python
     needs: [prepare_deploy_matrix, find_apps] # Needs both find_apps AND prepare_deploy_matrix
     runs-on: ubuntu-latest
     if: |
       always() &&
-      needs.find_apps.outputs.app_dirs_json != '[]'
+      needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
       - name: Checkout code
@@ -208,8 +169,7 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
-          APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          APP_DATA_MATRIX_JSON: ${{ needs.prepare_deploy_matrix.outputs.app_data_json }} # Pass matrix data for full app info
+          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }} # Pass rich app details
           RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
           RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
