@@ -1,16 +1,17 @@
 name: Dynamic Multi-App Discovery
 
 on:
-  # FIX: Add workflow_dispatch for manual triggering
   workflow_dispatch:
     inputs:
       branch:
         description: 'Branch to run the workflow on (e.g., main, new-apps)'
         required: true
         default: 'main' # Default to your main branch
-
-
-
+  push: # Keep this block if you want push to trigger it
+    branches:
+      - new-apps # Triggers only on pushes to 'new-apps'
+    paths:
+      - '**' # Triggers on changes to any path within 'new-apps'
 
 jobs:
   find_apps: # Job 1: Finds all deployable app directories and their details (no needs)
@@ -54,22 +55,22 @@ jobs:
 
               # Basic validation for essential fields
               if [ -z "$APP_NAME" ] || [ "$APP_NAME" == "null" ]; then
-                  echo "::warning::'name' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
-                  continue
+                echo "::warning::'name' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                continue
               fi
               if [ -z "$HEROKU_APP_NAME" ] || [ "$HEROKU_APP_NAME" == "null" ]; then
-                  echo "::warning::'herokuAppName' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
-                  continue
+                echo "::warning::'herokuAppName' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                continue
               fi
               if [ -z "$DEPLOYED_URL" ] || [ "$DEPLOYED_URL" == "null" ]; then
-                  echo "::warning::'deployedUrl' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
-                  continue
+                echo "::warning::'deployedUrl' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                continue
               fi
 
               # Consistency Check: Folder Name vs. package.json 'name'
               APP_FOLDER_NAME=$(basename "$APP_DIR")
               if [ "$APP_FOLDER_NAME" != "$APP_NAME" ]; then
-                  echo "::warning::Inconsistency: Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}'). Using folder name as primary identifier for consistency."
+                echo "::warning::Inconsistency: Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}'). Using folder name as primary identifier for consistency."
               fi
 
               # Construct JSON object for this app with all details
@@ -91,7 +92,7 @@ jobs:
           printf "app_details_json=%s\n" "$APP_DETAILS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
-
+---
 
   generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
     needs: find_apps # This job now only needs 'find_apps' to get all app details
@@ -104,14 +105,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }} # For PRs, this is the merge commit. For push, it's the head.
-          # For workflow_dispatch, this should be the branch specified in input.
-          # We'll use github.ref which is the branch the workflow is running on.
-          # If triggered by workflow_dispatch, github.ref will be the branch it was run from.
-          # If you want the *input* branch, you need: ref: ${{ github.event.inputs.branch }}
-          # Let's use the input branch if available, otherwise github.ref.
-          # ref: ${{ github.event.inputs.branch || github.ref }}
-
+          # This line was commented out; it's essential for checking out the correct branch.
+          ref: ${{ github.event.inputs.branch || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -146,16 +141,18 @@ jobs:
           APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
-      
+
+---
+
       - name: Commit and Push generated files
         if: |
           always() &&
-          (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || 
+          (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
            steps.generate_content_py.outputs.apps_json_updated_flag == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list"
           branch: ${{ github.event.inputs.branch || github.ref }} # Commit to the branch specified in input, or current branch
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Removed the 'token' line as it's no longer needed by the action
           add_options: "apps.md homepage-app/apps/apps.json"
           skip_dirty_check: true # Force commit even if repo is dirty
