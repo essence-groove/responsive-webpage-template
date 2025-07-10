@@ -178,15 +178,15 @@ jobs:
           retention-days: 7
 
       - name: Commit and Push generated files (including state file)
+        # Force commit if the state file was updated by Python script.
+        # This check is less direct, but assumes state file changes when `apps_json_updated_flag` is true
+        # or if we explicitly output a flag for state file changes from Python.
+        # For now, let's rely on apps_json_updated_flag for simplicity.
+        # If you need a separate commit specifically for state file, add a separate output flag in Python script.
         if: |
           always() &&
           (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
            steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || # Also commit if JSON updated (which includes metadata change)
-           # Force commit if the state file was updated by Python script.
-           # This check is less direct, but assumes state file changes when `apps_json_updated_flag` is true
-           # or if we explicitly output a flag for state file changes from Python.
-           # For now, let's rely on apps_json_updated_flag for simplicity.
-           # If you need a separate commit specifically for state file, add a separate output flag in Python script.
            !cancelled() # Ensure this always runs if a force upload needs state update
           )
         uses: stefanzweifel/git-auto-commit-action@v5
