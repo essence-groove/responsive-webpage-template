@@ -167,6 +167,7 @@ jobs:
 
 
   prepare_deploy_matrix: # Job 3: Reads apps.json and outputs the matrix data for deploy_all_apps
+    needs: generate_docs_files
     runs-on: ubuntu-latest
     outputs:
       app_data_json: ${{ steps.read_json.outputs.app_data_json }}
