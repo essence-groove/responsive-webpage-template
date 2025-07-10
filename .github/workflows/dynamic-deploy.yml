@@ -337,7 +337,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
-      - name: Get workflow state for download auditing
+      - name: Get workflow state for download auditing # This step still extracts counters from workflow_state.json
         id: get_download_state
         run: |
           STATE_FILE=".github/workflow_state.json"
@@ -367,80 +367,108 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get Artifact Run ID for Download (State-first, then Tiered Search) # MODIFIED STEP
-        id: get_artifact_run_id
+      - name: Get Latest Artifact Run ID from Registry (Tiered Search)
+        id: get_latest_artifact_run_id
         uses: actions/github-script@v6
         with:
           script: |
             const artifactName = 'latest-apps-json';
             const workflowFileName = 'dynamic-deploy.yml';
-            const searchBranches = ['main', 'new-workflow', 'new-workflow-2'];
+            const searchBranches = ['main', 'new-workflow', 'new-workflow-2']; 
             
-            // Priority 1: Try the run_id from workflow_state.json
-            let runIdFromState = process.env.LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
-            let finalRunIdToDownload = null;
+            console.log(`Searching for latest artifact '${artifactName}' from workflow '${workflowFileName}' across branches: ${searchBranches.join(', ')}.`);
 
-            if (runIdFromState && runIdFromState !== "null") {
-              console.log(`Priority 1: Attempting to download artifact from recorded state run ID: ${runIdFromState}`);
-              // We don't directly *check* if artifact exists with this ID via API without downloading,
-              // as that requires another API call. We'll rely on download-artifact to tell us.
-              finalRunIdToDownload = runIdFromState;
-            }
+            let latestRunIdWithArtifact = null;
 
-            // Priority 2: If state ID is not set or failed to download (handled by download-artifact's failure),
-            // then fall back to tiered search.
-            // This script *only* finds the ID. Download-artifact will handle the actual failure to download.
-            if (!finalRunIdToDownload) {
-              console.log(`Priority 2: No state ID or state ID was empty. Searching registry for latest artifact across branches: ${searchBranches.join(', ')}.`);
-              for (const branch of searchBranches) {
-                console.log(`Attempting to find artifact on branch: ${branch}`);
-                const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
+            for (const branch of searchBranches) {
+              console.log(`Attempting to find artifact on branch: ${branch}`);
+              const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflowFileName,
+                branch: branch,
+                status: 'completed', # Check for 'completed' runs, which includes success/failure
+                per_page: 20
+              });
+
+              if (workflow_runs.length === 0) {
+                console.log(`No completed workflow runs found on branch '${branch}'.`);
+                continue;
+              }
+
+              for (const run of workflow_runs) {
+                if (run.conclusion !== 'success') {
+                    console.log(`Skipping run ${run.id} on branch '${branch}' due to status: ${run.conclusion}`);
+                    continue;
+                }
+
+                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  workflow_id: workflowFileName,
-                  branch: branch,
-                  status: 'success',
-                  per_page: 5
+                  run_id: run.id
                 });
 
-                if (workflow_runs.length === 0) {
-                  console.log(`No successful workflow runs found on branch '${branch}'.`);
-                  continue;
-                }
+                const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
 
-                for (const run of workflow_runs) {
-                  const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    run_id: run.id
-                  });
-
-                  const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
-
-                  if (targetArtifact) {
-                    finalRunIdToDownload = run.id;
-                    console.log(`Found latest run ID '${finalRunIdToDownload}' with artifact '${artifactName}' on branch '${branch}'.`);
-                    break;
-                  }
-                }
-
-                if (finalRunIdToDownload) {
+                if (targetArtifact) {
+                  latestRunIdWithArtifact = run.id;
+                  console.log(`Found latest run ID '${latestRunIdWithArtifact}' with artifact '${artifactName}' on branch '${branch}'.`);
                   break;
                 }
               }
+
+              if (latestRunIdWithArtifact) {
+                break;
+              }
             }
 
-            if (finalRunIdToDownload) {
-              core.setOutput('artifact_run_id', finalRunIdToDownload);
+            if (latestRunIdWithArtifact) {
+              core.setOutput('artifact_run_id', latestRunIdWithArtifact);
             } else {
-              core.setFailed(`No artifact run ID determined (neither from state nor registry query). Cannot proceed with deployment.`);
+              // Instead of setFailed, just warn and output empty, so workflow can complete
+              console.log(`::warning::No successful workflow run found across specified branches with artifact '${artifactName}'. Deployment matrix will be empty.`);
+              core.setOutput('artifact_run_id', ''); # Output empty string
             }
           result-encoding: json
           github-token: ${{ secrets.GITHUB_TOKEN }}
-        env: # Pass state outputs as env vars to github-script
-          LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_uploaded_run_id }}
 
+      - name: Download latest-apps-json Artifact
+        uses: actions/download-artifact@v4
+        # Use an 'if' to proceed only if an artifact_run_id was found.
+        # Otherwise, this step will be skipped, and the 'Read apps.json' step will handle the empty file case.
+        if: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id != '' }}
+        with:
+          name: latest-apps-json
+          path: homepage-app/apps/
+          run-id: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}
 
+      - name: Read apps.json for Matrix
+        id: read_json
+        run: |
+          set -e
+          APPS_JSON_PATH="homepage-app/apps/apps.json"
+          
+          # This now handles two cases:
+          # 1. No artifact_run_id found, so download-artifact skipped, and file doesn't exist locally.
+          # 2. Artifact was downloaded but is empty/invalid.
+          if [ ! -f "$APPS_JSON_PATH" ] || [ ! -s "$APPS_JSON_PATH" ]; then
+            echo "::warning::${APPS_JSON_PATH} (source for deployment matrix) not found or is empty. This can happen if no artifact was found or downloaded."
+            echo "::warning::No deployment matrix will be generated for this run. Deployments will be skipped."
+            echo "app_data_json=[]" >> "$GITHUB_OUTPUT" # Output empty matrix
+            exit 0 # Exit successfully with warning
+          fi
+
+          APP_DATA_JSON=$(jq -c '[.apps[] | {"app_dir": .app_dir, "heroku_app_name": .herokuAppName, "url": .url}]' "$APPS_JSON_PATH")
+
+          if [ "$APP_DATA_JSON" == "[]" ]; then
+            echo "::warning::${APPS_JSON_PATH} (downloaded artifact) contains no valid app data. Skipping deployment matrix generation."
+            echo "app_data_json=[]" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Generated app data for matrix: $APP_DATA_JSON"
+          echo "app_data_json=$APP_DATA_JSON" >> "$GITHUB_OUTPUT"
+        shell: bash
 
 
       - name: Download latest-apps-json Artifact
@@ -482,8 +510,9 @@ jobs:
 
 
   deploy_all_apps:
-    needs: prepare_deploy_matrix
+    needs: prepare_deploy_matrix # Still needs this to get the matrix data
     runs-on: ubuntu-latest
+    # This 'if' condition will ensure the job is skipped if app_data_json is '[]'
     if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }}
     strategy:
       fail-fast: false
