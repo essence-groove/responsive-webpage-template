@@ -491,14 +491,16 @@ jobs:
 
 
   deploy_all_apps:
-    needs: prepare_deploy_matrix # Still needs this to get the matrix data
+    needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
     # This 'if' condition will ensure the job is skipped if app_data_json is '[]'
+    # Keeping this check is good to prevent job from starting if matrix is empty
     if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }}
     strategy:
       fail-fast: false
       matrix:
-        app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
+        # CRITICAL CHANGE: Provide a default empty array if the output is empty or invalid
+        app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json || '[]') }}
 
     steps:
       - name: Checkout code
