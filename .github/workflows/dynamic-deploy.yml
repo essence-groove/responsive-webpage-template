@@ -443,7 +443,7 @@ jobs:
           run-id: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}
 
       - name: Read apps.json for Matrix
-        id: read_json
+        id: read_json_for_matrix
         run: |
           set -e
           APPS_JSON_PATH="homepage-app/apps/apps.json"
@@ -470,40 +470,6 @@ jobs:
           echo "app_data_json=$APP_DATA_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
-
-      - name: Download latest-apps-json Artifact
-        uses: actions/download-artifact@v4
-        if: ${{ steps.get_artifact_run_id.outputs.artifact_run_id }} # Only if a run ID was successfully determined
-        with:
-          name: latest-apps-json
-          path: homepage-app/apps/
-          run-id: ${{ steps.get_artifact_run_id.outputs.artifact_run_id }} # Use the ID fetched by the script
-
-      - name: Read apps.json for Matrix
-        id: read_json
-        run: |
-          set -e
-          APPS_JSON_PATH="homepage-app/apps/apps.json"
-          
-          if [ ! -f "$APPS_JSON_PATH" ] || [ ! -s "$APPS_JSON_PATH" ]; then
-            echo "::error::${APPS_JSON_PATH} (downloaded artifact) not found or is empty. This indicates a problem: either artifact expired, was deleted, or the run ID was wrong."
-            echo "::warning::Warning: Deployment data source issue. Check artifact availability for run ID ${{ steps.get_artifact_run_id.outputs.artifact_run_id }}."
-            
-            echo "app_data_json=[]" >> "$GITHUB_OUTPUT"
-            exit 0 # Exit this step if the download truly failed
-          fi
-
-          APP_DATA_JSON=$(jq -c '[.apps[] | {"app_dir": .app_dir, "heroku_app_name": .herokuAppName, "url": .url}]' "$APPS_JSON_PATH")
-
-          if [ "$APP_DATA_JSON" == "[]" ]; then
-            echo "::warning::${APPS_JSON_PATH} (downloaded artifact) contains no valid app data. Skipping deployment matrix generation."
-            echo "app_data_json=[]" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Generated app data for matrix: $APP_DATA_JSON"
-          echo "app_data_json=$APP_DATA_JSON" >> "$GITHUB_OUTPUT"
-        shell: bash
 
 
   
