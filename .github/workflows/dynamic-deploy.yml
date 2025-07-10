@@ -94,8 +94,8 @@ jobs:
 generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
     needs: find_apps
     runs-on: ubuntu-latest
-    if: |
-      always() && needs.find_apps.outputs.app_details_json != '[]'
+    # if: |
+      # always() && needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
       - name: Checkout code
