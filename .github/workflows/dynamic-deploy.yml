@@ -113,8 +113,8 @@ jobs:
           fi
         shell: bash
 
-  generate_docs_files: # This job and all subsequent jobs must be indented two spaces under 'jobs:'
-    needs: find_apps # This dependency is still required to get current app_details_json
+  generate_docs_files:
+    needs: find_apps
     runs-on: ubuntu-latest
     if: |
       always() &&
@@ -159,14 +159,39 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
-      - name: Upload homepage-app/apps/apps.json as Artifact # NEW STEP: Upload the JSON
+      - name: Debug Artifact Upload Process # NEW DEBUG STEP
+        run: |
+          ARTIFACT_FILE="homepage-app/apps/apps.json"
+          
+          echo "--- Preparing to Upload Artifact ---"
+          echo "Checking if file exists: $ARTIFACT_FILE"
+          if [ -f "$ARTIFACT_FILE" ]; then
+            echo "File '$ARTIFACT_FILE' found."
+            echo "File size: $(du -h "$ARTIFACT_FILE" | awk '{print $1}')"
+            echo "File content (first 500 chars):"
+            head -c 500 "$ARTIFACT_FILE"
+            echo ""
+          else
+            echo "::error::File '$ARTIFACT_FILE' NOT FOUND. Cannot upload artifact."
+            exit 1 # Fail if the file to upload isn't there
+          fi
+          
+          echo "apps_json_updated_flag status: ${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
+          if [ "${{ steps.generate_content_py.outputs.apps_json_updated_flag }}" != "true" ]; then
+            echo "::notice::'apps_json_updated_flag' is not 'true'. The 'Upload homepage-app/apps/apps.json as Artifact' step will likely be skipped."
+          fi
+        shell: bash
+
+      - name: Upload homepage-app/apps/apps.json as Artifact
+        # Only attempt upload if the JSON content actually changed
+        if: ${{ steps.generate_content_py.outputs.apps_json_updated_flag == 'true' }} # Ensure this condition is met
         uses: actions/upload-artifact@v4
         with:
-          name: latest-apps-json # Name your artifact
+          name: latest-apps-json
           path: homepage-app/apps/apps.json
-          retention-days: 7 # Adjust as needed (e.g., 7 days is common for temporary data)
+          retention-days: 7
 
-      - name: Commit and Push generated files # This job is primarily for version control
+      - name: Commit and Push generated files
         if: |
           always() &&
           (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
