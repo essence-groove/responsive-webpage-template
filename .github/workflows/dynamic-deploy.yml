@@ -364,7 +364,7 @@ jobs:
     # It does NOT need prepare_deploy_matrix anymore for count/force, but might for overall workflow structure.
     # If deploy_all_apps always needs to run after this, you might need deploy_all_apps in needs.
     # For now, let's just use find_apps and generate_docs_files for state logic.
-    needs: [find_apps, generate_docs_files]
+    needs: find_apps
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
