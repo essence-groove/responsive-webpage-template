@@ -304,10 +304,11 @@ jobs:
 
       - name: Commit and Push generated files (including state file)
         # ONLY commit if any of the three files changed
+        # Include state file change
         if: |
           steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
           steps.generate_content_py.outputs.apps_json_updated_flag == 'true' ||
-          steps.update_state_file_content.outputs.state_file_changed == 'true' # Include state file change
+          steps.update_state_file_content.outputs.state_file_changed == 'true' 
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
