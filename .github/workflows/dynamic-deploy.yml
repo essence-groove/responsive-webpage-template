@@ -345,8 +345,10 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
-          branch: ${{ github.event.inputs.branch || github.ref }}
-          add_options: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
+          # Removed 'branch' input to avoid detached HEAD
+          # branch: ${{ github.event.inputs.branch || github.ref }} 
+          # Correctly specify files to add using file_pattern
+          file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json" 
           skip_dirty_check: true
           push_options: "--force"
 
