@@ -13,7 +13,7 @@ on:
     paths:
       - '**'
 
-jobs: # <--- THIS LINE IS CRUCIAL AND WAS LIKELY MISSING THE COLON OR MISPLACED
+jobs: 
   find_apps: # This job and all subsequent jobs must be indented two spaces under 'jobs:'
     runs-on: ubuntu-latest
     outputs:
