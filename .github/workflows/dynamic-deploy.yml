@@ -1,14 +1,11 @@
 name: Dynamic Multi-App Heroku Deploy
 
 on:
-  push:
+  pull_request:
     branches:
-      - main # Or 'master'
-      - new-build-scripting
-    paths:
-      - '.github/workflows/dynamic-deploy.yml'
-      - '.github/workflows/deploy-app-reusable.yml'
-      - '.github/workflows/utils-1.yml'
+      - sub-mix-1
+      - new-apps
+
 
 jobs:
   
@@ -16,7 +13,11 @@ jobs:
   prepare_deploy_matrix: # Job 3: Reads apps.json and outputs the matrix data for deploy_all_apps
     runs-on: ubuntu-latest
     outputs:
-      app_data_json: ${{ steps.read_json.outputs.app_data_json }}
+      app_details_json: ${{ steps.scan.outputs.app_details_json }}
+    env:
+      APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,8 +52,9 @@ jobs:
           echo "app_data_json=$APP_DATA_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
 
-  deploy_all_apps: # Job 4: Orchestrates deployment of all apps
-    needs: prepare_deploy_matrix # Now depends on the new job for matrix data
+  generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
+    needs: find_apps # FIX: This job now only needs 'find_apps' to get all app details
+
     runs-on: ubuntu-latest
     if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }}
     strategy:
@@ -76,8 +78,16 @@ jobs:
           /tmp/heroku-install.sh
         shell: bash
 
-      - name: Install jq (for package.json parsing)
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Generate apps.md and apps.json Content with Python Script
+        id: generate_content_py
+        run: python .github/scripts/generate_app_list.py
+        env:
+          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }} # Pass rich app details
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # This is for the old comma-separated secret, should be removed
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }} # Passed to the Python script
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }} # Passed to the Python script
+        shell: bash
+
 
       - name: Read App Config and Prepare Deploy Variables
         id: prepare_vars
@@ -119,12 +129,17 @@ jobs:
           echo "app_folder_name_for_deploy=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
           echo "deployed_url_for_docs=$DEPLOYED_URL" >> "$GITHUB_OUTPUT" # Pass full URL for docs generation
         shell: bash
-
-      - name: Deploy to Heroku - Actual Action
-        id: deploy_action
-        uses: akhileshns/heroku-deploy@v3.13.15
+      
+      - name: Commit and Push generated files
+        if: |
+          always() &&
+          (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || 
+           steps.generate_content_py.outputs.apps_json_updated_flag == 'true')
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          heroku_app_name: ${{ steps.prepare_vars.outputs.heroku_app_name_for_deploy }}
-          appdir: ${{ matrix.app_data.app_dir }}
+          commit_message: "Docs: Update deployed app links and JSON list"
+          branch: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add_options: "apps.md homepage-app/apps/apps.json" # Explicitly add files
+          skip_dirty_check: true # <--- CRITICAL FIX: Force commit even if repo is dirty
+
