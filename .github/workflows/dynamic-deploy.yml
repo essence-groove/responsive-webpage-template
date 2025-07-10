@@ -166,6 +166,9 @@ jobs:
           skip_dirty_check: true
 
 
+  jobs:
+  # ... (previous jobs: find_apps, generate_docs_files) ...
+
   prepare_deploy_matrix: # Job 3: Reads apps.json and outputs the matrix data for deploy_all_apps
     needs: generate_docs_files
     runs-on: ubuntu-latest
@@ -189,10 +192,7 @@ jobs:
           fi
 
           # Read apps.json and extract app names and URLs for the matrix
-          # The matrix needs a list of dictionaries, each containing 'app_dir' and 'heroku_app_name'
-          # 'app_dir' is derived from the 'name' field in apps.json, constructing the full path.
-          # 'heroku_app_name' is derived from the the 'herokuAppName' field.
-          # 'url' is derived from the 'deployedUrl' field.
+          # The matrix needs a list of dictionaries, each containing 'app_dir', 'heroku_app_name', and 'url'
           APP_DATA_JSON=$(jq -c '[.[] | {"app_dir": .app_dir, "heroku_app_name": .herokuAppName, "url": .url}]' "$APPS_JSON_PATH")
 
           if [ "$APP_DATA_JSON" == "[]" ]; then
@@ -233,13 +233,15 @@ jobs:
       - name: Install jq (for package.json parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Read App Config and Prepare Deploy Variables
+      - name: Read App Config and Prepare Deploy Variables # <-- This is the step
         id: prepare_vars
         run: |
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
-          HEROKU_APP_TARGET_NAME="${{ matrix.app_data.herokuAppName }}" # Use herokuAppName from matrix
-          DEPLOYED_URL="${{ matrix.app_data.url }}" # Use url from matrix
+          # CORRECTED LINE HERE: Use 'heroku_app_name' from the matrix
+          HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}"
+          # Also ensure 'url' is correctly referenced in case that was also affected
+          DEPLOYED_URL="${{ matrix.app_data.url }}"
 
           echo "Current APP_DIR: $APP_DIR"
           echo "Current HEROKU_APP_TARGET_NAME: $HEROKU_APP_TARGET_NAME"
@@ -271,7 +273,7 @@ jobs:
 
           echo "heroku_app_name_for_deploy=$HEROKU_APP_TARGET_NAME" >> "$GITHUB_OUTPUT"
           echo "app_folder_name_for_deploy=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
-          echo "deployed_url_for_docs=$DEPLOYED_URL" >> "$GITHUB_OUTPUT" # Pass full URL for docs generation
+          echo "deployed_url_for_docs=$DEPLOYED_URL" >> "$GITHUB_OUTPUT"
         shell: bash
 
       - name: Deploy to Heroku - Actual Action
