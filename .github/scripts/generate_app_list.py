@@ -3,41 +3,43 @@ import os
 import sys
 
 def main():
-    # --- Retrieve Writable Files Secrets ---
+    # --- Retrieve Writable Files Secrets (Individual) ---
     rwt_writable_files_str = os.environ.get("RWT_WRITABLE_FILES")
     allowed_write_paths = []
-    if rwt_writable_files_str:
-        allowed_write_paths = [os.path.normpath(p.strip()) for p in rwt_writable_files_str.split(',') if p.strip()]
     
+    apps_md_path = os.environ.get("RWT_WRITABLE_FILE_APPS_MD")
+    if apps_md_path:
+        allowed_write_paths.append(os.path.normpath(apps_md_path.strip()))
+    
+    homepage_apps_json_path = os.environ.get("RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON")
+    if homepage_apps_json_path:
+        allowed_write_paths.append(os.path.normpath(homepage_apps_json_path.strip()))
+
     def is_write_allowed(target_path):
         normalized_target_path = os.path.normpath(target_path)
         for allowed_path in allowed_write_paths:
             if normalized_target_path == allowed_path:
                 return True
+        
         print(f"::warning::SECURITY ALERT: Attempted to write to '{target_path}', but it is not listed in RWT_WRITABLE_FILES secrets. Write operation skipped.", file=sys.stderr)
         print(f"::warning::Please ensure the corresponding secret (e.g., 'RWT_WRITABLE_FILE_APPS_MD' or 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON') is correctly set with the exact path '{target_path}' if this write is intended.", file=sys.stderr)
         return False
 
     # --- Data Collection Logic ---
-    app_dirs_json_raw = os.environ.get("APP_DIRS_JSON_FROM_FIND_APPS") 
-    app_data_matrix_json = os.environ.get("APP_DATA_MATRIX_JSON") # This is needed for herokuAppName and deployedUrl
-
-    if not app_dirs_json_raw:
-        print("::error::APP_DIRS_JSON_FROM_FIND_APPS environment variable is missing.", file=sys.stderr)
-        sys.exit(1)
-    if not app_data_matrix_json:
-        print("::error::APP_DATA_MATRIX_JSON environment variable is missing.", file=sys.stderr)
+    # FIX: Change variable name from APP_DIRS_JSON_FROM_FIND_APPS to APP_DATA_FROM_FIND_APPS
+    app_data_from_find_apps_json = os.environ.get("APP_DATA_FROM_FIND_APPS") 
+    
+    if not app_data_from_find_apps_json: # Check for the correct variable name
+        print("::error::APP_DATA_FROM_FIND_APPS environment variable is missing.", file=sys.stderr)
         sys.exit(1)
 
     try:
-        app_dirs_raw = json.loads(app_dirs_json_raw) # e.g., ["homepage-app", "homepage-app/to_do_list"]
-        app_data_parsed = json.loads(app_data_matrix_json) # e.g., [{"app_dir": "homepage-app", "herokuAppName": "...", "url": "..."}, ...]
+        app_details_list = json.loads(app_data_from_find_apps_json)
     except json.JSONDecodeError:
-        print(f"::error::Failed to parse JSON from env vars. Raw dirs: {app_dirs_json_raw}, Matrix data: {app_data_matrix_json}", file=sys.stderr)
+        print(f"::error::Failed to parse JSON from APP_DATA_FROM_FIND_APPS: {app_data_from_find_apps_json}", file=sys.stderr)
         sys.exit(1)
 
-    # Create a dictionary for quick lookup of app data by app_dir (from matrix data)
-    app_data_lookup = {item["app_dir"]: item for item in app_data_parsed}
+    app_data_lookup = {item["app_dir"]: item for item in app_details_list}
 
     apps_for_md_content = [] 
     apps_for_json_data = []  
@@ -45,34 +47,23 @@ def main():
     apps_updated_flag_md = False 
     apps_updated_flag_json = False 
 
-    for app_dir in app_dirs_raw: # Iterate over the raw list of app directories found by find_apps
-        app_folder_name = os.path.basename(app_dir)
-        
-        # Get the full app data (including herokuAppName and deployedUrl) from the lookup dictionary
-        app_info = app_data_lookup.get(app_dir)
-
-        if not app_info:
-            print(f"::warning::App data for '{app_dir}' not found in matrix data. Skipping. This might indicate a mismatch between find_apps and apps.json.", file=sys.stderr)
-            continue
-
+    # Iterate over the original app directories list from find_apps' output.
+    # The `find_apps` job's output `app_details_json` now contains the full app details.
+    # So we don't need `app_dirs_raw` anymore. We just iterate over `app_details_list`.
+    for app_info in app_details_list: 
+        app_dir = app_info.get("app_dir")
+        app_folder_name = app_info.get("name") 
         app_url = app_info.get("url")
-        heroku_app_name_from_pkg = app_info.get("herokuAppName") # This is now directly from matrix data
+        heroku_app_name = app_info.get("herokuAppName") 
 
-        if not app_url: 
-            print(f"::warning::Skipping entry for \'{app_folder_name}\' as \'url\' is missing or empty in app data. Please check apps.json generation.", file=sys.stderr)
+        if not app_dir or not app_folder_name or not app_url or not heroku_app_name:
+            print(f"::warning::Skipping entry due to missing data in app_info: {app_info}. Ensure all required fields (app_dir, name, url, herokuAppName) are present.", file=sys.stderr)
             continue
         
-        # Prepare data for apps.md
         apps_for_md_content.append(f"* **{app_folder_name}:** [{app_url}]({app_url})")
         apps_updated_flag_md = True
 
-        # Prepare data for apps.json - NOW INCLUDING 'app_dir'
-        apps_for_json_data.append({
-            "app_dir": app_dir, # <--- ADDED: The full relative path
-            "name": app_folder_name, # The base folder name (e.g., homepage-app, to_do_list)
-            "url": app_url,
-            "herokuAppName": heroku_app_name_from_pkg
-        })
+        apps_for_json_data.append(app_info) 
         apps_updated_flag_json = True
 
     # --- Generate apps.md Content ---
