@@ -5,6 +5,8 @@ on:
     branches:
       - sub-mix-1
       - new-apps
+    paths:
+      - '**'
 
 
 jobs:
