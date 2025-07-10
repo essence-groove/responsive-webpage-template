@@ -360,24 +360,27 @@ jobs:
         shell: bash
 
   update_workflow_state:
-    # Now needs both find_apps and generate_docs_files to get relevant outputs
-    # It does NOT need prepare_deploy_matrix anymore for count/force, but might for overall workflow structure.
-    # If deploy_all_apps always needs to run after this, you might need deploy_all_apps in needs.
-    # For now, let's just use find_apps and generate_docs_files for state logic.
-    needs: find_apps
+    # Needs both find_apps and generate_docs_files to get relevant outputs for state.
+    needs: [find_apps, generate_docs_files]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Crucial: Checkout the branch to get the current state file
+          ref: ${{ github.event.inputs.branch || github.ref }}
       
       - name: Update Workflow State File
+        id: update_state_file_content # Add an ID to get its output
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
 
-          CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
+          # Read current state from the file that was just checked out
+          CURRENT_STATE_FROM_FILE=$(jq '.' "$STATE_FILE" || echo '{}')
+          echo "::debug::Current state from file: $CURRENT_STATE_FROM_FILE"
           
           # Get values from find_apps job outputs (the new source for these)
           DOWNLOAD_COUNT_FROM_FIND_APPS="${{ needs.find_apps.outputs.updated_download_count }}"
@@ -390,13 +393,13 @@ jobs:
           echo "::debug::Updating state with force_next_upload: ${FORCE_UPLOAD_FROM_FIND_APPS}"
           echo "::debug::Last uploaded run ID from generate_docs_files: ${LAST_UPLOADED_RUN_ID}"
 
-          # Update the JSON structure for count and force flag
-          UPDATED_STATE=$(echo "$CURRENT_STATE" | jq \
+          # Build the new state JSON structure
+          UPDATED_STATE=$(echo "$CURRENT_STATE_FROM_FILE" | jq \
             --argjson count "$DOWNLOAD_COUNT_FROM_FIND_APPS" \
             --argjson force "$FORCE_UPLOAD_FROM_FIND_APPS" \
             ".${DOWNLOAD_COUNT_KEY} = \$count | .${FORCE_UPLOAD_KEY} = \$force")
           
-          # Only update last_successful_apps_json_artifact_run_id if generate_docs_files actually uploaded it
+          # Only update last_successful_apps_json_artifact_run_id if generate_docs_files actually uploaded
           if [ -n "$LAST_UPLOADED_RUN_ID" ] && [ "$LAST_UPLOADED_RUN_ID" != "null" ]; then
               UPDATED_STATE=$(echo "$UPDATED_STATE" | jq \
                 --argjson last_run_id "$LAST_UPLOADED_RUN_ID" \
@@ -407,15 +410,28 @@ jobs:
           echo "::debug::New state to write: $UPDATED_STATE"
 
           mkdir -p $(dirname "$STATE_FILE")
-          echo "$UPDATED_STATE" > "$STATE_FILE"
+          echo "$UPDATED_STATE" > "$STATE_FILE" # Overwrite with the potentially updated state
+
+          # Compare new content with original file to determine if a commit is needed
+          if diff -q "$STATE_FILE" <(echo "$CURRENT_STATE_FROM_FILE" | jq '.'); then
+            echo "::notice::.github/workflow_state.json content is identical. No commit needed for state file."
+            echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::.github/workflow_state.json content has changed. Commit needed for state file."
+            echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
+          fi
         shell: bash
+
       - name: Commit Updated Workflow State
+        # ONLY commit if the state file content has actually changed
+        if: ${{ steps.update_state_file_content.outputs.state_file_changed == 'true' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Workflow: Update artifact download state [skip ci]"
-          branch: ${{ github.ref_name }}
-          add_options: ".github/workflow_state.json"
+          branch: ${{ github.event.inputs.branch || github.ref }}
+          add_options: ".github/workflow_state.json" # Only commit the state file
           skip_dirty_check: true
+          # push_options: "--force" # Add this if you consistently hit non-fast-forward errors
 
 
   deploy_all_apps:
