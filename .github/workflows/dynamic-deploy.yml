@@ -332,83 +332,99 @@ jobs:
     outputs:
       app_data_json: ${{ steps.read_json.outputs.app_data_json }}
     steps:
-      - name: Checkout code
+      - name: Checkout code # This is for accessing .github/workflow_state.json if needed
         uses: actions/checkout@v4
-      
-      - name: Get workflow state for download auditing
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }} # Checkout the branch to read current workflow_state.json
+
+      - name: Get workflow state for download auditing # This step still extracts counters from workflow_state.json
         id: get_download_state
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
-          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
-          FORCE_UPLOAD_KEY="force_next_upload" # This flag signals for the *next* run to force upload
+          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id" # We won't use this directly for download, but keep for auditing
+          FORCE_UPLOAD_KEY="force_next_upload"
+          UPLOAD_COUNT_KEY="apps_json_upload_count" # For auditing
 
-          # Read current state if exists
+          # Read current state (which reflects the last committed state)
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
-          # Extract values without modification here
-          CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
-          LAST_RUN_ID=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"" "$STATE_FILE")
-          CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
           
-          echo "Current download count from state: $CURRENT_COUNT"
-          echo "Last artifact run ID from state: $LAST_RUN_ID"
-          echo "Force upload flag from state: $CURRENT_FORCE_FLAG"
+          # Extract values from the state file
+          CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
+          LAST_UPLOADED_RUN_ID_FROM_STATE=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"") # For auditing/logging
+          CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${UPLOAD_COUNT_KEY} // 0") # For auditing
 
-          # Output these for the github-script step to consume directly
-          echo "download_count=$CURRENT_COUNT" >> "$GITHUB_OUTPUT"
-          echo "last_artifact_run_id=$LAST_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "Current download count from state: $CURRENT_DOWNLOAD_COUNT"
+          echo "Last artifact uploaded run ID from state: $LAST_UPLOADED_RUN_ID_FROM_STATE"
+          echo "Force upload flag from state: $CURRENT_FORCE_FLAG"
+          echo "Current upload count from state: $CURRENT_UPLOAD_COUNT"
+
+          # Output these values for potential use in subsequent steps (e.g., github-script)
+          echo "download_count=$CURRENT_DOWNLOAD_COUNT" >> "$GITHUB_OUTPUT"
+          echo "last_artifact_uploaded_run_id=$LAST_UPLOADED_RUN_ID_FROM_STATE" >> "$GITHUB_OUTPUT"
           echo "force_next_upload=$CURRENT_FORCE_FLAG" >> "$GITHUB_OUTPUT"
+          echo "upload_count=$CURRENT_UPLOAD_COUNT" >> "$GITHUB_OUTPUT"
         shell: bash
         
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get Latest Workflow Run ID for Artifact Download
-        id: get_run_id
+      - name: Get Latest Artifact Run ID from Registry # THIS IS THE KEY STEP
+        id: get_latest_artifact_run_id
         uses: actions/github-script@v6
         with:
           script: |
-            const downloadCount = parseInt(process.env.DOWNLOAD_COUNT_FROM_STATE);
-            const lastArtifactRunId = process.env.LAST_ARTIFACT_RUN_ID_FROM_STATE;
-            const forceNextUpload = process.env.FORCE_NEXT_UPLOAD_FROM_STATE === 'true';
+            const artifactName = 'latest-apps-json';
+            const workflowFileName = 'dynamic-deploy.yml'; // Your workflow file name
+            const targetBranch = 'main'; // The branch where artifacts are expected to be uploaded
 
-            let runToDownloadId = null;
-            
-            if (lastArtifactRunId && lastArtifactRunId !== "null") {
-                runToDownloadId = lastArtifactRunId;
-                console.log(`Attempting to download artifact from last known run ID from state: ${runToDownloadId}`);
-            } else {
-                console.log("No last known artifact run ID in state. Querying for latest successful workflow run via API.");
-                const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    workflow_id: 'dynamic-deploy.yml',
-                    branch: 'main',
-                    status: 'success',
-                    per_page: 1
-                });
-                if (workflow_runs.length > 0) {
-                    runToDownloadId = workflow_runs[0].id;
-                    console.log(`Found latest successful run ID via API: ${runToDownloadId}`);
-                } else {
-                    core.setFailed('No successful workflow run found on "main" to download artifacts from. Cannot proceed with deployment.');
-                    return;
-                }
+            console.log(`Searching for latest artifact '${artifactName}' from workflow '${workflowFileName}' on branch '${targetBranch}'.`);
+
+            // List workflow runs for the specific workflow and branch, sorted by most recent
+            const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: workflowFileName,
+              branch: targetBranch,
+              status: 'success', // Only consider successful runs
+              per_page: 10 // Fetch a few to ensure we find one with the artifact
+            });
+
+            let latestRunIdWithArtifact = null;
+
+            for (const run of workflow_runs) {
+              // List artifacts for each successful workflow run
+              const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: run.id
+              });
+
+              const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+
+              if (targetArtifact) {
+                latestRunIdWithArtifact = run.id;
+                console.log(`Found latest run ID '${latestRunIdWithArtifact}' with artifact '${artifactName}'.`);
+                break; // Found the latest, so break the loop
+              }
             }
-            core.setOutput('run_id', runToDownloadId);
+
+            if (latestRunIdWithArtifact) {
+              core.setOutput('artifact_run_id', latestRunIdWithArtifact);
+            } else {
+              core.setFailed(`No successful workflow run found on '${targetBranch}' with artifact '${artifactName}'. Cannot proceed with deployment.`);
+            }
           result-encoding: json
-        env:
-          DOWNLOAD_COUNT_FROM_STATE: ${{ steps.get_download_state.outputs.download_count }}
-          LAST_ARTIFACT_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_run_id }}
-          FORCE_NEXT_UPLOAD_FROM_STATE: ${{ steps.get_download_state.outputs.force_next_upload }}
+          github-token: ${{ secrets.GITHUB_TOKEN }} # Needs token to query API
 
       - name: Download latest-apps-json Artifact
         uses: actions/download-artifact@v4
-        if: ${{ steps.get_run_id.outputs.run_id }}
+        if: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}
         with:
           name: latest-apps-json
           path: homepage-app/apps/
-          run-id: ${{ steps.get_run_id.outputs.run_id }}
+          run-id: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }} # Use the ID fetched from registry
 
       - name: Read apps.json for Matrix
         id: read_json
@@ -417,8 +433,8 @@ jobs:
           APPS_JSON_PATH="homepage-app/apps/apps.json"
           
           if [ ! -f "$APPS_JSON_PATH" ] || [ ! -s "$APPS_JSON_PATH" ]; then
-            echo "::error::${APPS_JSON_PATH} (downloaded artifact) not found or is empty, despite expecting it from run ID ${{ steps.get_run_id.outputs.run_id }}. This indicates a potential artifact expiry or upload issue."
-            echo "::warning::Warning: The apps.json file said there is an artifact available, but it may not necessarily be true. Check previous workflow runs."
+            echo "::error::${APPS_JSON_PATH} (downloaded artifact) not found or is empty, despite being downloaded. This indicates a problem with the downloaded artifact itself."
+            echo "::warning::Warning: The apps.json file from the last successful upload was expected but missing or empty. Check the artifact contents of run ID ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}."
             
             echo "app_data_json=[]" >> "$GITHUB_OUTPUT"
             exit 0
