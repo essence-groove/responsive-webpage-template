@@ -150,24 +150,24 @@ jobs:
     needs: find_apps
     runs-on: ubuntu-latest
     outputs:
-      # NEW OUTPUT: Indicate the run_id if apps.json was successfully uploaded
-      last_uploaded_run_id: ${{ steps.upload_artifact_result.outputs.last_uploaded_run_id }}
+      # Output the run_id if apps.json was successfully uploaded by this job
+      last_uploaded_run_id: ${{ steps.set_uploaded_run_id.outputs.id }}
     if: |
       always() &&
       needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
-      - name: Debug APP_DATA_FROM_FIND_APPS Input
+      # Debug APP_DATA_FROM_FIND_APPS Input: Now more focused on inputs from 'find_apps'
+      - name: Debug Inputs from Find Apps
         run: |
-          echo "--- Debugging APP_DATA_FROM_FIND_APPS ---"
-          echo "Checking if 'find_apps' job ran: ${{ needs.find_apps.result }}"
+          echo "--- Debugging Inputs to generate_docs_files ---"
           echo "Output from 'find_apps.outputs.app_details_json': ${{ needs.find_apps.outputs.app_details_json }}"
-          echo "Environment variable APP_DATA_FROM_FIND_APPS: '$APP_DATA_FROM_FIND_APPS'"
+          echo "Value of APP_DATA_FROM_FIND_APPS env var: '$APP_DATA_FROM_FIND_APPS'"
           echo "Force apps.json upload flag from find_apps: ${{ needs.find_apps.outputs.force_apps_json_upload }}"
           if [ -z "$APP_DATA_FROM_FIND_APPS" ]; then
-            echo "::error::APP_DATA_FROM_FIND_APPS is indeed empty or not set in this job's environment."
+            echo "::error::APP_DATA_FROM_FIND_APPS is empty. This indicates a problem with output passing or 'find_apps' generating empty data."
           fi
-          echo "--- End Debug APP_DATA_FROM_FIND_APPS ---"
+          echo "--- End Debug Inputs ---"
         shell: bash
         env:
           APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
@@ -210,6 +210,7 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          # This flag is what tells the Python script to force the JSON update
           FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
         shell: bash
 
@@ -221,16 +222,19 @@ jobs:
         shell: bash
 
       - name: Upload homepage-app/apps/apps.json as Artifact
-        id: upload_artifact_result # Give this step an ID to output whether it uploaded
+        id: upload_artifact_result
         if: ${{ steps.generate_content_py.outputs.apps_json_updated_flag == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: latest-apps-json
           path: homepage-app/apps/apps.json
           retention-days: 7
-      - name: Set Last Uploaded Run ID Output # NEW STEP: Set output after artifact upload
-        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }} # Only if upload step ran and succeeded
-        run: echo "last_uploaded_run_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+      
+      # NEW STEP: Conditionally set the 'last_uploaded_run_id' output
+      - name: Set Last Uploaded Run ID Output
+        id: set_uploaded_run_id
+        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }}
+        run: echo "id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
         shell: bash
 
       - name: Commit and Push generated files (including state file)
@@ -243,7 +247,12 @@ jobs:
           branch: ${{ github.event.inputs.branch || github.ref }}
           add_options: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
           skip_dirty_check: true
+          push_options: "--force" # Ensure state file updates land, as discussed
 
+
+
+
+          
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
     outputs:
