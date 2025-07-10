@@ -37,7 +37,6 @@ jobs:
 
           for BASE_DIR in $APP_BASE_DIRS; do
             echo "Searching for package.json in base directory: $BASE_DIR"
-            # Debug: List directories where find is searching
             if [ ! -d "$BASE_DIR" ]; then
               echo "::error::Base directory '$BASE_DIR' not found. Please ensure it exists."
               continue
@@ -49,7 +48,7 @@ jobs:
               echo "No package.json files found directly within or under '$BASE_DIR'."
             else
               echo "Found potential app directories with package.json under '$BASE_DIR':"
-              echo "$FOUND_DIRS" | sed 's/^/- /' # List them with a bullet
+              echo "$FOUND_DIRS" | sed 's/^/- /'
             fi
 
             for APP_DIR in $FOUND_DIRS; do
@@ -62,16 +61,14 @@ jobs:
                 continue
               fi
 
-              # Read details from package.json
               APP_NAME=$(jq -r '.name' "$PACKAGE_JSON_PATH" || echo "")
               HEROKU_APP_NAME=$(jq -r '.herokuAppName' "$PACKAGE_JSON_PATH" || echo "")
               DEPLOYED_URL=$(jq -r '.deployedUrl' "$PACKAGE_JSON_PATH" || echo "")
 
               echo "  - Extracted Name: '$APP_NAME'"
-              echo "  - Extracted Heroku App Name: '$HEROKU_APP_NAME'"
+              echo "  - Extracted Heroku App Name: '$HEROKU_APP_APP_NAME'"
               echo "  - Extracted Deployed URL: '$DEPLOYED_URL'"
 
-              # Basic validation for essential fields
               if [ -z "$APP_NAME" ] || [ "$APP_NAME" == "null" ]; then
                   echo "::warning::'name' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
                   continue
@@ -85,14 +82,12 @@ jobs:
                   continue
               fi
 
-              # Consistency Check: Folder Name vs. package.json 'name'
               APP_FOLDER_NAME=$(basename "$APP_DIR")
               echo "  - App Folder Name: '$APP_FOLDER_NAME'"
               if [ "$APP_FOLDER_NAME" != "$APP_NAME" ]; then
                   echo "::warning::Inconsistency: Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}'). Using folder name as primary identifier for consistency."
               fi
 
-              # Construct JSON object for this app with all details
               APP_JSON_OBJ="{\"app_dir\":\"$APP_DIR\", \"name\":\"$APP_NAME\", \"herokuAppName\":\"$HEROKU_APP_NAME\", \"url\":\"$DEPLOYED_URL\"}"
               APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
               echo "  - App added to list: $APP_JSON_OBJ"
@@ -106,20 +101,18 @@ jobs:
             exit 0
           else
             echo "Total valid applications found: ${#APP_DETAILS_ARRAY[@]}"
-            # Convert array of JSON objects into a single JSON array string
             APP_DETAILS_JSON=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
             echo "Generated App Details JSON: $APP_DETAILS_JSON"
             printf "app_details_json=%s\n" "$APP_DETAILS_JSON" >> "$GITHUB_OUTPUT"
           fi
         shell: bash
 
-
-    generate_docs_files:
-     needs: find_apps
-      runs-on: ubuntu-latest
-      if: |
-        always() &&
-        needs.find_apps.outputs.app_details_json != '[]'
+  generate_docs_files: # <-- UNINDENTED HERE, ALIGNED WITH 'find_apps'
+    needs: find_apps
+    runs-on: ubuntu-latest
+    if: |
+      always() &&
+      needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
       - name: Checkout code
@@ -159,8 +152,6 @@ jobs:
           APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
-
----
 
       - name: Commit and Push generated files
         if: |
