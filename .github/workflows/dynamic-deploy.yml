@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - main
-      - artifact-not-found
     paths:
       - '**'
 
@@ -30,30 +29,32 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
-      # NEW STEP: Read and manage the workflow state file
       - name: Read Workflow State for Artifact Logic
         id: manage_workflow_state
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
-          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
+          DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          # Read the download threshold, defaulting to 0 if not present (will be handled more explicitly in generate_docs_files)
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY} // 0") 
 
-          echo "::debug::Initial state (find_apps) - Download Count: $CURRENT_DOWNLOAD_COUNT, Force Flag: $CURRENT_FORCE_FLAG"
+          echo "::debug::Initial state (find_apps) - Download Count: $CURRENT_DOWNLOAD_COUNT, Force Flag: $CURRENT_FORCE_FLAG, Threshold: $DOWNLOAD_THRESHOLD"
 
-          TEMP_NEW_DOWNLOAD_COUNT=$((CURRENT_DOWNLOAD_COUNT + 1)) 
           FORCE_UPLOAD_FOR_GENERATOR="false"
 
-          # Changed threshold to 1 to force upload every run
-          if [ "$TEMP_NEW_DOWNLOAD_COUNT" -ge 1 ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then
+          if [ "$DOWNLOAD_THRESHOLD" -eq 0 ]; then # Special case: If threshold is 0, always force upload
             FORCE_UPLOAD_FOR_GENERATOR="true"
-            echo "::notice::Download count reached NEW_THRESHOLD OR force flag was true. Signalling force apps.json upload for generate_docs_files."
+            echo "::notice::Download threshold is 0. Forcing apps.json upload for generate_docs_files."
+          elif [ "$CURRENT_DOWNLOAD_COUNT" -ge "$DOWNLOAD_THRESHOLD" ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then
+            FORCE_UPLOAD_FOR_GENERATOR="true"
+            echo "::notice::Download count ($CURRENT_DOWNLOAD_COUNT) reached threshold ($DOWNLOAD_THRESHOLD) OR force flag was true. Signalling force apps.json upload for generate_docs_files."
           else
-            echo "::notice::Download count: $TEMP_NEW_DOWNLOAD_COUNT/NEW_THRESHOLD. No force upload this run (yet)."
+            echo "::notice::Download count: $CURRENT_DOWNLOAD_COUNT/$DOWNLOAD_THRESHOLD. No force upload this run (yet)."
           fi
 
           echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT"
@@ -210,15 +211,15 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
-      - name: Update Workflow State File and Determine Commit # MODIFIED STEP
+      - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
-          # NEW KEY:
-          UPLOAD_COUNT_KEY="apps_json_upload_count" 
+          UPLOAD_COUNT_KEY="apps_json_upload_count"
+          DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
           # Read current state from the file that was just checked out
           CURRENT_STATE_FROM_FILE=$(jq '.' "$STATE_FILE" || echo '{}')
@@ -228,27 +229,42 @@ jobs:
           APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
           CURRENT_RUN_ID="${{ github.run_id }}"
           
-          # Get the current download count and force flag from the state file
-          # (These were read by find_apps and used for its decision in this run)
+          # Get the current state values for calculating the *next* state
           INITIAL_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           INITIAL_FORCE_FLAG=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${UPLOAD_COUNT_KEY} // 0")
           
-          # Get the current upload count
-          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${UPLOAD_COUNT_KEY} // 0") # Initialize to 0 if not found
+          # NEW LOGIC: Check and initialize DOWNLOAD_THRESHOLD
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY}")
+          if [ "$DOWNLOAD_THRESHOLD" == "null" ] || [ -z "$DOWNLOAD_THRESHOLD" ]; then
+            DOWNLOAD_THRESHOLD=0 # Default to 0 for "every run"
+            NEW_FORCE_UPLOAD_FLAG="true" # Force upload on the next run, since this is a new field
+            echo "::notice::Initializing '${DOWNLOAD_THRESHOLD_KEY}' in state file to ${DOWNLOAD_THRESHOLD}. Setting force_next_upload to true for next run."
+          else
+            # Ensure it's treated as a number for comparison later
+            DOWNLOAD_THRESHOLD=$(echo "$DOWNLOAD_THRESHOLD" | tr -d '\r') # Remove potential carriage return
+            NEW_FORCE_UPLOAD_FLAG="false" # Default for the next run, unless explicitly set
+          fi
 
-          # Determine new download count and force_next_upload for the *next* run
-          # This logic mirrors what find_apps *would have done* to its state if it persisted it.
-          NEW_DOWNLOAD_COUNT=$((INITIAL_DOWNLOAD_COUNT + 1))
-          NEW_FORCE_UPLOAD_FLAG="false"
-          # Changed threshold to 1 to force upload every run
-          if [ "$NEW_DOWNLOAD_COUNT" -ge 1 ] || [ "$INITIAL_FORCE_FLAG" = "true" ]; then
-              NEW_DOWNLOAD_COUNT=0 # Reset if force upload was triggered OR was already forced
-              NEW_FORCE_UPLOAD_FLAG="false" # Reset force flag after it has been acted upon
-              echo "::debug::State update: Count reset to 0, Force flag reset to false for next cycle."
+
+          # Determine NEW_DOWNLOAD_COUNT based on threshold and whether upload happened
+          NEW_DOWNLOAD_COUNT=$INITIAL_DOWNLOAD_COUNT # Start with current count
+
+          if [ "$DOWNLOAD_THRESHOLD" -eq 0 ]; then # If threshold is 0, count always resets to 0 regardless of upload status
+            NEW_DOWNLOAD_COUNT=0
+            echo "::debug::Threshold is 0. Download count reset to 0 for next cycle."
+          elif [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
+            # If apps.json was updated this run, it means a force upload occurred. Reset download count.
+            NEW_DOWNLOAD_COUNT=0
+            echo "::debug::apps.json was updated this run. Download count reset to 0 for next cycle."
+          else
+            # If apps.json was NOT updated, increment the download count.
+            NEW_DOWNLOAD_COUNT=$((INITIAL_DOWNLOAD_COUNT + 1))
+            echo "::debug::apps.json was NOT updated this run. Download count incremented to: $NEW_DOWNLOAD_COUNT"
           fi
 
           # Increment upload count ONLY if apps.json was updated in this run
-          NEW_UPLOAD_COUNT="$CURRENT_UPLOAD_COUNT" # Default to current
+          NEW_UPLOAD_COUNT="$CURRENT_UPLOAD_COUNT"
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
             NEW_UPLOAD_COUNT=$((CURRENT_UPLOAD_COUNT + 1))
             echo "::debug::apps.json was updated this run. Incrementing upload count to: $NEW_UPLOAD_COUNT"
@@ -256,13 +272,13 @@ jobs:
             echo "::debug::apps.json was NOT updated this run. Upload count remains: $CURRENT_UPLOAD_COUNT"
           fi
 
-
-          # Build the new state JSON structure
+          # Build the new state JSON structure including the threshold
           UPDATED_STATE=$(echo "$CURRENT_STATE_FROM_FILE" | jq \
             --argjson download_count "$NEW_DOWNLOAD_COUNT" \
             --argjson force "$NEW_FORCE_UPLOAD_FLAG" \
             --argjson upload_count "$NEW_UPLOAD_COUNT" \
-            ".${DOWNLOAD_COUNT_KEY} = \$download_count | .${FORCE_UPLOAD_KEY} = \$force | .${UPLOAD_COUNT_KEY} = \$upload_count")
+            --argjson download_threshold "$DOWNLOAD_THRESHOLD" \
+            ".${DOWNLOAD_COUNT_KEY} = \$download_count | .${FORCE_UPLOAD_KEY} = \$force | .${UPLOAD_COUNT_KEY} = \$upload_count | .${DOWNLOAD_THRESHOLD_KEY} = \$download_threshold")
           
           # Only update last_successful_apps_json_artifact_run_id if apps.json was actually updated and uploaded in this job
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
@@ -315,10 +331,6 @@ jobs:
           skip_dirty_check: true
           push_options: "--force"
 
-
-
-
-
           
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
@@ -338,6 +350,7 @@ jobs:
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
           UPLOAD_COUNT_KEY="apps_json_upload_count"
+          DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           
@@ -345,16 +358,20 @@ jobs:
           LAST_UPLOADED_RUN_ID_FROM_STATE=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"")
           CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
           CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${UPLOAD_COUNT_KEY} // 0")
+          # Read the download threshold, defaulting to 0 if not present (handled by generate_docs_files)
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY} // 0")
 
           echo "Current download count from state: $CURRENT_DOWNLOAD_COUNT"
           echo "Last artifact uploaded run ID from state: $LAST_UPLOADED_RUN_ID_FROM_STATE"
           echo "Force upload flag from state: $CURRENT_FORCE_FLAG"
           echo "Current upload count from state: $CURRENT_UPLOAD_COUNT"
+          echo "Download threshold from state: $DOWNLOAD_THRESHOLD"
 
           echo "download_count=$CURRENT_DOWNLOAD_COUNT" >> "$GITHUB_OUTPUT"
           echo "last_artifact_uploaded_run_id=$LAST_UPLOADED_RUN_ID_FROM_STATE" >> "$GITHUB_OUTPUT"
           echo "force_next_upload=$CURRENT_FORCE_FLAG" >> "$GITHUB_OUTPUT"
           echo "upload_count=$CURRENT_UPLOAD_COUNT" >> "$GITHUB_OUTPUT"
+          echo "download_threshold=$DOWNLOAD_THRESHOLD" >> "$GITHUB_OUTPUT"
         shell: bash
         
       - name: Install jq
@@ -463,62 +480,48 @@ jobs:
         continue-on-error: true # CRITICAL: Continue on error if download fails
 
       - name: Read apps.json for Matrix
-        id: extract_matrix_data # Renamed ID to avoid conflict, as previously discussed
+        id: extract_matrix_data 
         run: |
           set -e
           APPS_JSON_PATH="homepage-app/apps/apps.json"
           
-          # Use a multi-line string with a delimiter for GITHUB_OUTPUT to handle JSON arrays.
           DELIMITER="EOF_APP_DATA_JSON" 
           
-          # Initialize app_data_json_output to an empty JSON array string
-          # This ensures that even if no apps are found or download fails,
-          # a valid JSON array is always output.
-          # IMPORTANT: This must be a single string without newlines for the default initialization.
           app_data_json_output="[{\"dummy_run\":true,\"deploy_app\":false}]" # Default to dummy run if no real apps
 
-          # Check if the file was actually downloaded and exists after the previous step.
           if [ -f "$APPS_JSON_PATH" ] && [ -s "$APPS_JSON_PATH" ]; then
-            APP_DATA_RAW=$(cat "$APPS_JSON_PATH") # Read file content
-            # Add deploy_app: true to each real app, and check if it's valid JSON for .apps[]
+            APP_DATA_RAW=$(cat "$APPS_JSON_PATH") 
             PARSED_DATA=$(echo "$APP_DATA_RAW" | jq '[.apps[] | select(has("app_dir")) | . + {"deploy_app": true}]' 2>/dev/null)
 
             if [ -n "$PARSED_DATA" ] && [ "$PARSED_DATA" != "null" ]; then
               if [ "$(echo "$PARSED_DATA" | jq 'length')" -gt 0 ]; then
-                app_data_json_output="$PARSED_DATA" # Use real data if found
+                app_data_json_output="$PARSED_DATA" 
                 echo "Generated app data for matrix:"
-                echo "$app_data_json_output" # Print for debugging
+                echo "$app_data_json_output" 
               else
                 echo "::warning::${APPS_JSON_PATH} (downloaded artifact) contains no valid app data after parsing. Using dummy matrix for empty deployment."
               fi
             else
               echo "::warning::Failed to parse valid app data from ${APPS_JSON_PATH} (downloaded artifact). Content might be invalid JSON or unexpected structure. Using dummy matrix for empty deployment."
-              echo "Raw content for debugging: $APP_DATA_RAW" # Print raw content for debugging
+              echo "Raw content for debugging: $APP_DATA_RAW" 
             fi
           else
             echo "::warning::${APPS_JSON_PATH} (source for deployment matrix) not found or is empty locally. Using dummy matrix for empty deployment."
           fi
 
-          # Output the JSON string using the delimiter for multi-line output
           echo "app_data_json<<$DELIMITER" >> "$GITHUB_OUTPUT"
           echo "$app_data_json_output" >> "$GITHUB_OUTPUT"
           echo "$DELIMITER" >> "$GITHUB_OUTPUT"
-          # No exit 0 here; let the step complete based on its outputs.
         shell: bash
 
 
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
-    # NEW IF CONDITION: Skip the entire job if the matrix is just the dummy entry.
-    # We check if the 'app_data_json' is exactly equal to the dummy string.
-    # This prevents the job from appearing to run when there's nothing to deploy.
     if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run":true,"deploy_app":false}]' }}
     strategy:
       fail-fast: false
       matrix:
-        # This will now ALWAYS receive a non-empty array from prepare_deploy_matrix.
-        # It will be either real app data, or '[{"dummy_run": true, "deploy_app": false}]'.
         app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
 
     steps:
@@ -526,15 +529,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        # Filter for dummy run:
-        if: ${{ matrix.app_data.deploy_app != false }} # Checks if the dummy_run flag is NOT false
+        if: ${{ matrix.app_data.deploy_app != false }}
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
 
       - name: Install Heroku CLI
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         run: |
           curl -L https://cli-assets.heroku.com/install.sh -o /tmp/heroku-install.sh
           chmod +x /tmp/heroku-install.sh
@@ -542,12 +544,12 @@ jobs:
         shell: bash
 
       - name: Install jq (for package.json parsing)
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Read App Config and Prepare Deploy Variables
         id: prepare_vars
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         run: |
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
@@ -588,7 +590,7 @@ jobs:
 
       - name: Deploy to Heroku - Actual Action
         id: deploy_action
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
