@@ -36,7 +36,9 @@ jobs:
           # Read apps.json and extract app names and URLs for the matrix
           # The matrix needs a list of dictionaries, each containing 'app_dir' and 'heroku_app_name'
           # 'app_dir' is derived from the 'name' field in apps.json, constructing the full path.
-          # 'heroku_app_name' is derived from the 'url' field.
+          # 'heroku_app_name' is derived from the the 'herokuAppName' field.
+          # 'url' is derived from the 'deployedUrl' field.
+          # FIX: Directly use .herokuAppName and .deployedUrl from apps.json
           APP_DATA_JSON=$(jq -c '[.[] | {"app_dir": (if .name == "homepage-app" then "homepage-app" else "homepage-app/" + .name end), "heroku_app_name": .herokuAppName, "url": .deployedUrl}]' "$APPS_JSON_PATH")
 
           if [ "$APP_DATA_JSON" == "[]" ]; then
@@ -81,14 +83,12 @@ jobs:
         id: prepare_vars
         run: |
           set -e
-          # Debugging: Echo the full matrix item for this iteration
-          echo "Matrix app_data for this iteration: ${{ toJson(matrix.app_data) }}"
-
           APP_DIR="${{ matrix.app_data.app_dir }}"
-          # FIX: Correctly assign HEROKU_APP_TARGET_NAME from matrix.app_data
+          # FIX: Get heroku_app_name from matrix.app_data.heroku_app_name (already correct)
           HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}" 
 
           echo "Current APP_DIR: $APP_DIR"
+          echo "Current HEROKU_APP_TARGET_NAME: $HEROKU_APP_TARGET_NAME" # Debugging line
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           
           # Re-read package.json to get its 'name' for consistency check
