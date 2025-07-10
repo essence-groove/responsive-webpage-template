@@ -5,7 +5,8 @@ on:
     branches:
       - main # Or 'master'
       - new-build-scripting-2
-
+    paths:
+      - '**'
 
 jobs:
   
