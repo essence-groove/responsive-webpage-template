@@ -6,7 +6,7 @@ on:
       - main # Or 'master'
       - new-build-scripting-2
     paths:
-      - '**'
+      - '**' # <--- UPDATED: Workflow now runs on any push to any file
 
 jobs:
   
