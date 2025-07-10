@@ -102,26 +102,26 @@ jobs:
         shell: bash
 
   generate_docs_files:
+    # THIS LINE IS CRUCIAL. It ensures 'find_apps' runs and completes BEFORE this job starts.
     needs: find_apps
     runs-on: ubuntu-latest
     if: |
       always() &&
-      needs.find_apps.outputs.app_details_json != '[]'
+      needs.find_apps.outputs.app_details_json != '[]' # Ensure this condition is met (if find_apps had data)
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
+          ref: ${{ github.event.inputs.branch || github.ref }} # Checkout the correct branch
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      # NEW: Checkout the workflow_state.json file if it exists, for the Python script to read.
-      # This is critical if the Python script needs to read state from a previous commit.
-      # Note: This checks out the current branch, so the state file will be from the latest commit.
+      # Get current workflow state for the Python script to read.
+      # This step should ensure the file is present if it exists in the repo.
       - name: Get current workflow state (if exists)
         run: |
           if [ -f ".github/workflow_state.json" ]; then
@@ -141,7 +141,7 @@ jobs:
             echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty."
             echo "::warning::To enable writing to 'homepage-app/apps/apps.json', create a repository secret named 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON' with the value 'homepage-app/apps/apps.json'."
           fi
-          # Also warn if the new workflow_state.json path isn't allowed to be written
+          # Ensure this secret is set for state file writing
           if [ "${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}" != ".github/workflow_state.json" ]; then
             echo "::warning::RWT_WRITABLE_FILE_WORKFLOW_STATE secret should be set to '.github/workflow_state.json' for proper state management."
           fi
@@ -150,6 +150,7 @@ jobs:
       - name: Generate apps.md and apps.json Content with Python Script
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
+        # THIS IS THE CRITICAL LINE for passing output from 'find_apps'
         env:
           APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
@@ -177,22 +178,16 @@ jobs:
           retention-days: 7
 
       - name: Commit and Push generated files (including state file)
-        # Force commit if the state file was updated by Python script.
-        # This check is less direct, but assumes state file changes when `apps_json_updated_flag` is true
-        # or if we explicitly output a flag for state file changes from Python.
-        # For now, let's rely on apps_json_updated_flag for simplicity.
-        # If you need a separate commit specifically for state file, add a separate output flag in Python script.
-        # (Contains: Also commit if JSON updated (which includes metadata change) and 
-        #            Ensure this always runs if a force upload needs state update)
-        # This job will commit only if the Python script indicates actual content changes.
+        # Simplified 'if' condition to avoid syntax issues.
+        # This will commit if the Python script flagged any file as updated.
         if: |
           steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
           steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]" # Added [skip ci] to prevent infinite loops
+          commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
           branch: ${{ github.event.inputs.branch || github.ref }}
-          add_options: "apps.md homepage-app/apps/apps.json .github/workflow_state.json" # Add the state file
+          add_options: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
           skip_dirty_check: true
 
   prepare_deploy_matrix:
