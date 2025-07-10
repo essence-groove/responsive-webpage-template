@@ -1,10 +1,14 @@
 [
   {
+    "app_dir": "homepage-app",
     "name": "homepage-app",
+    "herokuAppName": "apm-essence-groove-h002",
     "url": "https://apm-essence-groove-h002-7cc826ef4a8c.herokuapp.com/"
   },
   {
+    "app_dir": "homepage-app/to_do_list",
     "name": "to_do_list",
+    "herokuAppName": "apm-essence-groove-h004",
     "url": "https://apm-essence-groove-h004-fc1ff5ff5de7.herokuapp.com/"
   }
 ]
