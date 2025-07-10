@@ -84,14 +84,12 @@ jobs:
         run: |
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
-          # FIX: Get heroku_app_name from matrix.app_data.heroku_app_name (already correct)
           HEROKU_APP_TARGET_NAME="${{ matrix.app_data.heroku_app_name }}" 
 
           echo "Current APP_DIR: $APP_DIR"
-          echo "Current HEROKU_APP_TARGET_NAME: $HEROKU_APP_TARGET_NAME" # Debugging line
+          echo "Current HEROKU_APP_TARGET_NAME: $HEROKU_APP_TARGET_NAME"
           APP_FOLDER_NAME=$(basename "$APP_DIR")
           
-          # Re-read package.json to get its 'name' for consistency check
           PACKAGE_JSON_APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
 
           if [ "$APP_FOLDER_NAME" != "$PACKAGE_JSON_APP_NAME" ]; then
@@ -207,8 +205,11 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
+          # FIX: Correctly pass APP_DIRS_JSON_FROM_FIND_APPS from the 'find_apps' job
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # This is for the old comma-separated secret, should be removed
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }} # Passed to the Python script
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }} # Passed to the Python script
         shell: bash
 
       - name: Write apps.md File
