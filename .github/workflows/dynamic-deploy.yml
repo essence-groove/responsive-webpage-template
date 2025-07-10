@@ -7,14 +7,9 @@ on:
         description: 'Branch to run the workflow on (e.g., main, new-apps)'
         required: true
         default: 'main'
-  push:
-    branches:
-      - main
-    paths:
-      - '**'
 
-jobs:
-  find_apps: # Job 1: Finds all deployable app directories and their details (no needs)
+jobs: # <--- THIS LINE IS CRUCIAL AND WAS LIKELY MISSING THE COLON OR MISPLACED
+  find_apps: # This job and all subsequent jobs must be indented two spaces under 'jobs:'
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
