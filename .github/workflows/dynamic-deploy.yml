@@ -114,7 +114,7 @@ jobs:
 
           echo "heroku_app_name_for_deploy=$HEROKU_APP_TARGET_NAME" >> "$GITHUB_OUTPUT"
           echo "app_folder_name_for_deploy=$APP_FOLDER_NAME" >> "$GITHUB_OUTPUT"
-
+          echo "deployed_url_for_docs=$DEPLOYED_URL" >> "$GITHUB_OUTPUT" # Pass full URL for docs generation
         shell: bash
 
       - name: Deploy to Heroku - Actual Action
@@ -175,7 +175,7 @@ jobs:
         shell: bash
 
   generate_docs_files: # Job 3: Generates apps.md and apps.json files using Python
-    needs: [find_apps, prepare_deploy_matrix] # FIX: Needs both find_apps AND prepare_deploy_matrix
+    needs: [prepare_deploy_matrix, find_apps] # Needs both find_apps AND prepare_deploy_matrix
     runs-on: ubuntu-latest
     if: |
       always() &&
