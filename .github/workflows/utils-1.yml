@@ -13,76 +13,150 @@ on:
         type: string
         default: '' # Default to empty string, meaning no -maxdepth, thus infinite depth
         description: 'Max depth for scanning directories for package.json. Use "0" for current dir only, "1" for direct subdirs, "2" for sub-subdirs, etc. Use empty string for infinite depth.'
-      # NEW INPUT: A placeholder parameter for future extensibility
+      # NEW INPUT: Algorithm selector
+      algorithm:
+        required: false
+        type: string
+        default: 'scan_package_json' # Default algorithm: scan package.json files
+        description: 'Algorithm to use for finding app details. Options: "scan_package_json", "read_apps_json".'
+      # Keep extra_options for general future use, if algorithm is not specific enough
       extra_options:
         required: false
         type: string
-        default: '' # Default to empty string, meaning it does nothing by default
+        default: ''
         description: 'Reserved for future extensions. Any non-empty value will currently be ignored.'
     outputs:
-      app_dirs_json:
-        description: 'JSON array of found app directory paths.'
-        value: ${{ jobs.scan_job.outputs.app_dirs_json }} # Output from the job
+      # Output now contains rich app details
+      app_details_json:
+        description: 'JSON array of found app directory paths with full details.'
+        value: ${{ jobs.scan_job.outputs.app_details_json }}
 
 jobs:
   scan_job: # This job contains the app scanning logic
     runs-on: ubuntu-latest
     outputs:
-      app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }} # Step output becomes job output
+      app_details_json: ${{ steps.scan.outputs.app_details_json }} # Step output becomes job output
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install jq (for package.json parsing and JSON output)
+      - name: Install jq (for JSON parsing)
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Scan for Apps
+      - name: Scan for Apps based on Algorithm
         id: scan # Step ID to reference output
         run: |
           set -e
-          # Access inputs from the workflow_call
           APP_BASE_DIRS="${{ inputs.app_base_dirs }}" 
           SCAN_DEPTH="${{ inputs.scan_depth }}"
-          EXTRA_OPTIONS="${{ inputs.extra_options }}" # NEW: Access the extra_options input
+          ALGORITHM="${{ inputs.algorithm }}" # Get the selected algorithm
+          EXTRA_OPTIONS="${{ inputs.extra_options }}"
 
-          # Placeholder for future extensibility with extra_options
           if [ -n "$EXTRA_OPTIONS" ]; then
             echo "::notice::Extra options provided: '$EXTRA_OPTIONS'. Currently, this parameter does nothing."
-            # Future: Add logic here based on EXTRA_OPTIONS
           fi
 
-          # Start with a basic find command
-          FIND_CMD="find \"$BASE_DIR\" -type f -name \"package.json\""
+          APP_DETAILS_ARRAY=() # Array to store JSON objects for each app
 
-          # Add maxdepth if scan_depth is provided and is NOT an empty string
-          if [ -n "$SCAN_DEPTH" ]; then
-            FIND_CMD="find \"$BASE_DIR\" -maxdepth \"$SCAN_DEPTH\" -type f -name \"package.json\""
-          fi
+          if [ "$ALGORITHM" == "scan_package_json" ]; then
+            echo "Running algorithm: scan_package_json"
+            FIND_CMD="find \"$BASE_DIR\" -type f -name \"package.json\""
+            if [ -n "$SCAN_DEPTH" ]; then
+              FIND_CMD="find \"$BASE_DIR\" -maxdepth \"$SCAN_DEPTH\" -type f -name \"package.json\""
+            fi
 
-          ALL_APP_DIRS_ARRAY=()
-          echo "Scanning for apps in: $APP_BASE_DIRS with max depth: ${SCAN_DEPTH:-'infinite'}"
-          for BASE_DIR in $APP_BASE_DIRS; do
-            # Execute the dynamically constructed find command
-            FOUND_DIRS=$(eval "$FIND_CMD -exec dirname {} \;")
-            for DIR in $FOUND_DIRS; do
-              ALL_APP_DIRS_ARRAY+=("$DIR")
+            for BASE_DIR in $APP_BASE_DIRS; do
+              FOUND_PACKAGE_JSON_PATHS=$(eval "$FIND_CMD -exec dirname {} \;")
+              for APP_DIR in $FOUND_PACKAGE_JSON_PATHS; do
+                PACKAGE_JSON_PATH="$APP_DIR/package.json"
+                
+                # Read details from package.json
+                APP_NAME=$(jq -r '.name' "$PACKAGE_JSON_PATH" || echo "")
+                HEROKU_APP_NAME=$(jq -r '.herokuAppName' "$PACKAGE_JSON_PATH" || echo "")
+                DEPLOYED_URL=$(jq -r '.deployedUrl' "$PACKAGE_JSON_PATH" || echo "")
+
+                # Basic validation for essential fields
+                if [ -z "$APP_NAME" ] || [ "$APP_NAME" == "null" ]; then
+                    echo "::warning::'name' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                    continue
+                fi
+                if [ -z "$HEROKU_APP_NAME" ] || [ "$HEROKU_APP_NAME" == "null" ]; then
+                    echo "::warning::'herokuAppName' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                    continue
+                fi
+                if [ -z "$DEPLOYED_URL" ] || [ "$DEPLOYED_URL" == "null" ]; then
+                    echo "::warning::'deployedUrl' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                    continue
+                fi
+
+                # Consistency Check: Folder Name vs. package.json 'name'
+                APP_FOLDER_NAME=$(basename "$APP_DIR")
+                if [ "$APP_FOLDER_NAME" != "$APP_NAME" ]; then
+                    echo "::warning::Inconsistency: Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}'). Using folder name as primary identifier for consistency."
+                fi
+
+                # Construct JSON object for this app
+                APP_JSON_OBJ="{\"app_dir\":\"$APP_DIR\", \"name\":\"$APP_NAME\", \"herokuAppName\":\"$HEROKU_APP_NAME\", \"url\":\"$DEPLOYED_URL\"}"
+                APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
+              done
             done
-          done
 
-          UNIQUE_APP_DIRS_NEWLINES=$(printf "%s\n" "${ALL_APP_DIRS_ARRAY[@]}" | sort -u)
+          elif [ "$ALGORITHM" == "read_apps_json" ]; then
+            echo "Running algorithm: read_apps_json"
+            APPS_JSON_PATH="$APP_BASE_DIRS" # In this algorithm, APP_BASE_DIRS is the path to apps.json
 
-          if [ -z "$UNIQUE_APP_DIRS_NEWLINES" ]; then
-            echo "No applications found with package.json in '$APP_BASE_DIRS'. Exiting."
-            printf "app_dirs_json=[]\n" >> "$GITHUB_OUTPUT"
+            if [ ! -f "$APPS_JSON_PATH" ] || [ ! -s "$APPS_JSON_PATH" ]; then
+              echo "::warning::${APPS_JSON_PATH} not found or is empty for 'read_apps_json' algorithm. Exiting."
+              printf "app_details_json=[]\n" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            # Read apps.json directly and validate structure
+            APP_DETAILS_ARRAY_FROM_JSON=$(jq -c '.' "$APPS_JSON_PATH")
+            
+            if [ "$APP_DETAILS_ARRAY_FROM_JSON" == "[]" ] || [ "$APP_DETAILS_ARRAY_FROM_JSON" == "null" ]; then
+              echo "::warning::${APPS_JSON_PATH} contains no valid app data for 'read_apps_json' algorithm. Exiting."
+              printf "app_details_json=[]\n" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            # Validate each item in the JSON array
+            VALID_APPS_FROM_JSON=()
+            for item in $(echo "$APP_DETAILS_ARRAY_FROM_JSON" | jq -c '.[]'); do
+                APP_DIR=$(echo "$item" | jq -r '.app_dir // empty')
+                APP_NAME=$(echo "$item" | jq -r '.name // empty')
+                HEROKU_APP_NAME=$(echo "$item" | jq -r '.herokuAppName // empty')
+                DEPLOYED_URL=$(echo "$item" | jq -r '.url // empty')
+
+                if [ -z "$APP_DIR" ] || [ -z "$APP_NAME" ] || [ -z "$HEROKU_APP_NAME" ] || [ -z "$DEPLOYED_URL" ]; then
+                    echo "::warning::Skipping malformed entry in ${APPS_JSON_PATH}: ${item}. Missing app_dir, name, herokuAppName, or url."
+                    continue
+                fi
+                VALID_APPS_FROM_JSON+=("$item")
+            done
+
+            if [ ${#VALID_APPS_FROM_JSON[@]} -eq 0 ]; then
+              echo "No valid applications found in ${APPS_JSON_PATH} after validation. Exiting."
+              printf "app_details_json=[]\n" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            APP_DETAILS_ARRAY=("${VALID_APPS_FROM_JSON[@]}") # Use the validated array
+
+          else
+            echo "::error::Unknown algorithm: '$ALGORITHM'. Valid options are 'scan_package_json', 'read_apps_json'."
+            exit 1
+          fi
+
+          if [ ${#APP_DETAILS_ARRAY[@]} -eq 0 ]; then
+            echo "No valid applications found after algorithm execution. Exiting."
+            printf "app_details_json=[]\n" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "Found applications in directories (for debugging):"
-          echo "$UNIQUE_APP_DIRS_NEWLINES"
+          # Convert array of JSON objects into a single JSON array string
+          APP_DETAILS_JSON=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
+          echo "Generated App Details JSON: $APP_DETAILS_JSON"
 
-          APP_DIRS_JSON=$(echo "$UNIQUE_APP_DIRS_NEWLINES" | jq -R . | jq -s -c .)
-          echo "Generated JSON (single line): $APP_DIRS_JSON"
-
-          # Set the output variable for the calling workflow
-          printf "app_dirs_json=%s\n" "$APP_DIRS_JSON" >> "$GITHUB_OUTPUT"
+          printf "app_details_json=%s\n" "$APP_DETAILS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
