@@ -7,11 +7,7 @@ on:
         description: 'Branch to run the workflow on (e.g., main, new-apps)'
         required: true
         default: 'main' # Default to your main branch
-  push: # Keep this block if you want push to trigger it
-    branches:
-      - new-apps # Triggers only on pushes to 'new-apps'
-    paths:
-      - '**' # Triggers on changes to any path within 'new-apps'
+
 
 jobs:
   find_apps: # Job 1: Finds all deployable app directories and their details (no needs)
