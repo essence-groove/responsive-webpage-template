@@ -1,7 +1,7 @@
 name: Dynamic Multi-App Heroku Deploy
 
 on:
-  push:
+  pull_request:
     branches:
       - new-apps
     paths:
