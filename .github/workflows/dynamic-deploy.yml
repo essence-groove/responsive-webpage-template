@@ -112,14 +112,14 @@ jobs:
             printf "app_details_json=%s\n" "$APP_DETAILS_JSON" >> "$GITHUB_OUTPUT"
           fi
         shell: bash
----
 
-  generate_docs_files:
-    needs: find_apps
-    runs-on: ubuntu-latest
-    if: |
-      always() &&
-      needs.find_apps.outputs.app_details_json != '[]'
+
+    generate_docs_files:
+     needs: find_apps
+      runs-on: ubuntu-latest
+      if: |
+        always() &&
+        needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
       - name: Checkout code
