@@ -6,21 +6,19 @@ on:
       branch:
         description: 'Branch to run the workflow on (e.g., main, new-apps)'
         required: true
-        default: 'main' # Default to your main branch
-
+        default: 'main'
 
 jobs:
-  find_apps: # Job 1: Finds all deployable app directories and their details (no needs)
+  find_apps:
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
     env:
-      APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are
+      APP_BASE_DIRS: "homepage-app"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        # For workflow_dispatch, checkout the specified branch
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
@@ -32,7 +30,7 @@ jobs:
         run: |
           set -e
 
-          APP_DETAILS_ARRAY=() # Array to store JSON objects for each app
+          APP_DETAILS_ARRAY=()
           echo "Scanning for apps in: $APP_BASE_DIRS"
           for BASE_DIR in $APP_BASE_DIRS; do
             FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
@@ -44,12 +42,10 @@ jobs:
                 continue
               fi
 
-              # Read details from package.json
               APP_NAME=$(jq -r '.name' "$PACKAGE_JSON_PATH" || echo "")
               HEROKU_APP_NAME=$(jq -r '.herokuAppName' "$PACKAGE_JSON_PATH" || echo "")
               DEPLOYED_URL=$(jq -r '.deployedUrl' "$PACKAGE_JSON_PATH" || echo "")
 
-              # Basic validation for essential fields
               if [ -z "$APP_NAME" ] || [ "$APP_NAME" == "null" ]; then
                 echo "::warning::'name' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
                 continue
@@ -63,13 +59,11 @@ jobs:
                 continue
               fi
 
-              # Consistency Check: Folder Name vs. package.json 'name'
               APP_FOLDER_NAME=$(basename "$APP_DIR")
               if [ "$APP_FOLDER_NAME" != "$APP_NAME" ]; then
                 echo "::warning::Inconsistency: Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}'). Using folder name as primary identifier for consistency."
               fi
 
-              # Construct JSON object for this app with all details
               APP_JSON_OBJ="{\"app_dir\":\"$APP_DIR\", \"name\":\"$APP_NAME\", \"herokuAppName\":\"$HEROKU_APP_NAME\", \"url\":\"$DEPLOYED_URL\"}"
               APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
             done
@@ -81,7 +75,6 @@ jobs:
             exit 0
           fi
 
-          # Convert array of JSON objects into a single JSON array string
           APP_DETAILS_JSON=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
           echo "Generated App Details JSON: $APP_DETAILS_JSON"
 
@@ -90,8 +83,8 @@ jobs:
 
 ---
 
-  generate_docs_files: # Job 2: Generates apps.md and apps.json files using Python
-    needs: find_apps # This job now only needs 'find_apps' to get all app details
+  generate_docs_files:
+    needs: find_apps
     runs-on: ubuntu-latest
     if: |
       always() &&
@@ -101,7 +94,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # This line was commented out; it's essential for checking out the correct branch.
           ref: ${{ github.event.inputs.branch || github.ref }}
 
       - name: Set up Python
@@ -109,7 +101,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Check Writable File Secrets # Updated warning message
+      - name: Check Writable File Secrets
         run: |
           if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
             echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty."
@@ -126,7 +118,6 @@ jobs:
         run: python .github/scripts/generate_app_list.py
         env:
           APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
           RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
         shell: bash
@@ -148,7 +139,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list"
-          branch: ${{ github.event.inputs.branch || github.ref }} # Commit to the branch specified in input, or current branch
-          # Removed the 'token' line as it's no longer needed by the action
+          branch: ${{ github.event.inputs.branch || github.ref }}
           add_options: "apps.md homepage-app/apps/apps.json"
-          skip_dirty_check: true # Force commit even if repo is dirty
+          skip_dirty_check: true
