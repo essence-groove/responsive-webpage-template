@@ -5,7 +5,7 @@ on:
     branches:
       - new-apps # Or 'master'
     paths:
-      - 'homepage-app/**'
+      - '**'
 
 
 jobs:
