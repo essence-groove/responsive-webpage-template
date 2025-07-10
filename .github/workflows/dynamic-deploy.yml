@@ -7,6 +7,11 @@ on:
         description: 'Branch to run the workflow on (e.g., main, new-apps)'
         required: true
         default: 'main'
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
 
 jobs: # <--- THIS LINE IS CRUCIAL AND WAS LIKELY MISSING THE COLON OR MISPLACED
   find_apps: # This job and all subsequent jobs must be indented two spaces under 'jobs:'
