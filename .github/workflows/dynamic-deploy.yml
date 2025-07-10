@@ -9,12 +9,12 @@ on:
         default: 'main'
 
 jobs:
-  find_apps:
+  find_apps: # Job 1: Finds all deployable app directories and their details (no needs)
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
     env:
-      APP_BASE_DIRS: "homepage-app"
+      APP_BASE_DIRS: "homepage-app" # The top-level folder where your apps are
 
     steps:
       - name: Checkout code
@@ -30,57 +30,88 @@ jobs:
         run: |
           set -e
 
-          APP_DETAILS_ARRAY=()
-          echo "Scanning for apps in: $APP_BASE_DIRS"
+          APP_DETAILS_ARRAY=() # Array to store JSON objects for each app
+          echo "--- Starting App Scan ---"
+          echo "Scanning for apps in base directories: $APP_BASE_DIRS"
+          echo "Current working directory: $(pwd)" # Debug: Show current working directory
+
           for BASE_DIR in $APP_BASE_DIRS; do
+            echo "Searching for package.json in base directory: $BASE_DIR"
+            # Debug: List directories where find is searching
+            if [ ! -d "$BASE_DIR" ]; then
+              echo "::error::Base directory '$BASE_DIR' not found. Please ensure it exists."
+              continue
+            fi
+
             FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
+            
+            if [ -z "$FOUND_DIRS" ]; then
+              echo "No package.json files found directly within or under '$BASE_DIR'."
+            else
+              echo "Found potential app directories with package.json under '$BASE_DIR':"
+              echo "$FOUND_DIRS" | sed 's/^/- /' # List them with a bullet
+            fi
+
             for APP_DIR in $FOUND_DIRS; do
               PACKAGE_JSON_PATH="$APP_DIR/package.json"
+              echo "--- Processing app directory: $APP_DIR ---"
+              echo "Checking package.json path: $PACKAGE_JSON_PATH"
 
               if [ ! -f "$PACKAGE_JSON_PATH" ]; then
                 echo "::warning::package.json not found for ${APP_DIR}. Skipping."
                 continue
               fi
 
+              # Read details from package.json
               APP_NAME=$(jq -r '.name' "$PACKAGE_JSON_PATH" || echo "")
               HEROKU_APP_NAME=$(jq -r '.herokuAppName' "$PACKAGE_JSON_PATH" || echo "")
               DEPLOYED_URL=$(jq -r '.deployedUrl' "$PACKAGE_JSON_PATH" || echo "")
 
+              echo "  - Extracted Name: '$APP_NAME'"
+              echo "  - Extracted Heroku App Name: '$HEROKU_APP_NAME'"
+              echo "  - Extracted Deployed URL: '$DEPLOYED_URL'"
+
+              # Basic validation for essential fields
               if [ -z "$APP_NAME" ] || [ "$APP_NAME" == "null" ]; then
-                echo "::warning::'name' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
-                continue
+                  echo "::warning::'name' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                  continue
               fi
               if [ -z "$HEROKU_APP_NAME" ] || [ "$HEROKU_APP_NAME" == "null" ]; then
-                echo "::warning::'herokuAppName' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
-                continue
+                  echo "::warning::'herokuAppName' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                  continue
               fi
               if [ -z "$DEPLOYED_URL" ] || [ "$DEPLOYED_URL" == "null" ]; then
-                echo "::warning::'deployedUrl' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
-                continue
+                  echo "::warning::'deployedUrl' field missing or empty in ${PACKAGE_JSON_PATH}. Skipping app."
+                  continue
               fi
 
+              # Consistency Check: Folder Name vs. package.json 'name'
               APP_FOLDER_NAME=$(basename "$APP_DIR")
+              echo "  - App Folder Name: '$APP_FOLDER_NAME'"
               if [ "$APP_FOLDER_NAME" != "$APP_NAME" ]; then
-                echo "::warning::Inconsistency: Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}'). Using folder name as primary identifier for consistency."
+                  echo "::warning::Inconsistency: Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}'). Using folder name as primary identifier for consistency."
               fi
 
+              # Construct JSON object for this app with all details
               APP_JSON_OBJ="{\"app_dir\":\"$APP_DIR\", \"name\":\"$APP_NAME\", \"herokuAppName\":\"$HEROKU_APP_NAME\", \"url\":\"$DEPLOYED_URL\"}"
               APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
+              echo "  - App added to list: $APP_JSON_OBJ"
             done
           done
 
+          echo "--- App Scan Summary ---"
           if [ ${#APP_DETAILS_ARRAY[@]} -eq 0 ]; then
-            echo "No valid applications found. Exiting."
+            echo "No valid applications found during scan."
             printf "app_details_json=[]\n" >> "$GITHUB_OUTPUT"
             exit 0
+          else
+            echo "Total valid applications found: ${#APP_DETAILS_ARRAY[@]}"
+            # Convert array of JSON objects into a single JSON array string
+            APP_DETAILS_JSON=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
+            echo "Generated App Details JSON: $APP_DETAILS_JSON"
+            printf "app_details_json=%s\n" "$APP_DETAILS_JSON" >> "$GITHUB_OUTPUT"
           fi
-
-          APP_DETAILS_JSON=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
-          echo "Generated App Details JSON: $APP_DETAILS_JSON"
-
-          printf "app_details_json=%s\n" "$APP_DETAILS_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
-
 ---
 
   generate_docs_files:
