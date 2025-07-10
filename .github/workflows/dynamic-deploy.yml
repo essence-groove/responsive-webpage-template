@@ -8,7 +8,11 @@ on:
         description: 'Branch to run the workflow on (e.g., main, new-apps)'
         required: true
         default: 'new-apps' # Default to your main branch
-  
+    push: # <--- ADD THIS LINE TEMPORARILY
+    branches:
+      - new-apps # <--- Or the branch you are working on
+    paths:
+      - '**'
 
 
 
