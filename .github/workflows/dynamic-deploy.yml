@@ -127,7 +127,7 @@ jobs:
           appdir: ${{ matrix.app_data.app_dir }}
 
   find_apps: # Job 2: Finds all deployable app directories
-    # FIX: No 'needs' dependency here. This job runs independently.
+    # FIX: Removed 'needs' dependency. This job now runs independently.
     runs-on: ubuntu-latest
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
@@ -175,7 +175,7 @@ jobs:
         shell: bash
 
   generate_docs_files: # Job 3: Generates apps.md and apps.json files using Python
-    needs: [prepare_deploy_matrix, find_apps] # Needs both for its inputs
+    needs: [find_apps, prepare_deploy_matrix] # FIX: Needs both find_apps AND prepare_deploy_matrix
     runs-on: ubuntu-latest
     if: |
       always() &&
