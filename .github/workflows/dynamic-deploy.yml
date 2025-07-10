@@ -47,12 +47,12 @@ jobs:
           TEMP_NEW_DOWNLOAD_COUNT=$((CURRENT_DOWNLOAD_COUNT + 1)) 
           FORCE_UPLOAD_FOR_GENERATOR="false"
 
-          # Change this '5' to '2' or '3' for the new threshold
-          if [ "$TEMP_NEW_DOWNLOAD_COUNT" -ge 2 ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then # <-- CHANGE '5' TO YOUR DESIRED THRESHOLD (e.g., 2 or 3)
+          # Changed threshold to 1 to force upload every run
+          if [ "$TEMP_NEW_DOWNLOAD_COUNT" -ge 1 ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then
             FORCE_UPLOAD_FOR_GENERATOR="true"
             echo "::notice::Download count reached NEW_THRESHOLD OR force flag was true. Signalling force apps.json upload for generate_docs_files."
           else
-            echo "::notice::Download count: $TEMP_NEW_DOWNLOAD_COUNT/NEW_THRESHOLD. No force upload this run (yet)." # Update log message
+            echo "::notice::Download count: $TEMP_NEW_DOWNLOAD_COUNT/NEW_THRESHOLD. No force upload this run (yet)."
           fi
 
           echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT"
@@ -131,7 +131,7 @@ jobs:
           printf "app_details_json=%s\n" "$APP_DETAILS_JSON_OUTPUT" >> "$GITHUB_OUTPUT"
           
           if [ ${#APP_DETAILS_ARRAY[@]} -eq 0 ]; then
-             exit 0
+              exit 0
           fi
         shell: bash
 
@@ -239,7 +239,8 @@ jobs:
           # This logic mirrors what find_apps *would have done* to its state if it persisted it.
           NEW_DOWNLOAD_COUNT=$((INITIAL_DOWNLOAD_COUNT + 1))
           NEW_FORCE_UPLOAD_FLAG="false"
-          if [ "$NEW_DOWNLOAD_COUNT" -ge 5 ] || [ "$INITIAL_FORCE_FLAG" = "true" ]; then
+          # Changed threshold to 1 to force upload every run
+          if [ "$NEW_DOWNLOAD_COUNT" -ge 1 ] || [ "$INITIAL_FORCE_FLAG" = "true" ]; then
               NEW_DOWNLOAD_COUNT=0 # Reset if force upload was triggered OR was already forced
               NEW_FORCE_UPLOAD_FLAG="false" # Reset force flag after it has been acted upon
               echo "::debug::State update: Count reset to 0, Force flag reset to false for next cycle."
@@ -503,9 +504,6 @@ jobs:
           echo "$DELIMITER" >> "$GITHUB_OUTPUT"
           # No exit 0 here; let the step complete based on its outputs.
         shell: bash
-
-
-  
 
 
   deploy_all_apps:
