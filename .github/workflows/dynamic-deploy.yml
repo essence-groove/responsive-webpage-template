@@ -189,7 +189,7 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get Latest Workflow Run ID for Artifact Download # NEW STEP: Find the run ID
+      - name: Get Latest Workflow Run ID for Artifact Download
         id: get_run_id
         uses: actions/github-script@v6
         with:
@@ -197,8 +197,8 @@ jobs:
             const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'dynamic-deploy.yml', # Replace with your workflow file name
-              branch: 'main', # The branch where the successful artifact should exist
+              workflow_id: 'dynamic-deploy.yml', // Use your workflow file name here
+              branch: 'main', // The branch where the successful artifact should exist
               status: 'success',
               per_page: 1
             });
