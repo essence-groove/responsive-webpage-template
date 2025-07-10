@@ -172,7 +172,8 @@ jobs:
         shell: bash
 
   generate_docs_files: # Job 3: Generates apps.md and apps.json files using Python
-    needs: find_apps # This job needs find_apps to get the list of apps
+    # FIX: This job now needs 'find_apps' for its app_dirs_json input.
+    needs: find_apps 
     runs-on: ubuntu-latest
     if: |
       always() &&
