@@ -150,7 +150,6 @@ jobs:
     needs: find_apps
     runs-on: ubuntu-latest
     outputs:
-      # Output the run_id if apps.json was successfully uploaded by this job
       last_uploaded_run_id: ${{ steps.set_uploaded_run_id.outputs.id }}
     if: |
       always() &&
@@ -209,7 +208,6 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          # This flag is what tells the Python script to force the JSON update
           FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
         shell: bash
 
@@ -220,36 +218,34 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
-      - name: Update Workflow State File and Determine Commit # NEW/MODIFIED STEP
+      - name: Update Workflow State File and Determine Commit # MODIFIED STEP
         id: update_state_file_content
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
-
-          # Get values needed for state update from Python script outputs
-          # (These were determined based on find_apps' input and python's logic)
-          APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
-          CURRENT_RUN_ID="${{ github.run_id }}"
+          # NEW KEY:
+          UPLOAD_COUNT_KEY="apps_json_upload_count" 
 
           # Read current state from the file that was just checked out
           CURRENT_STATE_FROM_FILE=$(jq '.' "$STATE_FILE" || echo '{}')
           echo "::debug::Current state (generate_docs_files): $CURRENT_STATE_FROM_FILE"
           
-          # Get count and force flag values that find_apps calculated and used for THIS run
-          # These are based on the state file *it* read, and its increment/reset logic
-          # IMPORTANT: We need to re-derive these based on the state *find_apps* would have produced.
-          # Or, better, pass the 'new_download_count' and 'new_force_upload_flag' from find_apps as outputs.
-          # For this quick fix, let's derive them based on the previous state and this run's outcome.
-
-          # Re-read initial state from state file
+          # Get values for state update
+          APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
+          CURRENT_RUN_ID="${{ github.run_id }}"
+          
+          # Get the current download count and force flag from the state file
+          # (These were read by find_apps and used for its decision in this run)
           INITIAL_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           INITIAL_FORCE_FLAG=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
           
-          # Determine new count and force_next_upload for the *next* run
+          # Get the current upload count
+          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${UPLOAD_COUNT_KEY} // 0") # Initialize to 0 if not found
+
+          # Determine new download count and force_next_upload for the *next* run
           # This logic mirrors what find_apps *would have done* to its state if it persisted it.
-          # We're making generate_docs_files take over find_apps' role in persisting this.
           NEW_DOWNLOAD_COUNT=$((INITIAL_DOWNLOAD_COUNT + 1))
           NEW_FORCE_UPLOAD_FLAG="false"
           if [ "$NEW_DOWNLOAD_COUNT" -ge 5 ] || [ "$INITIAL_FORCE_FLAG" = "true" ]; then
@@ -258,11 +254,22 @@ jobs:
               echo "::debug::State update: Count reset to 0, Force flag reset to false for next cycle."
           fi
 
+          # Increment upload count ONLY if apps.json was updated in this run
+          NEW_UPLOAD_COUNT="$CURRENT_UPLOAD_COUNT" # Default to current
+          if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
+            NEW_UPLOAD_COUNT=$((CURRENT_UPLOAD_COUNT + 1))
+            echo "::debug::apps.json was updated this run. Incrementing upload count to: $NEW_UPLOAD_COUNT"
+          else
+            echo "::debug::apps.json was NOT updated this run. Upload count remains: $CURRENT_UPLOAD_COUNT"
+          fi
+
+
           # Build the new state JSON structure
           UPDATED_STATE=$(echo "$CURRENT_STATE_FROM_FILE" | jq \
-            --argjson count "$NEW_DOWNLOAD_COUNT" \
+            --argjson download_count "$NEW_DOWNLOAD_COUNT" \
             --argjson force "$NEW_FORCE_UPLOAD_FLAG" \
-            ".${DOWNLOAD_COUNT_KEY} = \$count | .${FORCE_UPLOAD_KEY} = \$force")
+            --argjson upload_count "$NEW_UPLOAD_COUNT" \
+            ".${DOWNLOAD_COUNT_KEY} = \$download_count | .${FORCE_UPLOAD_KEY} = \$force | .${UPLOAD_COUNT_KEY} = \$upload_count")
           
           # Only update last_successful_apps_json_artifact_run_id if apps.json was actually updated and uploaded in this job
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
@@ -303,19 +310,18 @@ jobs:
         shell: bash
 
       - name: Commit and Push generated files (including state file)
-        # ONLY commit if any of the three files changed
-        # Include state file change
         if: |
           steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
           steps.generate_content_py.outputs.apps_json_updated_flag == 'true' ||
-          steps.update_state_file_content.outputs.state_file_changed == 'true' 
+          steps.update_state_file_content.outputs.state_file_changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
           branch: ${{ github.event.inputs.branch || github.ref }}
           add_options: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
           skip_dirty_check: true
-          push_options: "--force" # Ensure state file updates land, as discussed
+          push_options: "--force"
+
 
 
 
