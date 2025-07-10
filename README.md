@@ -2,4 +2,3 @@
 [Deployed Applications](apps.md)
 
 new-apps
-new-apps
