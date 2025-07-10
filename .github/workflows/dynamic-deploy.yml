@@ -493,36 +493,39 @@ jobs:
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
-    # This 'if' condition will ensure the job is skipped if app_data_json is '[]'
-    # Keeping this check is good to prevent job from starting if matrix is empty
-    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }}
+    # Keep this outer 'if' to skip the job entirely if the matrix is definitely empty
+    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[]' }} 
     strategy:
       fail-fast: false
       matrix:
-        # CRITICAL CHANGE: Provide a default empty array if the output is empty or invalid
         app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json || '[]') }}
+        # CRITICAL CHANGE: Conditionally include an empty 'app_data' array
+        # This allows the job to run with an empty matrix without failing.
+        # It's an empty array if the main app_data is empty.
+        include:
+          - app_data: []
+            # Add a dummy value that will only be present when app_data is empty
+            # This ensures the matrix is never truly "empty" to the strategy block,
+            # but we can filter it out in the steps.
+            deploy_app: false # Use a flag to indicate this is a dummy run
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+        # ... (rest of step) ...
 
       - name: Install Heroku CLI
-        run: |
-          curl -L https://cli-assets.heroku.com/install.sh -o /tmp/heroku-install.sh
-          chmod +x /tmp/heroku-install.sh
-          /tmp/heroku-install.sh
-        shell: bash
+        # ... (rest of step) ...
 
       - name: Install jq (for package.json parsing)
-        run: sudo apt-get update && sudo apt-get install -y jq
+        # ... (rest of step) ...
 
       - name: Read App Config and Prepare Deploy Variables
         id: prepare_vars
+        # Add an 'if' condition to skip this step if it's the dummy empty matrix run
+        if: ${{ matrix.deploy_app != false }} 
         run: |
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
@@ -563,6 +566,8 @@ jobs:
 
       - name: Deploy to Heroku - Actual Action
         id: deploy_action
+        # Add an 'if' condition to skip this step if it's the dummy empty matrix run
+        if: ${{ matrix.deploy_app != false }} 
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
