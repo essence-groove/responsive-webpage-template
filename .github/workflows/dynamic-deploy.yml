@@ -10,8 +10,6 @@ on:
   push:
     branches:
       - main
-      - new-workflow
-      - new-workflow-2
     paths:
       - '**'
 
