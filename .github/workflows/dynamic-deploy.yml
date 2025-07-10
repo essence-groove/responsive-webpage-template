@@ -6,9 +6,7 @@ on:
       - new-apps # Or 'master'
     paths:
       - 'homepage-app/**'
-      - '.github/workflows/dynamic-deploy.yml'
-      - '.github/workflows/deploy-app-reusable.yml'
-      - '.github/workflows/utils-1.yml'
+
 
 jobs:
   find_apps: # Job 1: Finds all deployable app directories and their details (no needs)
