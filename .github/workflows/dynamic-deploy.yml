@@ -332,10 +332,10 @@ jobs:
     outputs:
       app_data_json: ${{ steps.read_json.outputs.app_data_json }}
     steps:
-      - name: Checkout code # This is for accessing .github/workflow_state.json if needed
+      - name: Checkout code # This is for accessing .github/workflow_state.json
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref }} # Checkout the branch to read current workflow_state.json
+          ref: ${{ github.event.inputs.branch || github.ref }}
 
       - name: Get workflow state for download auditing # This step still extracts counters from workflow_state.json
         id: get_download_state
@@ -349,7 +349,6 @@ jobs:
           # Read current state (which reflects the last committed state)
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           
-          # Extract values from the state file
           CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           LAST_UPLOADED_RUN_ID_FROM_STATE=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"") # For auditing/logging
           CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
@@ -370,50 +369,63 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get Latest Artifact Run ID from Registry # THIS IS THE KEY STEP
+      - name: Get Latest Artifact Run ID from Registry (Tiered Search)
         id: get_latest_artifact_run_id
         uses: actions/github-script@v6
         with:
           script: |
             const artifactName = 'latest-apps-json';
             const workflowFileName = 'dynamic-deploy.yml'; // Your workflow file name
-            const targetBranch = 'main'; // The branch where artifacts are expected to be uploaded
+            // Define the branches to search in order of priority
+            const searchBranches = ['main', 'new-workflow', 'new-workflow-2']; 
 
-            console.log(`Searching for latest artifact '${artifactName}' from workflow '${workflowFileName}' on branch '${targetBranch}'.`);
-
-            // List workflow runs for the specific workflow and branch, sorted by most recent
-            const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: workflowFileName,
-              branch: targetBranch,
-              status: 'success', // Only consider successful runs
-              per_page: 10 // Fetch a few to ensure we find one with the artifact
-            });
+            console.log(`Searching for latest artifact '${artifactName}' from workflow '${workflowFileName}' across branches: ${searchBranches.join(', ')}.`);
 
             let latestRunIdWithArtifact = null;
 
-            for (const run of workflow_runs) {
-              // List artifacts for each successful workflow run
-              const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+            for (const branch of searchBranches) {
+              console.log(`Attempting to find artifact on branch: ${branch}`);
+              // List workflow runs for the specific workflow and branch, sorted by most recent
+              const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                run_id: run.id
+                workflow_id: workflowFileName,
+                branch: branch,
+                status: 'success', // Only consider successful runs
+                per_page: 5 // Fetch a few runs to ensure we find one with the artifact
               });
 
-              const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+              if (workflow_runs.length === 0) {
+                console.log(`No successful workflow runs found on branch '${branch}'.`);
+                continue; // Move to the next branch
+              }
 
-              if (targetArtifact) {
-                latestRunIdWithArtifact = run.id;
-                console.log(`Found latest run ID '${latestRunIdWithArtifact}' with artifact '${artifactName}'.`);
-                break; // Found the latest, so break the loop
+              // Iterate through the runs to find the first one that has the artifact
+              for (const run of workflow_runs) {
+                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id
+                });
+
+                const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+
+                if (targetArtifact) {
+                  latestRunIdWithArtifact = run.id;
+                  console.log(`Found latest run ID '${latestRunIdWithArtifact}' with artifact '${artifactName}' on branch '${branch}'.`);
+                  break; // Found the latest, so break the inner loop
+                }
+              }
+
+              if (latestRunIdWithArtifact) {
+                break; // Found it in a higher-priority branch, so break the outer loop
               }
             }
 
             if (latestRunIdWithArtifact) {
               core.setOutput('artifact_run_id', latestRunIdWithArtifact);
             } else {
-              core.setFailed(`No successful workflow run found on '${targetBranch}' with artifact '${artifactName}'. Cannot proceed with deployment.`);
+              core.setFailed(`No successful workflow run found across specified branches with artifact '${artifactName}'. Cannot proceed with deployment.`);
             }
           result-encoding: json
           github-token: ${{ secrets.GITHUB_TOKEN }} # Needs token to query API
@@ -451,7 +463,6 @@ jobs:
           echo "Generated app data for matrix: $APP_DATA_JSON"
           echo "app_data_json=$APP_DATA_JSON" >> "$GITHUB_OUTPUT"
         shell: bash
-
 
 
         
