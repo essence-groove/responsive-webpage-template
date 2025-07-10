@@ -127,7 +127,7 @@ jobs:
           appdir: ${{ matrix.app_data.app_dir }}
 
   find_apps: # Job 2: Finds all deployable app directories
-    needs: prepare_deploy_matrix # This ensures it runs AFTER prepare_deploy_matrix
+    # FIX: No 'needs' dependency here. This job runs independently.
     runs-on: ubuntu-latest
     outputs:
       app_dirs_json: ${{ steps.scan.outputs.app_dirs_json }}
@@ -175,7 +175,7 @@ jobs:
         shell: bash
 
   generate_docs_files: # Job 3: Generates apps.md and apps.json files using Python
-    needs: [prepare_deploy_matrix, find_apps] # FIX: Needs both prepare_deploy_matrix AND find_apps
+    needs: [prepare_deploy_matrix, find_apps] # Needs both for its inputs
     runs-on: ubuntu-latest
     if: |
       always() &&
@@ -208,11 +208,10 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
-          # FIX: Correctly pass APP_DIRS_JSON_FROM_FIND_APPS from the 'find_apps' job
           APP_DIRS_JSON_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_dirs_json }}
-          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }} # This is for the old comma-separated secret, should be removed
-          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }} # Passed to the Python script
-          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }} # Passed to the Python script
+          RWT_WRITABLE_FILES: ${{ secrets.RWT_WRITABLE_FILES }}
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
         shell: bash
 
       - name: Write apps.md File
