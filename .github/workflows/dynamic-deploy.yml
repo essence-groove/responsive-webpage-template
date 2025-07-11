@@ -299,7 +299,6 @@ jobs:
           push_options: "--force"
 
   prepare_deploy_matrix:
-    needs: find_apps # This job now only depends on the initial state from find_apps
     runs-on: ubuntu-latest
     outputs:
       app_data_json: ${{ steps.extract_matrix_data.outputs.app_data_json }}
@@ -309,10 +308,11 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
-      - name: Get workflow state for download auditing
+      - name: Get workflow state from file
         id: get_download_state
         run: |
-          WORKFLOW_STATE_JSON='${{ needs.find_apps.outputs.workflow_state_json }}'
+          STATE_FILE=".github/workflow_state.json"
+          WORKFLOW_STATE_JSON=$(jq -c '.' "$STATE_FILE" || echo '{}')
           
           # Use jq to safely parse the IDs from the new object structure
           HISTORICAL_RUN_ID=$(echo "$WORKFLOW_STATE_JSON" | jq -r '.historical_artifact_run.id // ""')
@@ -327,6 +327,8 @@ jobs:
           echo "current_run_id=$CURRENT_RUN_ID" >> "$GITHUB_OUTPUT"
           echo "last_run_id=$LAST_RUN_ID" >> "$GITHUB_OUTPUT"
         shell: bash
+        
+      # ... (The rest of the steps in prepare_deploy_matrix remain the same) ...
         
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
