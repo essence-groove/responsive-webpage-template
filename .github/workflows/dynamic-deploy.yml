@@ -197,10 +197,15 @@ jobs:
       - name: Warn on Push Failure
         if: steps.commit_and_push.outcome == 'failure'
         run: |
-          echo "::warning::The push operation was rejected by the remote repository."
-          echo "::warning::Since branch protection rules are not active, this typically indicates an issue with repository permissions."
-          echo "::warning::Please check your repository's 'Settings' > 'Actions' > 'General' and ensure that 'Workflow permissions' are set to 'Read and write permissions'."
-          echo "::warning::If this workflow is running on a fork, the token is read-only by default and cannot push changes."
+          echo "::warning::The push operation was rejected by the remote repository. This can happen for several reasons:"
+          echo "::warning::1. Branch Protection: Check if this branch has protection rules that prevent direct pushes."
+          echo "::warning::2. Repository Permissions: Go to 'Settings' > 'Actions' > 'General' and ensure 'Workflow permissions' are set to 'Read and write permissions'."
+          echo "::warning::3. Fork Permissions: If this workflow is running on a fork, its token is read-only by default and cannot push changes."
+
+
+
+
+
 
 
 
