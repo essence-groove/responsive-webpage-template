@@ -185,7 +185,6 @@ jobs:
 
       - name: Commit and Push generated files
         id: commit_and_push
-        # This step will only run if the state update was successful
         if: steps.update_state_file_content.outcome == 'success' && (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || steps.update_state_file_content.outputs.state_file_changed == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -198,9 +197,13 @@ jobs:
       - name: Warn on Push Failure
         if: steps.commit_and_push.outcome == 'failure'
         run: |
-          echo "::warning::An exit code of 5 in this context typically indicates that the push operation was rejected by the remote repository."
-          echo "::warning::This is likely due to branch protection rules. The workflow will continue, but the updated state file was not saved."
-          
+          echo "::warning::The push operation was rejected by the remote repository."
+          echo "::warning::Since branch protection rules are not active, this typically indicates an issue with repository permissions."
+          echo "::warning::Please check your repository's 'Settings' > 'Actions' > 'General' and ensure that 'Workflow permissions' are set to 'Read and write permissions'."
+          echo "::warning::If this workflow is running on a fork, the token is read-only by default and cannot push changes."
+
+
+
 
 
           
