@@ -14,12 +14,17 @@ on:
     paths:
       - '**'
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   find_apps:
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
       force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }}
+      workflow_state_json: ${{ steps.manage_workflow_state.outputs.workflow_state_output }} # NEW: Output the entire state JSON
     env:
       APP_BASE_DIRS: "homepage-app"
 
@@ -34,10 +39,15 @@ jobs:
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
+          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
+          CURRENT_ARTIFACT_RUN_ID_KEY="current_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
+          # Attempt to read the state file, providing a default empty JSON if it doesn't exist
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
+          echo "::debug::Current state (find_apps) read from file: $CURRENT_STATE"
+
           CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
           DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY} // 0") 
@@ -57,6 +67,12 @@ jobs:
           fi
 
           echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT"
+          
+          # NEW: Output the full current state JSON to be passed to other jobs
+          DELIMITER="EOF_WORKFLOW_STATE_JSON"
+          echo "workflow_state_output<<$DELIMITER" >> "$GITHUB_OUTPUT"
+          echo "$CURRENT_STATE" >> "$GITHUB_OUTPUT"
+          echo "$DELIMITER" >> "$GITHUB_OUTPUT"
         shell: bash
 
 
@@ -139,7 +155,7 @@ jobs:
         
 
   generate_docs_files:
-    needs: find_apps
+    needs: find_apps # This job needs find_apps to get the initial workflow state
     runs-on: ubuntu-latest
     outputs:
       last_uploaded_run_id: ${{ steps.set_uploaded_run_id.outputs.id }}
@@ -149,7 +165,69 @@ jobs:
       needs.find_apps.outputs.app_details_json != '[]'
 
     steps:
-      # ... (existing steps like Checkout code, Set up Python, Check Writable File Secrets) ...
+      - name: Debug Inputs from Find Apps
+        run: |
+          echo "--- Debugging Inputs to generate_docs_files ---"
+          echo "Output from 'find_apps.outputs.app_details_json': ${{ needs.find_apps.outputs.app_details_json }}"
+          echo "Output from 'find_apps.outputs.force_apps_json_upload': ${{ needs.find_apps.outputs.force_apps_json_upload }}"
+          echo "Output from 'find_apps.outputs.workflow_state_json': ${{ needs.find_apps.outputs.workflow_state_json }}" # NEW DEBUG
+          if [ -z "$APP_DATA_FROM_FIND_APPS" ]; then
+            echo "::error::APP_DATA_FROM_FIND_APPS is empty. This indicates a problem with output passing or 'find_apps' generating empty data."
+          fi
+          echo "--- End Debug Inputs ---"
+        shell: bash
+        env:
+          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
+          # NEW: Pass the entire state JSON from find_apps
+          WORKFLOW_STATE_FROM_FIND_APPS: ${{ needs.find_apps.outputs.workflow_state_json }} 
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check Writable File Secrets
+        run: |
+          if [ -z "${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}" ]; then
+            echo "::warning::RWT_WRITABLE_FILE_APPS_MD secret is not set or is empty."
+            echo "::warning::To enable writing to 'apps.md', create a repository secret named 'RWT_WRITABLE_FILE_APPS_MD' with the value 'apps.md'."
+          fi
+          if [ -z "${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}" ]; then
+            echo "::warning::RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON secret is not set or is empty."
+            echo "::warning::To enable writing to 'homepage-app/apps/apps.json', create a repository secret named 'RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON' with the value 'homepage-app/apps/apps.json'."
+          fi
+          if [ "${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}" != ".github/workflow_state.json" ]; then
+            echo "::warning::RWT_WRITABLE_FILE_WORKFLOW_STATE secret should be set to '.github/workflow_state.json' for proper state management."
+          fi
+        shell: bash
+
+      - name: Generate apps.md and apps.json Content with Python Script
+        id: generate_content_py
+        run: python .github/scripts/generate_app_list.py
+        env:
+          APP_DATA_FROM_FIND_APPS: ${{ env.APP_DATA_FROM_FIND_APPS }} # Use env var to access
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
+          RWT_WRITABLE_FILE_WORKFLOW_STATE: ${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ env.FORCE_APPS_JSON_UPLOAD_FLAG }} # Use env var to access
+        shell: bash
+
+      - name: Write apps.md File
+        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
+        run: |
+          APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
+          echo "$APPS_MD_SECTION_CONTENT" > apps.md
+        shell: bash
 
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
@@ -162,17 +240,20 @@ jobs:
           UPLOAD_COUNT_KEY="apps_json_upload_count"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
-          CURRENT_STATE_FROM_FILE=$(jq '.' "$STATE_FILE" || echo '{}')
-          echo "::debug::Current state (generate_docs_files) read from file: $CURRENT_STATE_FROM_FILE"
+          # NEW: Get initial state from find_apps job output, not by re-reading from disk
+          CURRENT_STATE_FROM_FIND_APPS_OUTPUT="${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}"
+          # Parse the JSON string from the output
+          CURRENT_STATE=$(echo "$CURRENT_STATE_FROM_FIND_APPS_OUTPUT" | jq '.')
+          echo "::debug::Current state (generate_docs_files) received from find_apps: $CURRENT_STATE"
           
           APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
           CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
           
-          INITIAL_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
-          INITIAL_FORCE_FLAG=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
-          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${UPLOAD_COUNT_KEY} // 0")
+          INITIAL_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
+          INITIAL_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${UPLOAD_COUNT_KEY} // 0")
           
-          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY}")
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY}")
           if [ "$DOWNLOAD_THRESHOLD" == "null" ] || [ -z "$DOWNLOAD_THRESHOLD" ]; then
             DOWNLOAD_THRESHOLD=0 # Default to 0 for "every run"
             NEW_FORCE_UPLOAD_FLAG="true"
@@ -182,8 +263,8 @@ jobs:
             NEW_FORCE_UPLOAD_FLAG="false"
           fi
 
-          OLD_LAST_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"")
-          OLD_CURRENT_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${CURRENT_ARTIFACT_RUN_ID_KEY}")
+          OLD_LAST_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"")
+          OLD_CURRENT_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE" | jq -r ".${CURRENT_ARTIFACT_RUN_ID_KEY}")
 
           NEW_LAST_ARTIFACT_RUN_ID="$OLD_LAST_ARTIFACT_RUN_ID"
           NEW_CURRENT_ARTIFACT_RUN_ID="$OLD_CURRENT_ARTIFACT_RUN_ID"
@@ -239,9 +320,12 @@ jobs:
           echo "::debug::New state to write: $UPDATED_STATE"
 
           mkdir -p $(dirname "$STATE_FILE")
-          echo "$UPDATED_STATE" > "$STATE_FILE"
+          echo "$UPDATED_STATE" > "$STATE_FILE" # This will write/overwrite the file
 
-          if diff -q "$STATE_FILE" <(echo "$CURRENT_STATE_FROM_FILE" | jq '.'); then
+          # The diff here will compare the newly written file against the state received from find_apps,
+          # as CURRENT_STATE is now derived from needs.find_apps.outputs.workflow_state_json.
+          # This should still correctly determine if a commit is needed.
+          if diff -q "$STATE_FILE" <(echo "$CURRENT_STATE" | jq '.'); then
             echo "::notice::.github/workflow_state.json content is identical. No commit needed for state file."
             echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
           else
@@ -250,18 +334,36 @@ jobs:
           fi
         shell: bash
 
-      # Add this step exactly here:
       - name: Debug Git Status Before Commit
         run: |
           echo "--- Git Status Debug Start ---"
-          git status --porcelain=v1 # Shows modified files succinctly
-          git diff                  # Shows content differences
-          ls -la .github/workflow_state.json # List file with details (permissions, size, timestamp)
-          cat .github/workflow_state.json    # Show the content of the file on disk
+          git status --porcelain=v1
+          git diff
+          ls -la .github/workflow_state.json
+          cat .github/workflow_state.json
           echo "--- Git Status Debug End ---"
         shell: bash
 
-      # ... (rest of your steps, including Upload homepage-app/apps/apps.json as Artifact and the auto-commit action) ...
+      - name: Upload homepage-app/apps/apps.json as Artifact
+        id: upload_artifact_result
+        if: ${{ steps.generate_content_py.outputs.apps_json_updated_flag == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest-apps-json
+          path: homepage-app/apps/apps.json
+          retention-days: 7
+      
+      - name: Set Last Uploaded Run ID Output
+        id: set_uploaded_run_id
+        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }}
+        run: echo "id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Set Current Uploaded Run ID Output
+        id: set_current_uploaded_run_id
+        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }}
+        run: echo "id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+        shell: bash
 
       - name: Commit and Push generated files (including state file)
         if: |
@@ -275,10 +377,9 @@ jobs:
           skip_dirty_check: true
           push_options: "--force"
 
-
           
   prepare_deploy_matrix:
-    needs: generate_docs_files # Ensure prepare_deploy_matrix waits for artifact upload
+    needs: find_apps # Only needs find_apps for state information, runs in parallel with generate_docs_files
     runs-on: ubuntu-latest
     outputs:
       app_data_json: ${{ steps.extract_matrix_data.outputs.app_data_json }}
@@ -291,15 +392,18 @@ jobs:
       - name: Get workflow state for download auditing
         id: get_download_state
         run: |
-          STATE_FILE=".github/workflow_state.json"
+          # NEW: Get initial state from find_apps job output, not by re-reading from disk
+          WORKFLOW_STATE_FROM_FIND_APPS_OUTPUT="${{ needs.find_apps.outputs.workflow_state_json }}"
+          # Parse the JSON string from the output
+          CURRENT_STATE=$(echo "$WORKFLOW_STATE_FROM_FIND_APPS_OUTPUT" | jq '.')
+          echo "::debug::Current state (prepare_deploy_matrix) received from find_apps: $CURRENT_STATE"
+
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
           CURRENT_ARTIFACT_RUN_ID_KEY="current_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
           UPLOAD_COUNT_KEY="apps_json_upload_count"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
-
-          CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
           
           CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           LAST_UPLOADED_RUN_ID_FROM_STATE=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"")
@@ -326,7 +430,7 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get Artifact Run ID for Download (Prioritizing current run output, then state, then registry)
+      - name: Get Artifact Run ID for Download (Prioritizing current state, then last state, then registry)
         id: get_latest_artifact_run_id
         uses: actions/github-script@v6
         with:
@@ -337,44 +441,39 @@ jobs:
 
             let runIdToUse = '';
 
-            // Priority 1: Use the run_id of the just-completed generate_docs_files job if it successfully uploaded an artifact
-            const currentUploadedRunIdFromNeeds = '${{ needs.generate_docs_files.outputs.current_uploaded_run_id }}';
-            if (currentUploadedRunIdFromNeeds && currentUploadedRunIdFromNeeds !== 'null' && currentUploadedRunIdFromNeeds !== '') {
-                console.log(`Priority 1: Using artifact from current workflow run output (ID: ${currentUploadedRunIdFromNeeds}).`);
-                runIdToUse = currentUploadedRunIdFromNeeds;
-            } else {
-                console.log('Priority 1: No artifact ID from current generate_docs_files job output or it was null/empty.');
-
-                // Priority 2: Use the 'current_apps_json_artifact_run_id' from the workflow state file
-                const currentArtifactIdFromState = process.env.CURRENT_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
-                if (currentArtifactIdFromState && currentArtifactIdFromState !== 'null' && currentArtifactIdFromState !== '') {
-                    console.log(`Priority 2: Attempting to download artifact from 'current' ID in state: ${currentArtifactIdFromState}`);
-                    try {
-                        const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            run_id: currentArtifactIdFromState
-                        });
-                        const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
-                        if (targetArtifact) {
-                            runIdToUse = currentArtifactIdFromState;
-                            console.log(`Priority 2: Found artifact '${artifactName}' with current state run ID '${runIdToUse}'.`);
-                        } else {
-                            console.log(`Priority 2: Artifact '${artifactName}' not found for current state run ID '${currentArtifactIdFromState}'.`);
-                        }
-                    } catch (error) {
-                        console.log(`Priority 2: Error checking artifacts for current state run ID '${currentArtifactIdFromState}': ${error.message}.`);
+            // Priority 1: Use the 'current_apps_json_artifact_run_id' from the workflow state file
+            // Note: This relies on the state file being updated *eventually* by generate_docs_files.
+            // For true parallel design, prepare_deploy_matrix might need to search the registry
+            // more aggressively or rely on a slightly older state if generate_docs_files hasn't finished its commit.
+            // However, this aligns with the user's explicit request to read from the state file.
+            const currentArtifactIdFromState = process.env.CURRENT_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
+            if (currentArtifactIdFromState && currentArtifactIdFromState !== 'null' && currentArtifactIdFromState !== '') {
+                console.log(`Priority 1: Attempting to download artifact from 'current' ID in state: ${currentArtifactIdFromState}`);
+                try {
+                    const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        run_id: currentArtifactIdFromState
+                    });
+                    const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+                    if (targetArtifact) {
+                        runIdToUse = currentArtifactIdFromState;
+                        console.log(`Priority 1: Found artifact '${artifactName}' with current state run ID '${runIdToUse}'.`);
+                    } else {
+                        console.log(`Priority 1: Artifact '${artifactName}' not found for current state run ID '${currentArtifactIdFromState}'.`);
                     }
-                } else {
-                    console.log('Priority 2: No \'current\' artifact ID in state file or it was null/empty.');
+                } catch (error) {
+                    console.log(`Priority 1: Error checking artifacts for current state run ID '${currentArtifactIdFromState}': ${error.message}.`);
                 }
+            } else {
+                console.log('Priority 1: No \'current\' artifact ID in state file or it was null/empty.');
             }
             
-            // Priority 3: Fallback to 'last_successful_apps_json_artifact_run_id' from the state file
+            // Priority 2: Fallback to 'last_successful_apps_json_artifact_run_id' from the state file
             if (!runIdToUse) {
                 const lastArtifactIdFromState = process.env.LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
                 if (lastArtifactIdFromState && lastArtifactIdFromState !== 'null' && lastArtifactIdFromState !== '') {
-                    console.log(`Priority 3: Attempting to download artifact from 'last successful' ID in state: ${lastArtifactIdFromState}`);
+                    console.log(`Priority 2: Attempting to download artifact from 'last successful' ID in state: ${lastArtifactIdFromState}`);
                     try {
                         const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
                             owner: context.repo.owner,
@@ -384,15 +483,15 @@ jobs:
                         const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
                         if (targetArtifact) {
                             runIdToUse = lastArtifactIdFromState;
-                            console.log(`Priority 3: Found artifact '${artifactName}' with last successful state run ID '${runIdToUse}'.`);
+                            console.log(`Priority 2: Found artifact '${artifactName}' with last successful state run ID '${runIdToUse}'.`);
                         } else {
-                            console.log(`Priority 3: Artifact '${artifactName}' not found for last successful state run ID '${lastArtifactIdFromState}'.`);
+                            console.log(`Priority 2: Artifact '${artifactName}' not found for last successful state run ID '${lastArtifactIdFromState}'.`);
                         }
                     } catch (error) {
-                        console.log(`Priority 3: Error checking artifacts for last successful state run ID '${lastArtifactIdFromState}': ${error.message}.`);
+                        console.log(`Priority 2: Error checking artifacts for last successful state run ID '${lastArtifactIdFromState}': ${error.message}.`);
                     }
                 } else {
-                    console.log('Priority 3: No \'last successful\' artifact ID in state file or it was null/empty.');
+                    console.log('Priority 2: No \'last successful\' artifact ID in state file or it was null/empty.');
                 }
             }
 
