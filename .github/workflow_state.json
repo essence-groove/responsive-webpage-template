@@ -1,8 +1,8 @@
 {
   "apps_json_download_count": 0,
-  "force_next_upload": true,
-  "apps_json_upload_count": 1,
+  "force_next_upload": false,
+  "apps_json_upload_count": 2,
   "apps_json_download_threshold": 0,
-  "last_successful_apps_json_artifact_run_id": "",
-  "current_apps_json_artifact_run_id": "16207966210"
+  "last_successful_apps_json_artifact_run_id": "16207966210",
+  "current_apps_json_artifact_run_id": "16215910810"
 }
