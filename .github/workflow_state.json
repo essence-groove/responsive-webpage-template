@@ -1,6 +1,7 @@
 {
   "apps_json_download_count": 0,
   "force_next_upload": true,
+  "required_diagnostics": true,
   "apps_json_upload_count": 7,
   "apps_json_download_threshold": 0,
   "last_successful_artifact_run": {
