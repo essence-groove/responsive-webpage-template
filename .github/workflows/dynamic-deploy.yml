@@ -164,9 +164,11 @@ jobs:
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
-          # ... (full script from previous version) ...
+          INCOMING_STATE='${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}'
+          STATE_FILE=".github/workflow_state.json"
+          # ... (full jq script) ...
         shell: bash
-        continue-on-error: true # Allows workflow to continue on failure
+        continue-on-error: true
 
       - name: Warn on State Update Failure
         if: steps.update_state_file_content.outcome == 'failure'
@@ -175,7 +177,6 @@ jobs:
           echo "::warning::An exit code of 127, if observed, indicates a 'command not found' error, likely meaning 'jq' was not installed on the runner."
 
       - name: Upload homepage-app/apps/apps.json as Artifact
-        # This step will only run if the state update was successful, to prevent uploading artifacts without a corresponding state change.
         if: steps.update_state_file_content.outcome == 'success' && steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -187,6 +188,10 @@ jobs:
         id: commit_and_push
         if: steps.update_state_file_content.outcome == 'success' && (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || steps.update_state_file_content.outputs.state_file_changed == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
+        # Add this env block to enable git debug logging
+        env:
+          GIT_TRACE: 1
+          GIT_CURL_VERBOSE: 1
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
           file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
@@ -202,9 +207,6 @@ jobs:
           echo "::warning::2. Repository Permissions: Verify 'Settings' > 'Actions' > 'General' has 'Workflow permissions' set to 'Read and write permissions'."
           echo "::warning::3. Fork Permissions: If this workflow is running on a fork, its token is read-only by default."
           echo "::warning::4. Organization Rules: If this repository is part of an organization, check the organization's settings for policies that may be overriding repository permissions."
-
-
-
 
 
 
