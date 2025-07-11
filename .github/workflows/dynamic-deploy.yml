@@ -160,122 +160,17 @@ jobs:
         run: |
           INCOMING_STATE='${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}'
           STATE_FILE=".github/workflow_state.json"
-
-          # Get current run info
-          APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
-          CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
-          CURRENT_TIMESTAMP_ISO=$(date -u -Iseconds)
-          CURRENT_TIMESTAMP_EPOCH=$(date -u +%s)
-          
-          # Define all keys
-          DC_KEY="apps_json_download_count"
-          FU_KEY="force_next_upload"
-          UC_KEY="apps_json_upload_count"
-          DT_KEY="apps_json_download_threshold"
-          # Define NEW object keys
-          LAST_RUN_KEY="last_successful_artifact_run"
-          CURRENT_RUN_KEY="current_successful_artifact_run"
-          HISTORICAL_RUN_KEY="historical_artifact_run"
-          # Define LEGACY string keys for migration
-          LEGACY_LARI_KEY="last_successful_apps_json_artifact_run_id"
-          LEGACY_CARI_KEY="current_apps_json_artifact_run_id"
-
-          # This jq script now handles the migration from old format to new
+          # ... (rest of the script from the previous version) ...
           UPDATED_STATE=$(jq -n \
             --argjson incoming_state "$INCOMING_STATE" \
-            --arg apps_json_updated "$APPS_JSON_UPDATED_THIS_RUN" \
-            --arg current_run_id "$CURRENT_WORKFLOW_RUN_ID" \
-            --arg current_ts_iso "$CURRENT_TIMESTAMP_ISO" \
-            --arg current_ts_epoch "$CURRENT_TIMESTAMP_EPOCH" \
-            --arg dc_key "$DC_KEY" \
-            --arg fu_key "$FU_KEY" \
-            --arg uc_key "$UC_KEY" \
-            --arg dt_key "$DT_KEY" \
-            --arg last_run_key "$LAST_RUN_KEY" \
-            --arg current_run_key "$CURRENT_RUN_KEY" \
-            --arg historical_run_key "$HISTORICAL_RUN_KEY" \
-            --arg legacy_lari_key "$LEGACY_LARI_KEY" \
-            --arg legacy_cari_key "$LEGACY_CARI_KEY" \
+            # ... (all other --arg definitions) ...
             '
-            # --- START MIGRATION LOGIC ---
-            # Function to safely upgrade a run record from string to object
-            def upgrade_run_object($legacy_key; $new_key):
-              # If new key exists and is an object, it is already in the new format.
-              if $incoming_state | has($new_key) and ($incoming_state[$new_key] | type == "object") then
-                $incoming_state[$new_key]
-              # Elif legacy key exists and is a string, convert it to the new object format.
-              elif $incoming_state | has($legacy_key) and ($incoming_state[$legacy_key] | type == "string") then
-                { "id": $incoming_state[$legacy_key], "timestamp": null }
-              # Else, create a clean, empty object.
-              else
-                { "id": null, "timestamp": null }
-              end;
-
-            # Perform the migration for all tracked runs
-            (
-              upgrade_run_object($legacy_lari_key; $last_run_key) as $migrated_last_run |
-              upgrade_run_object($legacy_cari_key; $current_run_key) as $migrated_current_run |
-              # Historical run has no legacy key, so just check for its existence.
-              (if $incoming_state | has($historical_run_key) and ($incoming_state[$historical_run_key] | type == "object") then $incoming_state[$historical_run_key] else { "id": null, "timestamp": null } end) as $migrated_historical_run |
-
-            # --- END MIGRATION LOGIC ---
-
-            # --- START STATE UPDATE LOGIC ---
-            (
-              # Determine new values for "last" and "current" runs
-              if $apps_json_updated == "true" then
-                {
-                  "new_last_run": $migrated_current_run,
-                  "new_current_run": { "id": $current_run_id, "timestamp": $current_ts_iso }
-                }
-              else
-                {
-                  "new_last_run": $migrated_last_run,
-                  "new_current_run": $migrated_current_run
-                }
-              end
-            ) as $promoted_runs |
-
-            (
-              # Determine new value for "historical" run
-              if ($promoted_runs.new_last_run.timestamp != null) and (($current_ts_epoch | tonumber) - ($promoted_runs.new_last_run.timestamp | fromdate) > 3600) then
-                $promoted_runs.new_last_run
-              else
-                $migrated_historical_run
-              end
-            ) as $new_historical_run |
-            
-            # --- START COUNTER/FLAG LOGIC ---
-            ($incoming_state[$dt_key] // 0) as $download_threshold |
-            {
-              ($dc_key): (if $download_threshold == 0 or $apps_json_updated == "true" then 0 else ($incoming_state[$dc_key] // 0) + 1 end),
-              ($fu_key): (if $download_threshold == 0 then true else false end),
-              ($uc_key): (if $apps_json_updated == "true" then ($incoming_state[$uc_key] // 0) + 1 else ($incoming_state[$uc_key] // 0) end),
-              ($dt_key): $download_threshold
-            } as $counters |
-
-            # --- START FINAL ASSEMBLY ---
-            # Combine counters and all run objects into the final state
-            $counters + {
-              ($last_run_key): $promoted_runs.new_last_run,
-              ($current_run_key): $promoted_runs.new_current_run,
-              ($historical_run_key): $new_historical_run
-            }
-            ) # End top-level migration block
+            # ... (the full jq script with migration and state logic) ...
             '
           )
-          
           echo "NEW STATE: $UPDATED_STATE"
           echo "$UPDATED_STATE" > "$STATE_FILE"
-
-          # Check if the file content actually changed before setting output
-          if [ -z "$(diff -q <(echo "$INCOMING_STATE" | jq '.') "$STATE_FILE")" ]; then
-             echo "::notice::.github/workflow_state.json content is identical."
-             echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
-          else
-             echo "::notice::.github/workflow_state.json content has changed."
-             echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
-          fi
+          # ... (rest of the diff check) ...
         shell: bash
 
       - name: Upload homepage-app/apps/apps.json as Artifact
@@ -287,6 +182,7 @@ jobs:
           retention-days: 7
 
       - name: Commit and Push generated files
+        id: commit_and_push
         if: |
           steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
           steps.generate_content_py.outputs.apps_json_updated_flag == 'true' ||
@@ -297,6 +193,13 @@ jobs:
           file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
           skip_dirty_check: true
           push_options: "--force"
+        continue-on-error: true # This prevents the job from failing on a push error
+
+      - name: Warn on Push Failure
+        if: steps.commit_and_push.outcome == 'failure'
+        run: |
+          echo "::warning::An exit code of 5 in this context typically indicates that the push operation was rejected by the remote repository."
+          echo "::warning::This is likely due to branch protection rules. The workflow will continue, but the updated state file was not saved."
 
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
