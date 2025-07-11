@@ -28,16 +28,6 @@ This application is deployed on Heroku using GitHub Actions for continuous deplo
 
 ---
 
-## Local Development
+## Personal Testamonial
 
-To run this project locally:
-
-1.  Clone the repository:
-    ```bash
-    git clone [https://github.com/YourUsername/your-repo-name.git](https://github.com/YourUsername/your-repo-name.git)
-    ```
-2.  Navigate into the project directory:
-    ```bash
-    cd your-repo-name
-    ```
-3.  Open `index.html` in your web browser.
+I find that this app I have created is indespensible. This to-do list allows for clear differentiation between a to-do list, as opposed to trying to use the issues tab on a GitHub repository for multiple things that are not necessarily defined as issues. - Eeshvar Das
