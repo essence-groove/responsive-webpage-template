@@ -160,6 +160,12 @@ jobs:
       always() &&
       needs.find_apps.outputs.app_details_json != '[]'
 
+    env:
+      APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+      FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
+      # NEW: Pass the entire state JSON from find_apps
+      WORKFLOW_STATE_FROM_FIND_APPS: ${{ needs.find_apps.outputs.workflow_state_json }} 
+
     steps:
       - name: Debug Inputs from Find Apps
         run: |
@@ -172,11 +178,6 @@ jobs:
           fi
           echo "--- End Debug Inputs ---"
         shell: bash
-        env:
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
-          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
-          # NEW: Pass the entire state JSON from find_apps
-          WORKFLOW_STATE_FROM_FIND_APPS: ${{ needs.find_apps.outputs.workflow_state_json }} 
 
       - name: Checkout code
         uses: actions/checkout@v4
