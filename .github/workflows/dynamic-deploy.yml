@@ -230,8 +230,7 @@ jobs:
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
-          # Enable verbose debugging to print the exact command being run
-          set -x
+          CURRENT_STATE=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq '.')
 
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
@@ -240,8 +239,6 @@ jobs:
           FORCE_UPLOAD_KEY="force_next_upload"
           UPLOAD_COUNT_KEY="apps_json_upload_count"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
-
-          CURRENT_STATE=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq '.')
           
           APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
           CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
@@ -288,7 +285,6 @@ jobs:
             NEW_UPLOAD_COUNT=$((CURRENT_UPLOAD_COUNT + 1))
           fi
 
-          # This is the command that is failing
           UPDATED_STATE=$(jq -n \
             --arg download_count "$NEW_DOWNLOAD_COUNT" \
             --arg force "$NEW_FORCE_UPLOAD_FLAG" \
@@ -311,9 +307,6 @@ jobs:
               ($cari_key): $current_artifact_run_id
             }')
           
-          # Disable verbose debugging
-          set +x
-
           echo "$UPDATED_STATE" > "$STATE_FILE"
 
           if diff -q "$STATE_FILE" <(echo "$CURRENT_STATE" | jq '.'); then
