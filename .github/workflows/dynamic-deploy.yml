@@ -300,19 +300,25 @@ jobs:
           fi
 
           UPDATED_STATE=$(jq -n \
-            --argjson download_count "$NEW_DOWNLOAD_COUNT" \
-            --argjson force "$NEW_FORCE_UPLOAD_FLAG" \
-            --argjson upload_count "$NEW_UPLOAD_COUNT" \
-            --argjson download_threshold "$DOWNLOAD_THRESHOLD" \
+            --arg download_count "$NEW_DOWNLOAD_COUNT" \
+            --arg force "$NEW_FORCE_UPLOAD_FLAG" \
+            --arg upload_count "$NEW_UPLOAD_COUNT" \
+            --arg download_threshold "$DOWNLOAD_THRESHOLD" \
             --arg last_artifact_run_id "$NEW_LAST_ARTIFACT_RUN_ID" \
             --arg current_artifact_run_id "$NEW_CURRENT_ARTIFACT_RUN_ID" \
+            --arg dc_key "$DOWNLOAD_COUNT_KEY" \
+            --arg fu_key "$FORCE_UPLOAD_KEY" \
+            --arg uc_key "$UPLOAD_COUNT_KEY" \
+            --arg dt_key "$DOWNLOAD_THRESHOLD_KEY" \
+            --arg lari_key "$LAST_ARTIFACT_RUN_ID_KEY" \
+            --arg cari_key "$CURRENT_ARTIFACT_RUN_ID_KEY" \
             '{
-              "'"${DOWNLOAD_COUNT_KEY}"'": $download_count,
-              "'"${FORCE_UPLOAD_KEY}"'": $force,
-              "'"${UPLOAD_COUNT_KEY}"'": $upload_count,
-              "'"${DOWNLOAD_THRESHOLD_KEY}"'": $download_threshold,
-              "'"${LAST_ARTIFACT_RUN_ID_KEY}"'": $last_artifact_run_id,
-              "'"${CURRENT_ARTIFACT_RUN_ID_KEY}"'": $current_artifact_run_id
+              ($dc_key): ($download_count | tonumber),
+              ($fu_key): ($force | test("true")),
+              ($uc_key): ($upload_count | tonumber),
+              ($dt_key): ($download_threshold | tonumber),
+              ($lari_key): $last_artifact_run_id,
+              ($cari_key): $current_artifact_run_id
             }')
           
           echo "::debug::New state to write: $UPDATED_STATE"
