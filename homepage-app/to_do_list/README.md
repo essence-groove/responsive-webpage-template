@@ -30,4 +30,4 @@ This application is deployed on Heroku using GitHub Actions for continuous deplo
 
 ## Personal Testamonial
 
-I find that this app I have created is indespensible. This to-do list allows for clear differentiation between a to-do list, as opposed to trying to use the issues tab on a GitHub repository for multiple things that are not necessarily defined as issues.
+I find that this app I have created is indespensible. This to-do list allows for clear differentiation between a to-do list, as opposed to trying to use the issues tab on a GitHub repository for multiple things that are not necessarily defined as issues. - Eeshvar Das
