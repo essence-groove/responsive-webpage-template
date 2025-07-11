@@ -137,6 +137,13 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
+      # New step to read the diagnostic flag from the state file
+      - name: Read Diagnostic Flag from State
+        id: read_diag_flag
+        run: |
+          diag_flag=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq -r '.required_diagnostics // false')
+          echo "is_enabled=$diag_flag" >> "$GITHUB_OUTPUT"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -144,6 +151,7 @@ jobs:
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
+
           
       - name: Generate apps.md and apps.json Content
         id: generate_content_py
@@ -164,8 +172,6 @@ jobs:
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
-          INCOMING_STATE='${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}'
-          STATE_FILE=".github/workflow_state.json"
           # ... (full jq script) ...
         shell: bash
         continue-on-error: true
@@ -176,6 +182,7 @@ jobs:
           echo "::warning::The 'Update Workflow State File' step failed. The state file was not updated."
           echo "::warning::An exit code of 127, if observed, indicates a 'command not found' error, likely meaning 'jq' was not installed on the runner."
 
+
       - name: Upload homepage-app/apps/apps.json as Artifact
         if: steps.update_state_file_content.outcome == 'success' && steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
         uses: actions/upload-artifact@v4
@@ -184,14 +191,16 @@ jobs:
           path: homepage-app/apps/apps.json
           retention-days: 7
 
+      
+
       - name: Commit and Push generated files
         id: commit_and_push
         if: steps.update_state_file_content.outcome == 'success' && (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || steps.update_state_file_content.outputs.state_file_changed == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
-        # Add this env block to enable git debug logging
+        # This env block is now conditional based on the flag from the state file
         env:
-          GIT_TRACE: 1
-          GIT_CURL_VERBOSE: 1
+          GIT_TRACE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
+          GIT_CURL_VERBOSE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
           file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
