@@ -227,11 +227,10 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
-      # ⬇️ ADD THIS DEBUGGING STEP HERE ⬇️
       - name: 🧐 Verify Correct Script is Running
         run: |
           echo "--- Verifying workflow file content before state update ---"
-          grep '($force | test("true"))' .github/workflows/YOUR_WORKFLOW_FILENAME.yml
+          grep '($force | test("true"))' .github/workflows/dynamic-deploy.yml
           if [ $? -ne 0 ]; then
             echo "::error::The running workflow file is OUTDATED. The expected jq 'test(\"true\")' command was not found."
             exit 1
