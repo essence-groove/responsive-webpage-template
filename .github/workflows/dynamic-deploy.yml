@@ -242,6 +242,9 @@ jobs:
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
+          # Enable verbose debugging to print the exact command being run
+          set -x
+
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
@@ -250,11 +253,8 @@ jobs:
           UPLOAD_COUNT_KEY="apps_json_upload_count"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
-          # NEW: Get initial state from find_apps job output, not by re-reading from disk
           CURRENT_STATE_FROM_FIND_APPS_OUTPUT="${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}"
-          # Parse the JSON string from the output
           CURRENT_STATE=$(echo "$CURRENT_STATE_FROM_FIND_APPS_OUTPUT" | jq '.')
-          echo "::debug::Current state (generate_docs_files) received from find_apps: $CURRENT_STATE"
           
           APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
           CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
@@ -265,9 +265,8 @@ jobs:
           
           DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY}")
           if [ "$DOWNLOAD_THRESHOLD" == "null" ] || [ -z "$DOWNLOAD_THRESHOLD" ]; then
-            DOWNLOAD_THRESHOLD=0 # Default to 0 for "every run"
+            DOWNLOAD_THRESHOLD=0
             NEW_FORCE_UPLOAD_FLAG="true"
-            echo "::notice::Initializing '${DOWNLOAD_THRESHOLD_KEY}' in state file to ${DOWNLOAD_THRESHOLD}. Setting force_next_upload to true for next run."
           else
             DOWNLOAD_THRESHOLD=$(echo "$DOWNLOAD_THRESHOLD" | tr -d '\r')
             NEW_FORCE_UPLOAD_FLAG="false"
@@ -282,35 +281,27 @@ jobs:
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
             NEW_LAST_ARTIFACT_RUN_ID="$OLD_CURRENT_ARTIFACT_RUN_ID"
             NEW_CURRENT_ARTIFACT_RUN_ID="$CURRENT_WORKFLOW_RUN_ID"
-            echo "::debug::apps.json was updated this run. Updating current_apps_json_artifact_run_id to ${NEW_CURRENT_ARTIFACT_RUN_ID}."
-            echo "::debug::Moving old current_apps_json_artifact_run_id (${OLD_CURRENT_ARTIFACT_RUN_ID}) to last_successful_apps_json_artifact_run_id."
           elif [ "$OLD_CURRENT_ARTIFACT_RUN_ID" == "null" ] || [ -z "$OLD_CURRENT_ARTIFACT_RUN_ID" ]; then
             if [ -n "$OLD_LAST_ARTIFACT_RUN_ID" ]; then
                 NEW_CURRENT_ARTIFACT_RUN_ID="$OLD_LAST_ARTIFACT_RUN_ID"
-                echo "::notice::Initialized '${CURRENT_ARTIFACT_RUN_ID_KEY}' from existing '${LAST_ARTIFACT_RUN_ID_KEY}'."
             fi
           fi
 
           NEW_DOWNLOAD_COUNT=$INITIAL_DOWNLOAD_COUNT 
           if [ "$DOWNLOAD_THRESHOLD" -eq 0 ]; then
             NEW_DOWNLOAD_COUNT=0
-            echo "::debug::Threshold is 0. Download count reset to 0 for next cycle."
           elif [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
             NEW_DOWNLOAD_COUNT=0
-            echo "::debug::apps.json was updated this run. Download count reset to 0 for next cycle."
           else
             NEW_DOWNLOAD_COUNT=$((INITIAL_DOWNLOAD_COUNT + 1))
-            echo "::debug::apps.json was NOT updated this run. Download count incremented to: $NEW_DOWNLOAD_COUNT"
           fi
 
           NEW_UPLOAD_COUNT="$CURRENT_UPLOAD_COUNT"
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
             NEW_UPLOAD_COUNT=$((CURRENT_UPLOAD_COUNT + 1))
-            echo "::debug::apps.json was updated this run. Incrementing upload count to: $NEW_UPLOAD_COUNT"
-          else
-            echo "::debug::apps.json was NOT updated this run. Upload count remains: $CURRENT_UPLOAD_COUNT"
           fi
 
+          # This is the command that is failing
           UPDATED_STATE=$(jq -n \
             --arg download_count "$NEW_DOWNLOAD_COUNT" \
             --arg force "$NEW_FORCE_UPLOAD_FLAG" \
@@ -333,31 +324,18 @@ jobs:
               ($cari_key): $current_artifact_run_id
             }')
           
-          echo "::debug::New state to write: $UPDATED_STATE"
+          # Disable verbose debugging
+          set +x
 
-          mkdir -p $(dirname "$STATE_FILE")
-          echo "$UPDATED_STATE" > "$STATE_FILE" # This will write/overwrite the file
+          echo "$UPDATED_STATE" > "$STATE_FILE"
 
-          # The diff here will compare the newly written file against the state received from find_apps,
-          # as CURRENT_STATE is now derived from needs.find_apps.outputs.workflow_state_json.
-          # This should still correctly determine if a commit is needed.
           if diff -q "$STATE_FILE" <(echo "$CURRENT_STATE" | jq '.'); then
-            echo "::notice::.github/workflow_state.json content is identical. No commit needed for state file."
+            echo "::notice::.github/workflow_state.json content is identical."
             echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::.github/workflow_state.json content has changed. Commit needed for state file."
+            echo "::notice::.github/workflow_state.json content has changed."
             echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
           fi
-        shell: bash
-
-      - name: Debug Git Status Before Commit
-        run: |
-          echo "--- Git Status Debug Start ---"
-          git status --porcelain=v1
-          git diff
-          ls -la .github/workflow_state.json
-          cat .github/workflow_state.json
-          echo "--- Git Status Debug End ---"
         shell: bash
 
       - name: Upload homepage-app/apps/apps.json as Artifact
