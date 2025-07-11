@@ -375,7 +375,6 @@ jobs:
 
           
   prepare_deploy_matrix:
-    needs: find_apps # Only needs find_apps for state information, runs in parallel with generate_docs_files
     runs-on: ubuntu-latest
     outputs:
       app_data_json: ${{ steps.extract_matrix_data.outputs.app_data_json }}
