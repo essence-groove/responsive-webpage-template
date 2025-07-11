@@ -10,6 +10,7 @@ on:
   push:
     branches:
       - main
+      - artifact-not-found
     paths:
       - '**'
 
@@ -18,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
-      # This is the ONLY output for the force flag for generate_docs_files
       force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }}
+      workflow_state_json: ${{ steps.manage_workflow_state.outputs.workflow_state_output }} # NEW: Output the entire state JSON
     env:
       APP_BASE_DIRS: "homepage-app"
 
@@ -29,33 +30,46 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
-      # NEW STEP: Read and manage the workflow state file
       - name: Read Workflow State for Artifact Logic
         id: manage_workflow_state
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
+          CURRENT_ARTIFACT_RUN_ID_KEY="current_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
+          DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
+          # Attempt to read the state file, providing a default empty JSON if it doesn't exist
           CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
+          echo "::debug::Current state (find_apps) read from file: $CURRENT_STATE"
+
           CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY} // 0") 
 
-          echo "::debug::Initial state (find_apps) - Download Count: $CURRENT_DOWNLOAD_COUNT, Force Flag: $CURRENT_FORCE_FLAG"
+          echo "::debug::Initial state (find_apps) - Download Count: $CURRENT_DOWNLOAD_COUNT, Force Flag: $CURRENT_FORCE_FLAG, Threshold: $DOWNLOAD_THRESHOLD"
 
-          TEMP_NEW_DOWNLOAD_COUNT=$((CURRENT_DOWNLOAD_COUNT + 1)) 
           FORCE_UPLOAD_FOR_GENERATOR="false"
 
-          # Change this '5' to '2' or '3' for the new threshold
-          if [ "$TEMP_NEW_DOWNLOAD_COUNT" -ge 2 ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then # <-- CHANGE '5' TO YOUR DESIRED THRESHOLD (e.g., 2 or 3)
+          if [ "$DOWNLOAD_THRESHOLD" -eq 0 ]; then
             FORCE_UPLOAD_FOR_GENERATOR="true"
-            echo "::notice::Download count reached NEW_THRESHOLD OR force flag was true. Signalling force apps.json upload for generate_docs_files."
+            echo "::notice::Download threshold is 0. Forcing apps.json upload for generate_docs_files."
+          elif [ "$CURRENT_DOWNLOAD_COUNT" -ge "$DOWNLOAD_THRESHOLD" ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then
+            FORCE_UPLOAD_FOR_GENERATOR="true"
+            echo "::notice::Download count ($CURRENT_DOWNLOAD_COUNT) reached threshold ($DOWNLOAD_THRESHOLD) OR force flag was true. Signalling force apps.json upload for generate_docs_files."
           else
-            echo "::notice::Download count: $TEMP_NEW_DOWNLOAD_COUNT/NEW_THRESHOLD. No force upload this run (yet)." # Update log message
+            echo "::notice::Download count: $CURRENT_DOWNLOAD_COUNT/$DOWNLOAD_THRESHOLD. No force upload this run (yet)."
           fi
 
           echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT"
+          
+          # In the 'run:' block of the 'manage_workflow_state' step
+          # ... (script logic to build CURRENT_STATE) ...
+
+          # NEW: Compact the JSON to a single line and set as a standard output
+          COMPACT_STATE=$(echo "$CURRENT_STATE" | jq -c '.')
+          echo "workflow_state_output=$COMPACT_STATE" >> "$GITHUB_OUTPUT"
         shell: bash
 
 
@@ -131,36 +145,40 @@ jobs:
           printf "app_details_json=%s\n" "$APP_DETAILS_JSON_OUTPUT" >> "$GITHUB_OUTPUT"
           
           if [ ${#APP_DETAILS_ARRAY[@]} -eq 0 ]; then
-             exit 0
+              exit 0
           fi
         shell: bash
 
         
 
   generate_docs_files:
-    needs: find_apps
+    needs: find_apps # This job needs find_apps to get the initial workflow state
     runs-on: ubuntu-latest
     outputs:
       last_uploaded_run_id: ${{ steps.set_uploaded_run_id.outputs.id }}
+      current_uploaded_run_id: ${{ steps.set_current_uploaded_run_id.outputs.id }} 
     if: |
       always() &&
       needs.find_apps.outputs.app_details_json != '[]'
+
+    env:
+      APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+      FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
+      # NEW: Pass the entire state JSON from find_apps
+      WORKFLOW_STATE_FROM_FIND_APPS: ${{ needs.find_apps.outputs.workflow_state_json }} 
 
     steps:
       - name: Debug Inputs from Find Apps
         run: |
           echo "--- Debugging Inputs to generate_docs_files ---"
           echo "Output from 'find_apps.outputs.app_details_json': ${{ needs.find_apps.outputs.app_details_json }}"
-          echo "Value of APP_DATA_FROM_FIND_APPS env var: '$APP_DATA_FROM_FIND_APPS'"
-          echo "Force apps.json upload flag from find_apps: ${{ needs.find_apps.outputs.force_apps_json_upload }}"
+          echo "Output from 'find_apps.outputs.force_apps_json_upload': ${{ needs.find_apps.outputs.force_apps_json_upload }}"
+          echo "Output from 'find_apps.outputs.workflow_state_json': ${{ needs.find_apps.outputs.workflow_state_json }}" # NEW DEBUG
           if [ -z "$APP_DATA_FROM_FIND_APPS" ]; then
             echo "::error::APP_DATA_FROM_FIND_APPS is empty. This indicates a problem with output passing or 'find_apps' generating empty data."
           fi
           echo "--- End Debug Inputs ---"
         shell: bash
-        env:
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
-          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -191,7 +209,7 @@ jobs:
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
         env:
-          APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+          APP_DATA_FROM_FIND_APPS: ${{ env.APP_DATA_FROM_FIND_APPS }} # Use env var to access
           RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
           RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
           RWT_WRITABLE_FILE_WORKFLOW_STATE: ${{ secrets.RWT_WRITABLE_FILE_WORKFLOW_STATE }}
@@ -199,7 +217,7 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
+          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ env.FORCE_APPS_JSON_UPLOAD_FLAG }} # Use env var to access
         shell: bash
 
       - name: Write apps.md File
@@ -209,78 +227,93 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
-      - name: Update Workflow State File and Determine Commit # MODIFIED STEP
+      - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
+          CURRENT_STATE=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq '.')
+
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
+          CURRENT_ARTIFACT_RUN_ID_KEY="current_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
-          # NEW KEY:
-          UPLOAD_COUNT_KEY="apps_json_upload_count" 
-
-          # Read current state from the file that was just checked out
-          CURRENT_STATE_FROM_FILE=$(jq '.' "$STATE_FILE" || echo '{}')
-          echo "::debug::Current state (generate_docs_files): $CURRENT_STATE_FROM_FILE"
+          UPLOAD_COUNT_KEY="apps_json_upload_count"
+          DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
           
-          # Get values for state update
           APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
-          CURRENT_RUN_ID="${{ github.run_id }}"
+          CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
           
-          # Get the current download count and force flag from the state file
-          # (These were read by find_apps and used for its decision in this run)
-          INITIAL_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
-          INITIAL_FORCE_FLAG=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          INITIAL_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
+          INITIAL_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${UPLOAD_COUNT_KEY} // 0")
           
-          # Get the current upload count
-          CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE_FROM_FILE" | jq -r ".${UPLOAD_COUNT_KEY} // 0") # Initialize to 0 if not found
-
-          # Determine new download count and force_next_upload for the *next* run
-          # This logic mirrors what find_apps *would have done* to its state if it persisted it.
-          NEW_DOWNLOAD_COUNT=$((INITIAL_DOWNLOAD_COUNT + 1))
-          NEW_FORCE_UPLOAD_FLAG="false"
-          if [ "$NEW_DOWNLOAD_COUNT" -ge 5 ] || [ "$INITIAL_FORCE_FLAG" = "true" ]; then
-              NEW_DOWNLOAD_COUNT=0 # Reset if force upload was triggered OR was already forced
-              NEW_FORCE_UPLOAD_FLAG="false" # Reset force flag after it has been acted upon
-              echo "::debug::State update: Count reset to 0, Force flag reset to false for next cycle."
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY}")
+          if [ "$DOWNLOAD_THRESHOLD" == "null" ] || [ -z "$DOWNLOAD_THRESHOLD" ]; then
+            DOWNLOAD_THRESHOLD=0
+            NEW_FORCE_UPLOAD_FLAG="true"
+          else
+            DOWNLOAD_THRESHOLD=$(echo "$DOWNLOAD_THRESHOLD" | tr -d '\r')
+            NEW_FORCE_UPLOAD_FLAG="false"
           fi
 
-          # Increment upload count ONLY if apps.json was updated in this run
-          NEW_UPLOAD_COUNT="$CURRENT_UPLOAD_COUNT" # Default to current
+          OLD_LAST_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"")
+          OLD_CURRENT_ARTIFACT_RUN_ID=$(echo "$CURRENT_STATE" | jq -r ".${CURRENT_ARTIFACT_RUN_ID_KEY}")
+
+          NEW_LAST_ARTIFACT_RUN_ID="$OLD_LAST_ARTIFACT_RUN_ID"
+          NEW_CURRENT_ARTIFACT_RUN_ID="$OLD_CURRENT_ARTIFACT_RUN_ID"
+
+          if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
+            NEW_LAST_ARTIFACT_RUN_ID="$OLD_CURRENT_ARTIFACT_RUN_ID"
+            NEW_CURRENT_ARTIFACT_RUN_ID="$CURRENT_WORKFLOW_RUN_ID"
+          elif [ "$OLD_CURRENT_ARTIFACT_RUN_ID" == "null" ] || [ -z "$OLD_CURRENT_ARTIFACT_RUN_ID" ]; then
+            if [ -n "$OLD_LAST_ARTIFACT_RUN_ID" ]; then
+                NEW_CURRENT_ARTIFACT_RUN_ID="$OLD_LAST_ARTIFACT_RUN_ID"
+            fi
+          fi
+
+          NEW_DOWNLOAD_COUNT=$INITIAL_DOWNLOAD_COUNT 
+          if [ "$DOWNLOAD_THRESHOLD" -eq 0 ]; then
+            NEW_DOWNLOAD_COUNT=0
+          elif [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
+            NEW_DOWNLOAD_COUNT=0
+          else
+            NEW_DOWNLOAD_COUNT=$((INITIAL_DOWNLOAD_COUNT + 1))
+          fi
+
+          NEW_UPLOAD_COUNT="$CURRENT_UPLOAD_COUNT"
           if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
             NEW_UPLOAD_COUNT=$((CURRENT_UPLOAD_COUNT + 1))
-            echo "::debug::apps.json was updated this run. Incrementing upload count to: $NEW_UPLOAD_COUNT"
-          else
-            echo "::debug::apps.json was NOT updated this run. Upload count remains: $CURRENT_UPLOAD_COUNT"
           fi
 
-
-          # Build the new state JSON structure
-          UPDATED_STATE=$(echo "$CURRENT_STATE_FROM_FILE" | jq \
-            --argjson download_count "$NEW_DOWNLOAD_COUNT" \
-            --argjson force "$NEW_FORCE_UPLOAD_FLAG" \
-            --argjson upload_count "$NEW_UPLOAD_COUNT" \
-            ".${DOWNLOAD_COUNT_KEY} = \$download_count | .${FORCE_UPLOAD_KEY} = \$force | .${UPLOAD_COUNT_KEY} = \$upload_count")
+          UPDATED_STATE=$(jq -n \
+            --arg download_count "$NEW_DOWNLOAD_COUNT" \
+            --arg force "$NEW_FORCE_UPLOAD_FLAG" \
+            --arg upload_count "$NEW_UPLOAD_COUNT" \
+            --arg download_threshold "$DOWNLOAD_THRESHOLD" \
+            --arg last_artifact_run_id "$NEW_LAST_ARTIFACT_RUN_ID" \
+            --arg current_artifact_run_id "$NEW_CURRENT_ARTIFACT_RUN_ID" \
+            --arg dc_key "$DOWNLOAD_COUNT_KEY" \
+            --arg fu_key "$FORCE_UPLOAD_KEY" \
+            --arg uc_key "$UPLOAD_COUNT_KEY" \
+            --arg dt_key "$DOWNLOAD_THRESHOLD_KEY" \
+            --arg lari_key "$LAST_ARTIFACT_RUN_ID_KEY" \
+            --arg cari_key "$CURRENT_ARTIFACT_RUN_ID_KEY" \
+            '{
+              ($dc_key): ($download_count | tonumber),
+              ($fu_key): ($force | test("true")),
+              ($uc_key): ($upload_count | tonumber),
+              ($dt_key): ($download_threshold | tonumber),
+              ($lari_key): $last_artifact_run_id,
+              ($cari_key): $current_artifact_run_id
+            }')
           
-          # Only update last_successful_apps_json_artifact_run_id if apps.json was actually updated and uploaded in this job
-          if [ "$APPS_JSON_UPDATED_THIS_RUN" = "true" ]; then
-              UPDATED_STATE=$(echo "$UPDATED_STATE" | jq \
-                --argjson last_run_id "$CURRENT_RUN_ID" \
-                ".${LAST_ARTIFACT_RUN_ID_KEY} = \$last_run_id")
-              echo "::debug::Updated last_successful_apps_json_artifact_run_id in state to $CURRENT_RUN_ID"
-          fi
+          echo "$UPDATED_STATE" > "$STATE_FILE"
 
-          echo "::debug::New state to write: $UPDATED_STATE"
-
-          mkdir -p $(dirname "$STATE_FILE")
-          echo "$UPDATED_STATE" > "$STATE_FILE" # Overwrite with the potentially updated state
-
-          # Compare new content with original file to determine if a commit is needed
-          if diff -q "$STATE_FILE" <(echo "$CURRENT_STATE_FROM_FILE" | jq '.'); then
-            echo "::notice::.github/workflow_state.json content is identical. No commit needed for state file."
+          if diff -q "$STATE_FILE" <(echo "$CURRENT_STATE" | jq '.'); then
+            echo "::notice::.github/workflow_state.json content is identical."
             echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::.github/workflow_state.json content has changed. Commit needed for state file."
+            echo "::notice::.github/workflow_state.json content has changed."
             echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
           fi
         shell: bash
@@ -300,6 +333,12 @@ jobs:
         run: echo "id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
         shell: bash
 
+      - name: Set Current Uploaded Run ID Output
+        id: set_current_uploaded_run_id
+        if: ${{ success() && steps.upload_artifact_result.outcome == 'success' }}
+        run: echo "id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+        shell: bash
+
       - name: Commit and Push generated files (including state file)
         if: |
           steps.generate_content_py.outputs.apps_md_updated_flag == 'true' ||
@@ -308,14 +347,9 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
-          branch: ${{ github.event.inputs.branch || github.ref }}
-          add_options: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
+          file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json" 
           skip_dirty_check: true
           push_options: "--force"
-
-
-
-
 
           
   prepare_deploy_matrix:
@@ -331,116 +365,152 @@ jobs:
       - name: Get workflow state for download auditing
         id: get_download_state
         run: |
-          STATE_FILE=".github/workflow_state.json"
+          # NEW: Get initial state from find_apps job output, not by re-reading from disk
+          WORKFLOW_STATE_FROM_FIND_APPS_OUTPUT="${{ needs.find_apps.outputs.workflow_state_json }}"
+          # Parse the JSON string from the output
+          CURRENT_STATE=$(echo "$WORKFLOW_STATE_FROM_FIND_APPS_OUTPUT" | jq '.')
+          echo "::debug::Current state (prepare_deploy_matrix) received from find_apps: $CURRENT_STATE"
+
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
           LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
+          CURRENT_ARTIFACT_RUN_ID_KEY="current_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
           UPLOAD_COUNT_KEY="apps_json_upload_count"
-
-          CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
+          DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
           
           CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
           LAST_UPLOADED_RUN_ID_FROM_STATE=$(echo "$CURRENT_STATE" | jq -r ".${LAST_ARTIFACT_RUN_ID_KEY} // \"\"")
+          CURRENT_UPLOADED_RUN_ID_FROM_STATE=$(echo "$CURRENT_STATE" | jq -r ".${CURRENT_ARTIFACT_RUN_ID_KEY} // \"\"")
           CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
           CURRENT_UPLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${UPLOAD_COUNT_KEY} // 0")
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY} // 0")
 
           echo "Current download count from state: $CURRENT_DOWNLOAD_COUNT"
           echo "Last artifact uploaded run ID from state: $LAST_UPLOADED_RUN_ID_FROM_STATE"
+          echo "Current artifact uploaded run ID from state: $CURRENT_UPLOADED_RUN_ID_FROM_STATE"
           echo "Force upload flag from state: $CURRENT_FORCE_FLAG"
           echo "Current upload count from state: $CURRENT_UPLOAD_COUNT"
+          echo "Download threshold from state: $DOWNLOAD_THRESHOLD"
 
           echo "download_count=$CURRENT_DOWNLOAD_COUNT" >> "$GITHUB_OUTPUT"
           echo "last_artifact_uploaded_run_id=$LAST_UPLOADED_RUN_ID_FROM_STATE" >> "$GITHUB_OUTPUT"
+          echo "current_artifact_uploaded_run_id=$CURRENT_UPLOADED_RUN_ID_FROM_STATE" >> "$GITHUB_OUTPUT"
           echo "force_next_upload=$CURRENT_FORCE_FLAG" >> "$GITHUB_OUTPUT"
           echo "upload_count=$CURRENT_UPLOAD_COUNT" >> "$GITHUB_OUTPUT"
+          echo "download_threshold=$DOWNLOAD_THRESHOLD" >> "$GITHUB_OUTPUT"
         shell: bash
         
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get Artifact Run ID for Download (State-first, then Tiered Search)
+      - name: Get Artifact Run ID for Download (Prioritizing current state, then last state, then registry)
         id: get_latest_artifact_run_id
         uses: actions/github-script@v6
         with:
           script: |
             const artifactName = 'latest-apps-json';
             const workflowFileName = 'dynamic-deploy.yml';
-            const searchBranches = ['main']; // Centralized on main for now
-            
-            console.log(`Searching for latest artifact '${artifactName}' from workflow '${workflowFileName}' across branches: ${searchBranches.join(', ')}.`);
+            const searchBranches = ['main', 'artifact-not-found'];
 
-            let latestRunIdWithArtifact = null;
+            let runIdToUse = '';
 
-            // Priority 1: Try the run_id from workflow_state.json
-            let runIdFromState = process.env.LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
-            if (runIdFromState && runIdFromState !== "null" && runIdFromState !== "") {
-              console.log(`Priority 1: Attempting to download artifact from recorded state run ID: ${runIdFromState}`);
-              try {
-                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  run_id: runIdFromState
-                });
-                const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
-                if (targetArtifact) {
-                  latestRunIdWithArtifact = runIdFromState;
-                  console.log(`Priority 1: Found artifact '${artifactName}' with recorded state run ID '${latestRunIdWithArtifact}'.`);
-                } else {
-                  console.log(`Priority 1: Artifact '${artifactName}' not found for recorded state run ID '${runIdFromState}'. Falling back to registry query.`);
+            // Priority 1: Use the 'current_apps_json_artifact_run_id' from the workflow state file
+            // Note: This relies on the state file being updated *eventually* by generate_docs_files.
+            // For true parallel design, prepare_deploy_matrix might need to search the registry
+            // more aggressively or rely on a slightly older state if generate_docs_files hasn't finished its commit.
+            // However, this aligns with the user's explicit request to read from the state file.
+            const currentArtifactIdFromState = process.env.CURRENT_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
+            if (currentArtifactIdFromState && currentArtifactIdFromState !== 'null' && currentArtifactIdFromState !== '') {
+                console.log(`Priority 1: Attempting to download artifact from 'current' ID in state: ${currentArtifactIdFromState}`);
+                try {
+                    const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        run_id: currentArtifactIdFromState
+                    });
+                    const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+                    if (targetArtifact) {
+                        runIdToUse = currentArtifactIdFromState;
+                        console.log(`Priority 1: Found artifact '${artifactName}' with current state run ID '${runIdToUse}'.`);
+                    } else {
+                        console.log(`Priority 1: Artifact '${artifactName}' not found for current state run ID '${currentArtifactIdFromState}'.`);
+                    }
+                } catch (error) {
+                    console.log(`Priority 1: Error checking artifacts for current state run ID '${currentArtifactIdFromState}': ${error.message}.`);
                 }
-              } catch (error) {
-                console.log(`Priority 1: Error checking artifacts for recorded state run ID '${runIdFromState}': ${error.message}. Falling back to registry query.`);
-              }
+            } else {
+                console.log('Priority 1: No \'current\' artifact ID in state file or it was null/empty.');
+            }
+            
+            // Priority 2: Fallback to 'last_successful_apps_json_artifact_run_id' from the state file
+            if (!runIdToUse) {
+                const lastArtifactIdFromState = process.env.LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE;
+                if (lastArtifactIdFromState && lastArtifactIdFromState !== 'null' && lastArtifactIdFromState !== '') {
+                    console.log(`Priority 2: Attempting to download artifact from 'last successful' ID in state: ${lastArtifactIdFromState}`);
+                    try {
+                        const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            run_id: lastArtifactIdFromState
+                        });
+                        const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+                        if (targetArtifact) {
+                            runIdToUse = lastArtifactIdFromState;
+                            console.log(`Priority 2: Found artifact '${artifactName}' with last successful state run ID '${runIdToUse}'.`);
+                        } else {
+                            console.log(`Priority 2: Artifact '${artifactName}' not found for last successful state run ID '${lastArtifactIdFromState}'.`);
+                        }
+                    } catch (error) {
+                        console.log(`Priority 2: Error checking artifacts for last successful state run ID '${lastArtifactIdFromState}': ${error.message}.`);
+                    }
+                } else {
+                    console.log('Priority 2: No \'last successful\' artifact ID in state file or it was null/empty.');
+                }
             }
 
-            // Priority 2: Fallback to tiered registry search if state ID is not found or failed to download
-            if (!latestRunIdWithArtifact) {
-              console.log(`Priority 2: No valid state ID found or artifact not present for it. Searching registry for latest artifact across branches: ${searchBranches.join(', ')}.`);
-              for (const branch of searchBranches) {
-                console.log(`Attempting to find artifact on branch: ${branch}`);
-                const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  workflow_id: workflowFileName,
-                  branch: branch,
-                  status: 'completed',
-                  per_page: 20
-                });
 
-                if (workflow_runs.length === 0) {
-                  console.log(`No completed workflow runs found on branch '${branch}'.`);
-                  continue;
-                }
-
-                for (const run of workflow_runs) {
-                  if (run.conclusion !== 'success') {
-                      console.log(`Skipping run ${run.id} on branch '${branch}' due to status: ${run.conclusion}`);
-                      continue;
-                  }
-
-                  const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+            // Final Fallback: Search the registry for the absolute latest successful artifact across relevant branches
+            if (!runIdToUse) {
+                console.log(`Final Fallback: Searching registry for latest artifact across branches: ${searchBranches.join(', ')}.`);
+                for (const branch of searchBranches) {
+                  console.log(`Attempting to find artifact on branch: ${branch}`);
+                  const { data: { workflow_runs } } = await github.rest.actions.listWorkflowRunsForRepo({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    run_id: run.id
+                    workflow_id: workflowFileName,
+                    branch: branch,
+                    status: 'completed',
+                    per_page: 20
                   });
 
-                  const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+                  if (workflow_runs.length === 0) {
+                    console.log(`No completed workflow runs found on branch '${branch}'.`);
+                    continue;
+                  }
 
-                  if (targetArtifact) {
-                    latestRunIdWithArtifact = run.id;
-                    console.log(`Found latest run ID '${latestRunIdWithArtifact}' with artifact '${artifactName}' on branch '${branch}'.`);
+                  for (const run of workflow_runs) {
+                    if (run.conclusion === 'success') {
+                      const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        run_id: run.id
+                      });
+                      const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+                      if (targetArtifact) {
+                        runIdToUse = run.id;
+                        console.log(`Found latest run ID '${runIdToUse}' with artifact '${artifactName}' on branch '${branch}'.`);
+                        break;
+                      }
+                    }
+                  }
+                  if (runIdToUse) {
                     break;
                   }
                 }
-
-                if (latestRunIdWithArtifact) {
-                  break;
-                }
-              }
             }
 
-            if (latestRunIdWithArtifact) {
-              core.setOutput('artifact_run_id', latestRunIdWithArtifact);
+            if (runIdToUse) {
+              core.setOutput('artifact_run_id', runIdToUse);
             } else {
               console.log(`::warning::No successful workflow run found across specified sources with artifact '${artifactName}'. Deployment matrix will be empty.`);
               core.setOutput('artifact_run_id', '');
@@ -449,6 +519,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
           LAST_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.last_artifact_uploaded_run_id }}
+          CURRENT_ARTIFACT_UPLOADED_RUN_ID_FROM_STATE: ${{ steps.get_download_state.outputs.current_artifact_uploaded_run_id }}
 
 
       - name: Download latest-apps-json Artifact
@@ -458,68 +529,51 @@ jobs:
           name: latest-apps-json
           path: homepage-app/apps/
           run-id: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}
-        continue-on-error: true # CRITICAL: Continue on error if download fails
+        continue-on-error: true
 
       - name: Read apps.json for Matrix
-        id: extract_matrix_data # Renamed ID to avoid conflict, as previously discussed
+        id: extract_matrix_data 
         run: |
           set -e
           APPS_JSON_PATH="homepage-app/apps/apps.json"
           
-          # Use a multi-line string with a delimiter for GITHUB_OUTPUT to handle JSON arrays.
           DELIMITER="EOF_APP_DATA_JSON" 
           
-          # Initialize app_data_json_output to an empty JSON array string
-          # This ensures that even if no apps are found or download fails,
-          # a valid JSON array is always output.
-          # IMPORTANT: This must be a single string without newlines for the default initialization.
-          app_data_json_output="[{\"dummy_run\":true,\"deploy_app\":false}]" # Default to dummy run if no real apps
+          app_data_json_output="[{\"dummy_run\":true,\"deploy_app\":false}]"
 
-          # Check if the file was actually downloaded and exists after the previous step.
           if [ -f "$APPS_JSON_PATH" ] && [ -s "$APPS_JSON_PATH" ]; then
-            APP_DATA_RAW=$(cat "$APPS_JSON_PATH") # Read file content
-            # Add deploy_app: true to each real app, and check if it's valid JSON for .apps[]
+            APP_DATA_RAW=$(cat "$APPS_JSON_PATH") 
             PARSED_DATA=$(echo "$APP_DATA_RAW" | jq '[.apps[] | select(has("app_dir")) | . + {"deploy_app": true}]' 2>/dev/null)
 
             if [ -n "$PARSED_DATA" ] && [ "$PARSED_DATA" != "null" ]; then
               if [ "$(echo "$PARSED_DATA" | jq 'length')" -gt 0 ]; then
-                app_data_json_output="$PARSED_DATA" # Use real data if found
+                app_data_json_output="$PARSED_DATA" 
                 echo "Generated app data for matrix:"
-                echo "$app_data_json_output" # Print for debugging
+                echo "$app_data_json_output" 
               else
                 echo "::warning::${APPS_JSON_PATH} (downloaded artifact) contains no valid app data after parsing. Using dummy matrix for empty deployment."
               fi
             else
               echo "::warning::Failed to parse valid app data from ${APPS_JSON_PATH} (downloaded artifact). Content might be invalid JSON or unexpected structure. Using dummy matrix for empty deployment."
-              echo "Raw content for debugging: $APP_DATA_RAW" # Print raw content for debugging
+              echo "Raw content for debugging: $APP_DATA_RAW" 
             fi
           else
             echo "::warning::${APPS_JSON_PATH} (source for deployment matrix) not found or is empty locally. Using dummy matrix for empty deployment."
           fi
 
-          # Output the JSON string using the delimiter for multi-line output
           echo "app_data_json<<$DELIMITER" >> "$GITHUB_OUTPUT"
           echo "$app_data_json_output" >> "$GITHUB_OUTPUT"
           echo "$DELIMITER" >> "$GITHUB_OUTPUT"
-          # No exit 0 here; let the step complete based on its outputs.
         shell: bash
-
-
-  
 
 
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
-    # NEW IF CONDITION: Skip the entire job if the matrix is just the dummy entry.
-    # We check if the 'app_data_json' is exactly equal to the dummy string.
-    # This prevents the job from appearing to run when there's nothing to deploy.
     if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run":true,"deploy_app":false}]' }}
     strategy:
       fail-fast: false
       matrix:
-        # This will now ALWAYS receive a non-empty array from prepare_deploy_matrix.
-        # It will be either real app data, or '[{"dummy_run": true, "deploy_app": false}]'.
         app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
 
     steps:
@@ -527,15 +581,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        # Filter for dummy run:
-        if: ${{ matrix.app_data.deploy_app != false }} # Checks if the dummy_run flag is NOT false
+        if: ${{ matrix.app_data.deploy_app != false }}
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
 
       - name: Install Heroku CLI
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         run: |
           curl -L https://cli-assets.heroku.com/install.sh -o /tmp/heroku-install.sh
           chmod +x /tmp/heroku-install.sh
@@ -543,12 +596,12 @@ jobs:
         shell: bash
 
       - name: Install jq (for package.json parsing)
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Read App Config and Prepare Deploy Variables
         id: prepare_vars
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         run: |
           set -e
           APP_DIR="${{ matrix.app_data.app_dir }}"
@@ -589,7 +642,7 @@ jobs:
 
       - name: Deploy to Heroku - Actual Action
         id: deploy_action
-        if: ${{ matrix.deploy_app != false }} # Skip for dummy run
+        if: ${{ matrix.deploy_app != false }}
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
