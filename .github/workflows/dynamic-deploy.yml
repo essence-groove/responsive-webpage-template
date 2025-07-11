@@ -64,11 +64,12 @@ jobs:
 
           echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT"
           
-          # NEW: Output the full current state JSON to be passed to other jobs
-          DELIMITER="EOF_WORKFLOW_STATE_JSON"
-          echo "workflow_state_output<<$DELIMITER" >> "$GITHUB_OUTPUT"
-          echo "$CURRENT_STATE" >> "$GITHUB_OUTPUT"
-          echo "$DELIMITER" >> "$GITHUB_OUTPUT"
+          # In the 'run:' block of the 'manage_workflow_state' step
+          # ... (script logic to build CURRENT_STATE) ...
+
+          # NEW: Compact the JSON to a single line and set as a standard output
+          COMPACT_STATE=$(echo "$CURRENT_STATE" | jq -c '.')
+          echo "workflow_state_output=$COMPACT_STATE" >> "$GITHUB_OUTPUT"
         shell: bash
 
 
