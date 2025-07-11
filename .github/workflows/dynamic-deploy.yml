@@ -199,10 +199,9 @@ jobs:
         run: |
           echo "::warning::The push operation was rejected by the remote repository. This can happen for several reasons:"
           echo "::warning::1. Branch Protection: Check if this branch has protection rules that prevent direct pushes."
-          echo "::warning::2. Repository Permissions: Go to 'Settings' > 'Actions' > 'General' and ensure 'Workflow permissions' are set to 'Read and write permissions'."
-          echo "::warning::3. Fork Permissions: If this workflow is running on a fork, its token is read-only by default and cannot push changes."
-
-
+          echo "::warning::2. Repository Permissions: Verify 'Settings' > 'Actions' > 'General' has 'Workflow permissions' set to 'Read and write permissions'."
+          echo "::warning::3. Fork Permissions: If this workflow is running on a fork, its token is read-only by default."
+          echo "::warning::4. Organization Rules: If this repository is part of an organization, check the organization's settings for policies that may be overriding repository permissions."
 
 
 
