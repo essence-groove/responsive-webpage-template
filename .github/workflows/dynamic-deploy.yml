@@ -241,8 +241,7 @@ jobs:
           UPLOAD_COUNT_KEY="apps_json_upload_count"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
-          CURRENT_STATE_FROM_FIND_APPS_OUTPUT="${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}"
-          CURRENT_STATE=$(echo "$CURRENT_STATE_FROM_FIND_APPS_OUTPUT" | jq '.')
+          CURRENT_STATE=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq '.')
           
           APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
           CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
