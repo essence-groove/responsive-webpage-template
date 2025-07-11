@@ -227,18 +227,6 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
-      - name: 🧐 Verify Correct Script is Running
-        run: |
-          echo "--- Verifying workflow file content before state update ---"
-          grep '($force | test("true"))' .github/workflows/dynamic-deploy.yml
-          if [ $? -ne 0 ]; then
-            echo "::error::The running workflow file is OUTDATED. The expected jq 'test(\"true\")' command was not found."
-            exit 1
-          else
-            echo "::notice::SUCCESS: The running workflow file is the updated version."
-          fi
-        shell: bash
-
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
