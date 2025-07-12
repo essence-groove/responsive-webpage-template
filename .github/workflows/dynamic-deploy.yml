@@ -10,7 +10,7 @@ on:
   push:
     branches:
       - main
-      - artifact-not-found
+      - underlying-permission
     paths:
       - '**'
 
