@@ -144,6 +144,12 @@ jobs:
           diag_flag=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq -r '.required_diagnostics // false')
           echo "is_enabled=$diag_flag" >> "$GITHUB_OUTPUT"
 
+      # This new step adds the requested warning note
+      - name: Note on Diagnostics
+        if: steps.read_diag_flag.outputs.is_enabled == 'true'
+        run: |
+          echo "::warning::Note: The diagnostic features in this workflow are not yet fully implemented."
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -151,6 +157,7 @@ jobs:
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
+
 
           
       - name: Generate apps.md and apps.json Content
