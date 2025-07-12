@@ -1,8 +1,19 @@
 {
   "apps_json_download_count": 0,
-  "force_next_upload": false,
+  "force_next_upload": true,
+  "required_diagnostics": true,
   "apps_json_upload_count": 7,
   "apps_json_download_threshold": 0,
-  "last_successful_apps_json_artifact_run_id": "16222292822",
-  "current_apps_json_artifact_run_id": "16222292822"
+  "last_successful_artifact_run": {
+    "id": "16230038636",
+    "timestamp": null
+  },
+  "current_successful_artifact_run": {
+    "id": "16230694686",
+    "timestamp": "2025-07-11T22:11:50+00:00"
+  },
+  "historical_artifact_run": {
+    "id": null,
+    "timestamp": null
+  }
 }
