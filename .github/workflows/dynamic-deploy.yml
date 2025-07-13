@@ -12,7 +12,461 @@ name: Dynamic Multi-App Discovery
 on:
   workflow_dispatch:
     inputs:
+      branch:name: Dynamic Multi-App Discovery
+
+#
+# CONCEPT DEMONSTRATION: The Event -> Response Model
+# ---------------------------------------------------
+# This 'on' block defines the "Event" that triggers the workflow. It's the "WHEN".
+# In this case, the events are a manual `workflow_dispatch` OR an automated `push`.
+#
+# The `jobs:` section below defines the "Response" – the complex, automated process
+# that runs when one of these events occurs.
+#
+on:
+  workflow_dispatch:
+    inputs:
       branch:
+        description: 'Branch to run the workflow on (e.g., main, new-apps)'
+        required: true
+        default: 'main'
+  push:
+    branches:
+      - main
+      - underlying-permission
+    paths:
+      - '**'
+
+jobs:
+  find_apps:
+    runs-on: ubuntu-latest
+    outputs:
+      app_details_json: ${{ steps.scan.outputs.app_details_json }}
+      force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }}
+      workflow_state_json: ${{ steps.manage_workflow_state.outputs.workflow_state_output }}
+    env:
+      APP_BASE_DIRS: "homepage-app"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - name: Read Workflow State for Artifact Logic
+        id: manage_workflow_state
+        run: |
+          STATE_FILE=".github/workflow_state.json"
+          DOWNLOAD_COUNT_KEY="apps_json_download_count"
+          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
+          CURRENT_ARTIFACT_RUN_ID_KEY="current_apps_json_artifact_run_id"
+          FORCE_UPLOAD_KEY="force_next_upload"
+          DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
+
+          CURRENT_STATE=$(jq '.' "$STATE_FILE" || echo '{}')
+          echo "::debug::Current state (find_apps) read from file: $CURRENT_STATE"
+
+          CURRENT_DOWNLOAD_COUNT=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_COUNT_KEY} // 0")
+          CURRENT_FORCE_FLAG=$(echo "$CURRENT_STATE" | jq -r ".${FORCE_UPLOAD_KEY} // false")
+          DOWNLOAD_THRESHOLD=$(echo "$CURRENT_STATE" | jq -r ".${DOWNLOAD_THRESHOLD_KEY} // 0")
+
+          echo "::debug::Initial state (find_apps) - Download Count: $CURRENT_DOWNLOAD_COUNT, Force Flag: $CURRENT_FORCE_FLAG, Threshold: $DOWNLOAD_THRESHOLD"
+
+          FORCE_UPLOAD_FOR_GENERATOR="false"
+
+          if [ "$DOWNLOAD_THRESHOLD" -eq 0 ]; then
+            FORCE_UPLOAD_FOR_GENERATOR="true"
+            echo "::notice::Download threshold is 0. Forcing apps.json upload for generate_docs_files."
+          elif [ "$CURRENT_DOWNLOAD_COUNT" -ge "$DOWNLOAD_THRESHOLD" ] || [ "$CURRENT_FORCE_FLAG" = "true" ]; then
+            FORCE_UPLOAD_FOR_GENERATOR="true"
+            echo "::notice::Download count ($CURRENT_DOWNLOAD_COUNT) reached threshold ($DOWNLOAD_THRESHOLD) OR force flag was true. Signalling force apps.json upload for generate_docs_files."
+          else
+            echo "::notice::Download count: $CURRENT_DOWNLOAD_COUNT/$DOWNLOAD_THRESHOLD. No force upload this run (yet)."
+          fi
+
+          echo "force_apps_json_upload_for_generator=$FORCE_UPLOAD_FOR_GENERATOR" >> "$GITHUB_OUTPUT"
+          
+          COMPACT_STATE=$(echo "$CURRENT_STATE" | jq -c '.')
+          echo "workflow_state_output=$COMPACT_STATE" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Scan for Apps and Collect Details
+        id: scan
+        run: |
+          set -e
+          APP_DETAILS_ARRAY=()
+          echo "--- Starting App Scan ---"
+          echo "Scanning for apps in base directories: $APP_BASE_DIRS"
+          for BASE_DIR in $APP_BASE_DIRS; do
+            if [ ! -d "$BASE_DIR" ]; then
+              echo "::error::Base directory '$BASE_DIR' not found."
+              continue
+            fi
+            FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
+            for APP_DIR in $FOUND_DIRS; do
+              PACKAGE_JSON_PATH="$APP_DIR/package.json"
+              echo "--- Processing app directory: $APP_DIR ---"
+              if [ ! -f "$PACKAGE_JSON_PATH" ]; then
+                echo "::warning::package.json not found for ${APP_DIR}. Skipping."
+                continue
+              fi
+              APP_NAME=$(jq -r '.name' "$PACKAGE_JSON_PATH" || echo "")
+              HEROKU_APP_NAME=$(jq -r '.herokuAppName' "$PACKAGE_JSON_PATH" || echo "")
+              DEPLOYED_URL=$(jq -r '.deployedUrl' "$PACKAGE_JSON_PATH" || echo "")
+              if [ -z "$APP_NAME" ] || [ "$APP_NAME" == "null" ] || [ -z "$HEROKU_APP_NAME" ] || [ "$HEROKU_APP_NAME" == "null" ] || [ -z "$DEPLOYED_URL" ] || [ "$DEPLOYED_URL" == "null" ]; then
+                echo "::warning::'name', 'herokuAppName', or 'deployedUrl' missing in ${PACKAGE_JSON_PATH}. Skipping."
+                continue
+              fi
+              APP_FOLDER_NAME=$(basename "$APP_DIR")
+              if [ "$APP_FOLDER_NAME" != "$APP_NAME" ]; then
+                echo "::warning::Folder name ('${APP_FOLDER_NAME}') does NOT match 'name' in package.json ('${APP_NAME}')."
+              fi
+              APP_JSON_OBJ="{\"app_dir\":\"$APP_DIR\", \"name\":\"$APP_NAME\", \"herokuAppName\":\"$HEROKU_APP_NAME\", \"url\":\"$DEPLOYED_URL\"}"
+              APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
+            done
+          done
+          echo "--- App Scan Summary ---"
+          if [ ${#APP_DETAILS_ARRAY[@]} -eq 0 ]; then
+            echo "No valid applications found during scan."
+            APP_DETAILS_JSON_OUTPUT="[]"
+          else
+            echo "Total valid applications found: ${#APP_DETAILS_ARRAY[@]}"
+            APP_DETAILS_JSON_OUTPUT=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
+          fi
+          echo "Final app_details_json output: $APP_DETAILS_JSON_OUTPUT"
+          printf "app_details_json=%s\n" "$APP_DETAILS_JSON_OUTPUT" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+
+      
+
+  #
+  # CONCEPT DEMONSTRATION: Identifying Automation Opportunities
+  # --------------------------------------------------------------------
+  # This job goes beyond simple testing. It automates several key repository
+  # maintenance tasks that would otherwise need to be done manually:
+  #   1. Generating Documentation: It creates the `apps.md` file.
+  #   2. Managing Data: It updates the `apps.json` data file.
+  #   3. Self-Updating: It commits these changes back to the repository.
+  # This is a perfect example of using Actions to automate the entire
+  # lifecycle of repository content, not just for CI.
+  #
+  generate_docs_files:
+    needs: find_apps
+    runs-on: ubuntu-latest
+    if: |
+      always() &&
+      needs.find_apps.outputs.app_details_json != '[]'
+    env:
+      APP_DATA_FROM_FIND_APPS: ${{ needs.find_apps.outputs.app_details_json }}
+      FORCE_APPS_JSON_UPLOAD_FLAG: ${{ needs.find_apps.outputs.force_apps_json_upload }}
+      WORKFLOW_STATE_FROM_FIND_APPS: ${{ needs.find_apps.outputs.workflow_state_json }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      # New step to read the diagnostic flag from the state file
+      - name: Read Diagnostic Flag from State
+        id: read_diag_flag
+        run: |
+          diag_flag=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq -r '.required_diagnostics // false')
+          echo "is_enabled=$diag_flag" >> "$GITHUB_OUTPUT"
+
+      # This new step adds the requested warning note
+      - name: Note on Diagnostics
+        if: steps.read_diag_flag.outputs.is_enabled == 'true'
+        run: |
+          echo "::warning::Note: The diagnostic features in this workflow are not yet fully implemented."
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+
+          
+      - name: Generate apps.md and apps.json Content
+        id: generate_content_py
+        run: python .github/scripts/generate_app_list.py
+        env:
+          APP_DATA_FROM_FIND_APPS: ${{ env.APP_DATA_FROM_FIND_APPS }}
+          RWT_WRITABLE_FILE_APPS_MD: ${{ secrets.RWT_WRITABLE_FILE_APPS_MD }}
+          RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON: ${{ secrets.RWT_WRITABLE_FILE_HOMEPAGE_APPS_JSON }}
+          FORCE_APPS_JSON_UPLOAD_FLAG: ${{ env.FORCE_APPS_JSON_UPLOAD_FLAG }}
+          
+      - name: Write apps.md File
+        if: ${{ steps.generate_content_py.outputs.apps_md_updated_flag == 'true' }}
+        run: |
+          APPS_MD_SECTION_CONTENT="${{ steps.generate_content_py.outputs.apps_md_section_content }}"
+          echo "$APPS_MD_SECTION_CONTENT" > apps.md
+        shell: bash
+
+      - name: Update Workflow State File and Determine Commit
+        id: update_state_file_content
+        run: |
+          # ... (full jq script) ...
+        shell: bash
+        continue-on-error: true
+
+      - name: Warn on State Update Failure
+        if: steps.update_state_file_content.outcome == 'failure'
+        run: |
+          echo "::warning::The 'Update Workflow State File' step failed. The state file was not updated."
+          echo "::warning::An exit code of 127, if observed, indicates a 'command not found' error, likely meaning 'jq' was not installed on the runner."
+
+
+      - name: Upload homepage-app/apps/apps.json as Artifact
+        if: steps.update_state_file_content.outcome == 'success' && steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest-apps-json
+          path: homepage-app/apps/apps.json
+          retention-days: 7
+
+      
+      #
+      # CONCEPT DEMONSTRATION: Deep Ecosystem Integration
+      # --------------------------------------------------------------------
+      # This step (`uses: stefanzweifel/git-auto-commit-action@v5`) is a perfect
+      # example of leveraging the GitHub Actions ecosystem. Instead of writing a
+      # complex git script manually, we use a pre-built, community-vetted action
+      # from the Marketplace to handle a common task. This ability to compose
+      # workflows from a vast library of reusable components is a key differentiator.
+      #
+      - name: Commit and Push generated files
+        id: commit_and_push
+        if: steps.update_state_file_content.outcome == 'success' && (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || steps.update_state_file_content.outputs.state_file_changed == 'true')
+        uses: stefanzweifel/git-auto-commit-action@v5
+        # This env block is now conditional based on the flag from the state file
+        env:
+          GIT_TRACE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
+          GIT_CURL_VERBOSE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
+        with:
+          commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
+          file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
+          skip_dirty_check: true
+          push_options: "--force"
+        continue-on-error: true
+
+      - name: Warn on Push Failure
+        if: steps.commit_and_push.outcome == 'failure'
+        run: |
+          echo "::warning::The push operation was rejected by the remote repository. This can happen for several reasons:"
+          echo "::warning::1. Branch Protection: Check if this branch has protection rules that prevent direct pushes."
+          echo "::warning::2. Repository Permissions: Verify 'Settings' > 'Actions' > 'General' has 'Workflow permissions' set to 'Read and write permissions'."
+          echo "::warning::3. Fork Permissions: If this workflow is running on a fork, its token is read-only by default."
+          echo "::warning::4. Organization Rules: If this repository is part of an organization, check the organization's settings for policies that may be overriding repository permissions."
+
+
+
+
+
+          
+          
+  prepare_deploy_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      app_data_json: ${{ steps.extract_matrix_data.outputs.app_data_json }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - name: Get workflow state from file
+        id: get_download_state
+        run: |
+          STATE_FILE=".github/workflow_state.json"
+          WORKFLOW_STATE_JSON=$(jq -c '.' "$STATE_FILE" || echo '{}')
+          
+          # Use jq to safely parse the IDs from the new object structure
+          HISTORICAL_RUN_ID=$(echo "$WORKFLOW_STATE_JSON" | jq -r '.historical_artifact_run.id // ""')
+          CURRENT_RUN_ID=$(echo "$WORKFLOW_STATE_JSON" | jq -r '.current_successful_artifact_run.id // ""')
+          LAST_RUN_ID=$(echo "$WORKFLOW_STATE_JSON" | jq -r '.last_successful_artifact_run.id // ""')
+
+          echo "::debug::Historical run ID from state: $HISTORICAL_RUN_ID"
+          echo "::debug::Current run ID from state: $CURRENT_RUN_ID"
+          echo "::debug::Last run ID from state: $LAST_RUN_ID"
+
+          echo "historical_run_id=$HISTORICAL_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "current_run_id=$CURRENT_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "last_run_id=$LAST_RUN_ID" >> "$GITHUB_OUTPUT"
+        shell: bash
+        
+      # ... (The rest of the steps in prepare_deploy_matrix remain the same) ...
+        
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      #
+      # CONCEPT DEMONSTRATION: Deep Platform Integration
+      # --------------------------------------------------------------------
+      # This step (`uses: actions/github-script@v6`) showcases native platform
+      # integration. It runs a script that has direct, authenticated access to
+      # the GitHub API via the `github` context and the automatically-provided
+      # `github-token`. This allows the workflow to interact with the repository
+      # (e.g., listing artifacts) as a first-class citizen of the platform.
+      #
+      - name: Get Artifact Run ID for Download
+        id: get_latest_artifact_run_id
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const artifactName = 'latest-apps-json';
+            const { owner, repo } = context.repo;
+            const historicalRunId = process.env.HISTORICAL_RUN_ID;
+            const currentRunId = process.env.CURRENT_RUN_ID;
+            const lastRunId = process.env.LAST_RUN_ID;
+            
+            async function findArtifactInRun(runId, runLabel) {
+              if (!runId || runId === 'null') {
+                console.log(`Skipping search: ${runLabel} run ID is not available.`);
+                return null;
+              }
+              try {
+                console.log(`Searching for artifact '${artifactName}' in ${runLabel} run ID: ${runId}`);
+                const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts({
+                  owner,
+                  repo,
+                  run_id: runId,
+                });
+                const targetArtifact = artifacts.find(artifact => artifact.name === artifactName);
+                if (targetArtifact) {
+                  console.log(`SUCCESS: Found artifact in ${runLabel} run ID: ${runId}`);
+                  return runId;
+                }
+                console.log(`INFO: Artifact not found in ${runLabel} run ID: ${runId}`);
+              } catch (error) {
+                console.log(`WARN: Could not check artifacts for ${runLabel} run ID ${runId}. Error: ${error.message}`);
+              }
+              return null;
+            }
+
+            // Priority 1: Use the time-vetted "historical" run ID.
+            let runIdToUse = await findArtifactInRun(historicalRunId, "Historical");
+
+            // Priority 2: Fallback to "current" run ID.
+            if (!runIdToUse) {
+              runIdToUse = await findArtifactInRun(currentRunId, "Current");
+            }
+
+            // Priority 3: Fallback to "last" run ID.
+            if (!runIdToUse) {
+              runIdToUse = await findArtifactInRun(lastRunId, "Last");
+            }
+
+            if (runIdToUse) {
+              core.setOutput('artifact_run_id', runIdToUse);
+            } else {
+              console.log("::warning::Could not find artifact in Historical, Current, or Last known run IDs. Deployment matrix will be empty.");
+              core.setOutput('artifact_run_id', '');
+            }
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          HISTORICAL_RUN_ID: ${{ steps.get_download_state.outputs.historical_run_id }}
+          CURRENT_RUN_ID: ${{ steps.get_download_state.outputs.current_run_id }}
+          LAST_RUN_ID: ${{ steps.get_download_state.outputs.last_run_id }}
+
+      - name: Download latest-apps-json Artifact
+        uses: actions/download-artifact@v4
+        if: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id != '' }}
+        with:
+          name: latest-apps-json
+          path: homepage-app/apps/
+          run-id: ${{ steps.get_latest_artifact_run_id.outputs.artifact_run_id }}
+        continue-on-error: true
+
+      - name: Read apps.json for Matrix
+        id: extract_matrix_data
+        run: |
+          set -e
+          APPS_JSON_PATH="homepage-app/apps/apps.json"
+          app_data_json_output="[{\"dummy_run\":true,\"deploy_app\":false}]"
+
+          if [ -f "$APPS_JSON_PATH" ] && [ -s "$APPS_JSON_PATH" ]; then
+            APP_DATA_RAW=$(cat "$APPS_JSON_PATH")
+            PARSED_DATA=$(echo "$APP_DATA_RAW" | jq '[.apps[] | select(has("app_dir")) | . + {"deploy_app": true}]' 2>/dev/null)
+
+            if [ -n "$PARSED_DATA" ] && [ "$PARSED_DATA" != "null" ] && [ "$(echo "$PARSED_DATA" | jq 'length')" -gt 0 ]; then
+              app_data_json_output="$PARSED_DATA"
+              echo "Generated app data for matrix:"
+              echo "$app_data_json_output"
+            else
+              echo "::warning::Downloaded artifact contains no valid app data. Using dummy matrix."
+            fi
+          else
+            echo "::warning::Deployment matrix source not found or is empty. Using dummy matrix."
+          fi
+          
+          echo "app_data_json<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$app_data_json_output" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+  #
+  # CONCEPT DEMONSTRATION: Identifying Automation Opportunities
+  # --------------------------------------------------------------------
+  # This job automates the deployment process for all applications discovered
+  # in the `find_apps` job. By dynamically generating a deployment matrix,
+  # it removes the need to manually add or remove deployment jobs as
+  # applications are added or removed from the repository.
+  #
+  deploy_all_apps:
+    needs: prepare_deploy_matrix
+    runs-on: ubuntu-latest
+    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run":true,"deploy_app":false}]' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        app_data: ${{ fromJson(needs.prepare_deploy_matrix.outputs.app_data_json) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        if: ${{ matrix.app_data.deploy_app != false }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Heroku CLI
+        if: ${{ matrix.app_data.deploy_app != false }}
+        run: |
+          curl -L https://cli-assets.heroku.com/install.sh | sh
+        shell: bash
+
+      - name: Install jq
+        if: ${{ matrix.app_data.deploy_app != false }}
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      #
+      # CONCEPT DEMONSTRATION: Deep Platform Integration
+      # --------------------------------------------------------------------
+      # This step demonstrates native secrets management. The value for
+      # `heroku_api_key` is fetched directly from GitHub's encrypted secrets
+      # store using `${{ secrets.HEROKU_API_KEY }}`. There is no need for
+      # external credential managers or complex configuration; the integration
+      # is built directly into the platform.
+      #
+      - name: Deploy to Heroku
+        if: ${{ matrix.app_data.deploy_app != false }}
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_app_name: ${{ matrix.app_data.herokuAppName }}
+          appdir: ${{ matrix.app_data.app_dir }}
+
         description: 'Branch to run the workflow on (e.g., main, new-apps)'
         required: true
         default: 'main'
