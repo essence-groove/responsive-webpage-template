@@ -1,5 +1,14 @@
 name: Dynamic Multi-App Discovery
 
+#
+# The Event -> Response Model
+# ---------------------------------------------------
+# This 'on' block defines the "Event" that triggers the workflow. It's the "WHEN".
+# In this case, the events are a manual `workflow_dispatch` OR an automated `push`.
+#
+# The `jobs:` section below defines the "Response" – the complex, automated process
+# that runs when one of these events occurs.
+#
 on:
   workflow_dispatch:
     inputs:
@@ -118,7 +127,7 @@ jobs:
         shell: bash
 
 
-        
+      
 
   generate_docs_files:
     needs: find_apps
