@@ -1,7 +1,7 @@
 name: Dynamic Multi-App Discovery
 
 #
-# The Event -> Response Model
+# CONCEPT DEMONSTRATION: The Event -> Response Model
 # ---------------------------------------------------
 # This 'on' block defines the "Event" that triggers the workflow. It's the "WHEN".
 # In this case, the events are a manual `workflow_dispatch` OR an automated `push`.
@@ -129,6 +129,17 @@ jobs:
 
       
 
+  #
+  # CONCEPT DEMONSTRATION: Identifying Automation Opportunities
+  # --------------------------------------------------------------------
+  # This job goes beyond simple testing. It automates several key repository
+  # maintenance tasks that would otherwise need to be done manually:
+  #   1. Generating Documentation: It creates the `apps.md` file.
+  #   2. Managing Data: It updates the `apps.json` data file.
+  #   3. Self-Updating: It commits these changes back to the repository.
+  # This is a perfect example of using Actions to automate the entire
+  # lifecycle of repository content, not just for CI.
+  #
   generate_docs_files:
     needs: find_apps
     runs-on: ubuntu-latest
@@ -370,6 +381,14 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
         shell: bash
 
+  #
+  # CONCEPT DEMONSTRATION: Identifying Automation Opportunities
+  # --------------------------------------------------------------------
+  # This job automates the deployment process for all applications discovered
+  # in the `find_apps` job. By dynamically generating a deployment matrix,
+  # it removes the need to manually add or remove deployment jobs as
+  # applications are added or removed from the repository.
+  #
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
