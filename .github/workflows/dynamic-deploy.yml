@@ -1,7 +1,7 @@
 name: Full App Discovery, Docs & Deploy
 
 #
-# CONCEPT DEMONSTRATION: Naming the Workflow (1.2.1)
+# CONCEPT DEMONSTRATION: Naming the Workflow
 # ---------------------------------------------------
 # The `name` key provides a clear, human-readable name for the workflow.
 # This name is what appears in the GitHub Actions UI, making it easy to
