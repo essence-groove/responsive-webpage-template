@@ -9,6 +9,29 @@ name: Full App Discovery, Docs & Deploy
 #
 
 #
+# CONCEPT DEMONSTRATION: The 'on' Event Trigger
+# ---------------------------------------------------
+# The `on` key defines the event(s) that will trigger the workflow. This workflow
+# demonstrates several types of triggers:
+#
+# - Webhook Event (`push`): The workflow runs automatically when a commit is
+#   pushed to the repository.
+#
+# - Filtered Webhooks (`branches`, `paths`): The `push` event is filtered to
+#   only run for commits on specific branches (`main`, `underlying-permission`)
+#   and when changes occur in any file path (`**`). This prevents the workflow
+#   from running unnecessarily on other branches.
+#
+# - Manual Event (`workflow_dispatch`): This allows the workflow to be
+#   triggered manually from the GitHub UI, providing an `input` for the user
+#   to specify which branch to run against.
+#
+# Other common triggers not used here include `schedule` for running at
+# specific times (e.g., nightly builds) and `pull_request` for running
+# checks when a pull request is opened or updated.
+#
+
+#
 # CONCEPT DEMONSTRATION: The Event -> Response Model
 # ---------------------------------------------------
 # This 'on' block defines the "Event" that triggers the workflow. It's the "WHEN".
