@@ -1,7 +1,7 @@
 name: Full App Discovery, Docs & Deploy
 
 #
-# CONCEPT DEMONSTRATION: Naming the Workflow
+# CONCEPT DEMONSTRATION: Naming the Workflow 
 # ---------------------------------------------------
 # The `name` key provides a clear, human-readable name for the workflow.
 # This name is what appears in the GitHub Actions UI, making it easy to
@@ -9,7 +9,7 @@ name: Full App Discovery, Docs & Deploy
 #
 
 #
-# CONCEPT DEMONSTRATION: The 'on' Event Trigger
+# CONCEPT DEMONSTRATION: The 'on' Event Trigger 
 # ---------------------------------------------------
 # The `on` key defines the event(s) that will trigger the workflow. This workflow
 # demonstrates several types of triggers:
@@ -45,7 +45,7 @@ on:
       - '**'
 
 #
-# CONCEPT DEMONSTRATION: Defining Jobs
+# CONCEPT DEMONSTRATION: Defining Jobs 
 # ---------------------------------------------------
 # The `jobs` key contains all the major units of work for the workflow. Each
 # key under `jobs` (e.g., `find_apps`, `prepare_deploy_matrix`) is a separate
@@ -61,6 +61,22 @@ on:
 #
 jobs:
   find_apps:
+    #
+    # CONCEPT DEMONSTRATION: The Runner (`runs-on`) 
+    # ---------------------------------------------------
+    # The `runs-on` key specifies the type of virtual machine, or "runner,"
+    # that the job will execute on.
+    #
+    # - GitHub-Hosted Runner: `ubuntu-latest` designates a standard,
+    #   Linux-based virtual machine provided by GitHub. This is the most
+    #   common choice for workflows that use standard command-line tools
+    #   and don't have special operating system requirements. Other options
+    #   include `windows-latest` and `macos-latest`.
+    #
+    # - Self-Hosted Runners: For specialized needs (e.g., custom hardware,
+    #   private network access, specific software), users can configure their
+    #   own "self-hosted" runners. This workflow does not require one.
+    #
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
