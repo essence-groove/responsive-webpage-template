@@ -30,16 +30,6 @@ name: Full App Discovery, Docs & Deploy
 # specific times (e.g., nightly builds) and `pull_request` for running
 # checks when a pull request is opened or updated.
 #
-
-#
-# CONCEPT DEMONSTRATION: The Event -> Response Model
-# ---------------------------------------------------
-# This 'on' block defines the "Event" that triggers the workflow. It's the "WHEN".
-# In this case, the events are a manual `workflow_dispatch` OR an automated `push`.
-#
-# The `jobs:` section below defines the "Response" – the complex, automated process
-# that runs when one of these events occurs.
-#
 on:
   workflow_dispatch:
     inputs:
@@ -54,6 +44,21 @@ on:
     paths:
       - '**'
 
+#
+# CONCEPT DEMONSTRATION: Defining Jobs
+# ---------------------------------------------------
+# The `jobs` key contains all the major units of work for the workflow. Each
+# key under `jobs` (e.g., `find_apps`, `prepare_deploy_matrix`) is a separate
+# job that runs on a fresh virtual machine.
+#
+# - Parallel Execution: By default, all jobs without a `needs` dependency
+#   run in parallel. In this workflow, `find_apps` and `prepare_deploy_matrix`
+#   start at the same time, demonstrating this parallel execution.
+#
+# - Workflow/Job Relationship: The workflow itself is the overall process
+#   defined by this file. The jobs are the individual, executable components
+#   that carry out the steps of that process.
+#
 jobs:
   find_apps:
     runs-on: ubuntu-latest
