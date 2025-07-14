@@ -45,7 +45,7 @@ on:
       - '**'
 
 #
-# CONCEPT DEMONSTRATION: Defining Jobs
+# CONCEPT DEMONSTRATION: Defining Jobs 
 # ---------------------------------------------------
 # The `jobs` key contains all the major units of work for the workflow. Each
 # key under `jobs` (e.g., `find_apps`, `prepare_deploy_matrix`) is a separate
@@ -62,7 +62,7 @@ on:
 jobs:
   find_apps:
     #
-    # CONCEPT DEMONSTRATION: The Runner (`runs-on`) 
+    # CONCEPT DEMONSTRATION: The Runner (`runs-on`)
     # ---------------------------------------------------
     # The `runs-on` key specifies the type of virtual machine, or "runner,"
     # that the job will execute on.
@@ -82,6 +82,15 @@ jobs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
       force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }}
       workflow_state_json: ${{ steps.manage_workflow_state.outputs.workflow_state_output }}
+    #
+    # CONCEPT DEMONSTRATION: Environment Variables (`env`)
+    # ---------------------------------------------------
+    # The `env` key is used to set environment variables. They can be defined
+    # at the workflow, job, or step level.
+    #
+    # - Job-Level `env`: The `APP_BASE_DIRS` variable is defined here at the
+    #   job level, making it available to all steps within the `find_apps` job.
+    #
     env:
       APP_BASE_DIRS: "homepage-app"
 
@@ -408,6 +417,15 @@ jobs:
         id: commit_and_push
         if: steps.update_state_file_content.outcome == 'success' && (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || steps.update_state_file_content.outputs.state_file_changed == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
+        #
+        # CONCEPT DEMONSTRATION: Environment Variables (`env`)
+        # ---------------------------------------------------
+        # - Step-Level `env`: These variables (`GIT_TRACE`, `GIT_CURL_VERBOSE`)
+        #   are defined only for this specific step. They are set conditionally
+        #   based on the output of the "Read Diagnostic Flag from State" step,
+        #   demonstrating how to dynamically enable debug logging for a
+        #   single action.
+        #
         env:
           GIT_TRACE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
           GIT_CURL_VERBOSE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
