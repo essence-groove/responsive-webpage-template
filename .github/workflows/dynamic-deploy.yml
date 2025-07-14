@@ -9,7 +9,7 @@ name: Full App Discovery, Docs & Deploy
 #
 
 #
-# CONCEPT DEMONSTRATION: The 'on' Event Trigger 
+# CONCEPT DEMONSTRATION: The 'on' Event Trigger
 # ---------------------------------------------------
 # The `on` key defines the event(s) that will trigger the workflow. This workflow
 # demonstrates several types of triggers:
@@ -45,7 +45,7 @@ on:
       - '**'
 
 #
-# CONCEPT DEMONSTRATION: Defining Jobs 
+# CONCEPT DEMONSTRATION: Defining Jobs
 # ---------------------------------------------------
 # The `jobs` key contains all the major units of work for the workflow. Each
 # key under `jobs` (e.g., `find_apps`, `prepare_deploy_matrix`) is a separate
@@ -85,6 +85,21 @@ jobs:
     env:
       APP_BASE_DIRS: "homepage-app"
 
+    #
+    # CONCEPT DEMONSTRATION: Steps 
+    # ---------------------------------------------------
+    # The `steps` key contains a sequence of the individual tasks that make
+    # up a job. They are executed in order.
+    #
+    # - `name`: Each step has a descriptive name, which is crucial for
+    #   readability in the workflow logs. It clearly states the purpose
+    #   of the step (e.g., "Checkout code").
+    #
+    # - `uses`: This key demonstrates the power of the Actions ecosystem.
+    #   Instead of writing a script from scratch, `uses: actions/checkout@v4`
+    #   leverages a reusable, community-vetted action from the GitHub
+    #   Marketplace to perform a common task.
+    #
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -561,7 +576,7 @@ jobs:
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
-    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run":true,"deploy_app":false}]' }}
+    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run\":true,\"deploy_app\":false}]' }}
     strategy:
       fail-fast: false
       matrix:
