@@ -1,6 +1,14 @@
 name: Full App Discovery, Docs & Deploy
 
 #
+# CONCEPT DEMONSTRATION: Naming the Workflow (1.2.1)
+# ---------------------------------------------------
+# The `name` key provides a clear, human-readable name for the workflow.
+# This name is what appears in the GitHub Actions UI, making it easy to
+# identify and distinguish from other workflows in the repository.
+#
+
+#
 # CONCEPT DEMONSTRATION: The Event -> Response Model
 # ---------------------------------------------------
 # This 'on' block defines the "Event" that triggers the workflow. It's the "WHEN".
