@@ -1,5 +1,35 @@
-name: Dynamic Multi-App Discovery
+name: Full App Discovery, Docs & Deploy
 
+#
+# CONCEPT DEMONSTRATION: Naming the Workflow (1.2.1)
+# ---------------------------------------------------
+# The `name` key provides a clear, human-readable name for the workflow.
+# This name is what appears in the GitHub Actions UI, making it easy to
+# identify and distinguish from other workflows in the repository.
+#
+
+#
+# CONCEPT DEMONSTRATION: The 'on' Event Trigger (1.2.2)
+# ---------------------------------------------------
+# The `on` key defines the event(s) that will trigger the workflow. This workflow
+# demonstrates several types of triggers:
+#
+# - Webhook Event (`push`): The workflow runs automatically when a commit is
+#   pushed to the repository.
+#
+# - Filtered Webhooks (`branches`, `paths`): The `push` event is filtered to
+#   only run for commits on specific branches (`main`, `underlying-permission`)
+#   and when changes occur in any file path (`**`). This prevents the workflow
+#   from running unnecessarily on other branches.
+#
+# - Manual Event (`workflow_dispatch`): This allows the workflow to be
+#   triggered manually from the GitHub UI, providing an `input` for the user
+#   to specify which branch to run against.
+#
+# Other common triggers not used here include `schedule` for running at
+# specific times (e.g., nightly builds) and `pull_request` for running
+# checks when a pull request is opened or updated.
+#
 on:
   workflow_dispatch:
     inputs:
@@ -14,16 +44,71 @@ on:
     paths:
       - '**'
 
+#
+# CONCEPT DEMONSTRATION: Defining Jobs (1.2.3)
+# ---------------------------------------------------
+# The `jobs` key contains all the major units of work for the workflow. Each
+# key under `jobs` (e.g., `find_apps`, `prepare_deploy_matrix`) is a separate
+# job that runs on a fresh virtual machine.
+#
+# - Parallel Execution: By default, all jobs without a `needs` dependency
+#   run in parallel. In this workflow, `find_apps`, `prepare_deploy_matrix`,
+#   and the new `intelligent_ci` job start at the same time.
+#
+# - Workflow/Job Relationship: The workflow itself is the overall process
+#   defined by this file. The jobs are the individual, executable components
+#   that carry out the steps of that process.
+#
 jobs:
   find_apps:
+    #
+    # CONCEPT DEMONSTRATION: The Runner (`runs-on`) (1.2.4)
+    # ---------------------------------------------------
+    # The `runs-on` key specifies the type of virtual machine, or "runner,"
+    # that the job will execute on.
+    #
+    # - GitHub-Hosted Runner: `ubuntu-latest` designates a standard,
+    #   Linux-based virtual machine provided by GitHub. This is the most
+    #   common choice for workflows that use standard command-line tools
+    #   and don't have special operating system requirements. Other options
+    #   include `windows-latest` and `macos-latest`.
+    #
+    # - Self-Hosted Runners: For specialized needs (e.g., custom hardware,
+    #   private network access, specific software), users can configure their
+    #   own "self-hosted" runners. This workflow does not require one.
+    #
     runs-on: ubuntu-latest
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
       force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }}
       workflow_state_json: ${{ steps.manage_workflow_state.outputs.workflow_state_output }}
+    #
+    # CONCEPT DEMONSTRATION: Environment Variables (`env`) (1.2.6)
+    # ---------------------------------------------------
+    # The `env` key is used to set environment variables. They can be defined
+    # at the workflow, job, or step level.
+    #
+    # - Job-Level `env`: The `APP_BASE_DIRS` variable is defined here at the
+    #   job level, making it available to all steps within the `find_apps` job.
+    #
     env:
       APP_BASE_DIRS: "homepage-app"
 
+    #
+    # CONCEPT DEMONSTRATION: Steps (1.2.5)
+    # ---------------------------------------------------
+    # The `steps` key contains a sequence of the individual tasks that make
+    # up a job. They are executed in order.
+    #
+    # - `name`: Each step has a descriptive name, which is crucial for
+    #   readability in the workflow logs. It clearly states the purpose
+    #   of the step (e.g., "Checkout code").
+    #
+    # - `uses`: This key demonstrates the power of the Actions ecosystem.
+    #   Instead of writing a script from scratch, `uses: actions/checkout@v4`
+    #   leverages a reusable, community-vetted action from the GitHub
+    #   Marketplace to perform a common task.
+    #
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,8 +120,6 @@ jobs:
         run: |
           STATE_FILE=".github/workflow_state.json"
           DOWNLOAD_COUNT_KEY="apps_json_download_count"
-          LAST_ARTIFACT_RUN_ID_KEY="last_successful_apps_json_artifact_run_id"
-          CURRENT_ARTIFACT_RUN_ID_KEY="current_apps_json_artifact_run_id"
           FORCE_UPLOAD_KEY="force_next_upload"
           DOWNLOAD_THRESHOLD_KEY="apps_json_download_threshold"
 
@@ -117,9 +200,17 @@ jobs:
           printf "app_details_json=%s\n" "$APP_DETAILS_JSON_OUTPUT" >> "$GITHUB_OUTPUT"
         shell: bash
 
-
-        
-
+  #
+  # CONCEPT DEMONSTRATION: Identifying Automation Opportunities
+  # --------------------------------------------------------------------
+  # This job goes beyond simple testing. It automates several key repository
+  # maintenance tasks that would otherwise need to be done manually:
+  #   1. Generating Documentation: It creates the `apps.md` file.
+  #   2. Managing Data: It updates the `apps.json` data file.
+  #   3. Self-Updating: It commits these changes back to the repository.
+  # This is a perfect example of using Actions to automate the entire
+  # lifecycle of repository content, not just for CI.
+  #
   generate_docs_files:
     needs: find_apps
     runs-on: ubuntu-latest
@@ -137,14 +228,12 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
-      # New step to read the diagnostic flag from the state file
       - name: Read Diagnostic Flag from State
         id: read_diag_flag
         run: |
           diag_flag=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq -r '.required_diagnostics // false')
           echo "is_enabled=$diag_flag" >> "$GITHUB_OUTPUT"
 
-      # This new step adds the requested warning note
       - name: Note on Diagnostics
         if: steps.read_diag_flag.outputs.is_enabled == 'true'
         run: |
@@ -157,9 +246,7 @@ jobs:
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
-
-
-          
+        
       - name: Generate apps.md and apps.json Content
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
@@ -176,10 +263,152 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
+      #
+      # CONCEPT DEMONSTRATION: Advanced State Management & Versioning
+      # --------------------------------------------------------------------
+      # This step is the core of the workflow's intelligence. It uses a
+      # sophisticated `jq` script to manage a persistent state file.
+      #
+      # - Automatic Initialization: If versioning or other keys are not present
+      #   in the state file, they are automatically initialized on the first
+      #   run with default values.
+      # - State Migration: It automatically upgrades legacy string-based run
+      #   IDs to the new object format on the fly.
+      # - Run ID Promotion: It manages `current`, `last`, and `historical`
+      #   run IDs to track artifact history.
+      # - Semantic Versioning: It implements a versioning system where the
+      #   version is stored directly within the run record that produced it.
+      #   This versioning can be controlled both automatically (tweaks) and
+      #   manually (minor/major bumps) via the state file.
+      #
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
-          # ... (full jq script) ...
+          INCOMING_STATE='${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}'
+          STATE_FILE=".github/workflow_state.json"
+
+          # Get current run info
+          APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
+          CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
+          CURRENT_TIMESTAMP_ISO=$(date -u -Iseconds)
+          CURRENT_TIMESTAMP_EPOCH=$(date -u +%s)
+          
+          # Define all keys
+          DC_KEY="apps_json_download_count"
+          FU_KEY="force_next_upload"
+          UC_KEY="apps_json_upload_count"
+          DT_KEY="apps_json_download_threshold"
+          DIAG_KEY="required_diagnostics"
+          VERSION_KEY="artifact_version"
+          STRATEGY_KEY="version_update_strategy"
+          LAST_RUN_KEY="last_successful_artifact_run"
+          CURRENT_RUN_KEY="current_successful_artifact_run"
+          HISTORICAL_RUN_KEY="historical_artifact_run"
+          LEGACY_LARI_KEY="last_successful_apps_json_artifact_run_id"
+          LEGACY_CARI_KEY="current_apps_json_artifact_run_id"
+
+          UPDATED_STATE=$(jq -n \
+            --argjson incoming_state "$INCOMING_STATE" \
+            --arg apps_json_updated "$APPS_JSON_UPDATED_THIS_RUN" \
+            --arg current_run_id "$CURRENT_WORKFLOW_RUN_ID" \
+            --arg current_ts_iso "$CURRENT_TIMESTAMP_ISO" \
+            --arg current_ts_epoch "$CURRENT_TIMESTAMP_EPOCH" \
+            --arg dc_key "$DC_KEY" \
+            --arg fu_key "$FU_KEY" \
+            --arg uc_key "$UC_KEY" \
+            --arg dt_key "$DT_KEY" \
+            --arg diag_key "$DIAG_KEY" \
+            --arg version_key "$VERSION_KEY" \
+            --arg strategy_key "$STRATEGY_KEY" \
+            --arg last_run_key "$LAST_RUN_KEY" \
+            --arg current_run_key "$CURRENT_RUN_KEY" \
+            --arg historical_run_key "$HISTORICAL_RUN_KEY" \
+            --arg legacy_lari_key "$LEGACY_LARI_KEY" \
+            --arg legacy_cari_key "$LEGACY_CARI_KEY" \
+            '
+            # --- MIGRATION LOGIC ---
+            def upgrade_run_object($legacy_key; $new_key):
+              if $incoming_state | has($new_key) and ($incoming_state[$new_key] | type == "object") then $incoming_state[$new_key]
+              elif $incoming_state | has($legacy_key) and ($incoming_state[$legacy_key] | type == "string") then { "id": $incoming_state[$legacy_key], "timestamp": null, ($version_key): ($incoming_state[$version_key] // "0.1.0") }
+              else { "id": null, "timestamp": null, ($version_key): "0.1.0" }
+              end;
+
+            (
+              upgrade_run_object($legacy_lari_key; $last_run_key) as $migrated_last_run |
+              upgrade_run_object($legacy_cari_key; $current_run_key) as $migrated_current_run |
+              (if $incoming_state | has($historical_run_key) and ($incoming_state[$historical_run_key] | type == "object") then $incoming_state[$historical_run_key] else { "id": null, "timestamp": null, ($version_key): "0.1.0" } end) as $migrated_historical_run |
+
+            # --- STATE UPDATE LOGIC ---
+            (
+              if $apps_json_updated == "true" then { "new_last_run": $migrated_current_run, "new_current_run": { "id": $current_run_id, "timestamp": $current_ts_iso } }
+              else { "new_last_run": $migrated_last_run, "new_current_run": $migrated_current_run }
+              end
+            ) as $promoted_runs |
+
+            (
+              if ($promoted_runs.new_last_run.timestamp != null) and (($current_ts_epoch | tonumber) - ($promoted_runs.new_last_run.timestamp | fromdate) > 3600) then
+                $promoted_runs.new_last_run
+              else
+                $migrated_historical_run
+              end
+            ) as $new_historical_run |
+
+            # --- VERSIONING LOGIC ---
+            (
+              ($migrated_current_run[$version_key] // "0.1.0") as $current_version |
+              ($incoming_state[$strategy_key] // "DEVELOPING") as $strategy |
+              if $new_historical_run.id == $promoted_runs.new_last_run.id and $new_historical_run.id != $migrated_historical_run.id then
+                (
+                  $current_version | split(".") | map(tonumber) as $parts |
+                  if $strategy == "NEW_MAJOR_VERSION" then { "v": "\($parts[0] + 1).0.0", "s": "DEVELOPING" }
+                  elif $strategy == "NEW_MINOR_VERSION" then { "v": "\($parts[0]).\($parts[1] + 1).0", "s": "DEVELOPING" }
+                  elif $parts[2] < 9 then { "v": "\($parts[0]).\($parts[1]).\($parts[2] + 1)", "s": $strategy }
+                  else { "v": "\($parts[0]).\($parts[1] + 1).0", "s": $strategy }
+                  end
+                )
+              else
+                { "v": $current_version, "s": $strategy }
+              end
+            ) as $version_info |
+
+            # --- COUNTER/FLAG LOGIC ---
+            ($incoming_state[$dt_key] // 0) as $download_threshold |
+            {
+              ($dc_key): (if $download_threshold == 0 or $apps_json_updated == "true" then 0 else ($incoming_state[$dc_key] // 0) + 1 end),
+              ($fu_key): (if $download_threshold == 0 then true else false end),
+              ($uc_key): (if $apps_json_updated == "true" then ($incoming_state[$uc_key] // 0) + 1 else ($incoming_state[$uc_key] // 0) end),
+              ($dt_key): $download_threshold,
+              ($diag_key): ($incoming_state[$diag_key] // false),
+              ($strategy_key): $version_info.s
+            } as $counters_and_strategy |
+
+            # --- FINAL ASSEMBLY ---
+            $counters_and_strategy + {
+              ($last_run_key): $promoted_runs.new_last_run,
+              ($current_run_key): (
+                if $apps_json_updated == "true" then
+                  $promoted_runs.new_current_run + { ($version_key): $version_info.v }
+                else
+                  $promoted_runs.new_current_run
+                end
+              ),
+              ($historical_run_key): $new_historical_run
+            }
+            ) # End top-level migration block
+            '
+          )
+          
+          echo "NEW STATE: $UPDATED_STATE"
+          echo "$UPDATED_STATE" > "$STATE_FILE"
+
+          # Check if the file content actually changed before setting output
+          if [ -z "$(diff -q <(echo "$INCOMING_STATE" | jq '.') "$STATE_FILE")" ]; then
+             echo "::notice::.github/workflow_state.json content is identical."
+             echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
+          else
+             echo "::notice::.github/workflow_state.json content has changed."
+             echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
+          fi
         shell: bash
         continue-on-error: true
 
@@ -189,7 +418,6 @@ jobs:
           echo "::warning::The 'Update Workflow State File' step failed. The state file was not updated."
           echo "::warning::An exit code of 127, if observed, indicates a 'command not found' error, likely meaning 'jq' was not installed on the runner."
 
-
       - name: Upload homepage-app/apps/apps.json as Artifact
         if: steps.update_state_file_content.outcome == 'success' && steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
         uses: actions/upload-artifact@v4
@@ -198,13 +426,28 @@ jobs:
           path: homepage-app/apps/apps.json
           retention-days: 7
 
-      
-
+      #
+      # CONCEPT DEMONSTRATION: Deep Ecosystem Integration
+      # --------------------------------------------------------------------
+      # This step (`uses: stefanzweifel/git-auto-commit-action@v5`) is a perfect
+      # example of leveraging the GitHub Actions ecosystem. Instead of writing a
+      # complex git script manually, we use a pre-built, community-vetted action
+      # from the Marketplace to handle a common task. This ability to compose
+      # workflows from a vast library of reusable components is a key differentiator.
+      #
       - name: Commit and Push generated files
         id: commit_and_push
         if: steps.update_state_file_content.outcome == 'success' && (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || steps.update_state_file_content.outputs.state_file_changed == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
-        # This env block is now conditional based on the flag from the state file
+        #
+        # CONCEPT DEMONSTRATION: Environment Variables (`env`) (1.2.6)
+        # ---------------------------------------------------
+        # - Step-Level `env`: These variables (`GIT_TRACE`, `GIT_CURL_VERBOSE`)
+        #   are defined only for this specific step. They are set conditionally
+        #   based on the output of the "Read Diagnostic Flag from State" step,
+        #   demonstrating how to dynamically enable debug logging for a
+        #   single action.
+        #
         env:
           GIT_TRACE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
           GIT_CURL_VERBOSE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
@@ -224,12 +467,90 @@ jobs:
           echo "::warning::3. Fork Permissions: If this workflow is running on a fork, its token is read-only by default."
           echo "::warning::4. Organization Rules: If this repository is part of an organization, check the organization's settings for policies that may be overriding repository permissions."
 
+  #
+  # CONCEPT DEMONSTRATION: "Intelligent CI" Job (Part 2)
+  # ---------------------------------------------------
+  # This job serves as a Continuous Integration (CI) check for all applications
+  # in the repository. It runs in parallel with the documentation and deployment
+  # jobs to provide fast feedback.
+  #
+  # Note on CI/CD Order: In a typical linear pipeline, the deployment job would
+  # depend on this CI job completing successfully (`needs: intelligent_ci`).
+  # This workflow runs them in parallel to keep the deployment flow independent.
+  #
+  intelligent_ci:
+    name: "Intelligent CI"
+    runs-on: ubuntu-latest
+    #
+    # CONCEPT DEMONSTRATION: The Matrix Strategy (2.2.2)
+    # ---------------------------------------------------
+    # This `strategy` block creates a "matrix" of jobs. The `intelligent_ci`
+    # job will be run three separate times, in parallel. Each run will have a
+    # different value for `matrix.node-version`, allowing us to test our code
+    # across multiple Node.js environments simultaneously.
+    #
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
 
+    steps:
+      #
+      # CONCEPT DEMONSTRATION: Checkout and Setup (2.1.1, 2.1.2)
+      # ---------------------------------------------------
+      # - `actions/checkout`: The essential first step to get the code.
+      # - `actions/setup-node`: Prepares the runner with a specific Node.js
+      #   version, pulling the version directly from the matrix context.
+      #
+      - name: "Checkout code"
+        uses: actions/checkout@v4
 
+      - name: "Setup Node.js ${{ matrix.node-version }}"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
+      #
+      # CONCEPT DEMONSTRATION: Caching Dependencies (2.2.1)
+      # ---------------------------------------------------
+      # This step uses `actions/cache` to dramatically speed up the workflow.
+      # - `path`: Specifies the directory to save/restore (`~/.npm`).
+      # - `key`: Creates a unique identifier for the cache. It includes the
+      #   runner's OS, the Node.js version, and a hash of all package-lock.json
+      #   files. If any lockfile changes, the hash changes, and a new cache
+      #   is created.
+      # - `restore-keys`: Provides a fallback key for partial matches.
+      #
+      - name: "Cache node modules"
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-
 
-          
-          
+      - name: "Install Dependencies and Run Tests for All Apps"
+        run: |
+          echo "--- Starting CI for all apps ---"
+          # This is the same logic as the find_apps job, adapted for CI.
+          # It makes this job self-contained and independent.
+          APP_BASE_DIRS="homepage-app"
+          for BASE_DIR in $APP_BASE_DIRS; do
+            if [ ! -d "$BASE_DIR" ]; then
+              echo "::error::Base directory '$BASE_DIR' not found."
+              continue
+            fi
+            FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
+            for APP_DIR in $FOUND_DIRS; do
+              echo "--- Testing app in: $APP_DIR ---"
+              echo "Installing dependencies..."
+              npm install --prefix "$APP_DIR"
+              echo "Running tests..."
+              # Use --if-present to avoid errors if a 'test' script doesn't exist
+              npm test --if-present --prefix "$APP_DIR"
+            done
+          done
+          echo "--- CI Complete ---"
+
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -260,11 +581,18 @@ jobs:
           echo "last_run_id=$LAST_RUN_ID" >> "$GITHUB_OUTPUT"
         shell: bash
         
-      # ... (The rest of the steps in prepare_deploy_matrix remain the same) ...
-        
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
+      #
+      # CONCEPT DEMONSTRATION: Deep Platform Integration
+      # --------------------------------------------------------------------
+      # This step (`uses: actions/github-script@v6`) showcases native platform
+      # integration. It runs a script that has direct, authenticated access to
+      # the GitHub API via the `github` context and the automatically-provided
+      # `github-token`. This allows the workflow to interact with the repository
+      # (e.g., listing artifacts) as a first-class citizen of the platform.
+      #
       - name: Get Artifact Run ID for Download
         id: get_latest_artifact_run_id
         uses: actions/github-script@v6
@@ -361,10 +689,19 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
         shell: bash
 
+  #
+  # CONCEPT DEMONSTRATION: The "Continuous Deployment" (CD) Job (2.3)
+  # --------------------------------------------------------------------
+  # This job handles the Continuous Deployment (CD) part of the pipeline.
+  # - It depends on the `prepare_deploy_matrix` job to know which apps to deploy.
+  # - It uses a dynamic matrix to deploy each application in parallel.
+  # - This conceptually covers building, packaging (implicitly by Heroku),
+  #   and deploying to a cloud provider.
+  #
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
-    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run":true,"deploy_app":false}]' }}
+    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run\":true,\"deploy_app\":false}]' }}
     strategy:
       fail-fast: false
       matrix:
@@ -390,6 +727,15 @@ jobs:
         if: ${{ matrix.app_data.deploy_app != false }}
         run: sudo apt-get update && sudo apt-get install -y jq
 
+      #
+      # CONCEPT DEMONSTRATION: Deep Platform Integration
+      # --------------------------------------------------------------------
+      # This step demonstrates native secrets management. The value for
+      # `heroku_api_key` is fetched directly from GitHub's encrypted secrets
+      # store using `${{ secrets.HEROKU_API_KEY }}`. There is no need for
+      # external credential managers or complex configuration; the integration
+      # is built directly into the platform.
+      #
       - name: Deploy to Heroku
         if: ${{ matrix.app_data.deploy_app != false }}
         uses: akhileshns/heroku-deploy@v3.13.15
