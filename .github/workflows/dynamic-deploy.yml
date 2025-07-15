@@ -269,6 +269,9 @@ jobs:
       # This step is the core of the workflow's intelligence. It uses a
       # sophisticated `jq` script to manage a persistent state file.
       #
+      # - Automatic Initialization: If versioning or other keys are not present
+      #   in the state file, they are automatically initialized on the first
+      #   run with default values (e.g., version "0.1.0").
       # - State Migration: It automatically upgrades the state file from an
       #   old format to a new one on the fly.
       # - Run ID Promotion: It manages `current`, `last`, and `historical`
