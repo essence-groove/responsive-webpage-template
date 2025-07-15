@@ -53,7 +53,7 @@ on:
 #
 # - Parallel Execution: By default, all jobs without a `needs` dependency
 #   run in parallel. In this workflow, `find_apps`, `prepare_deploy_matrix`,
-#   and the new `intelligent_ci` job start at the same time.
+#   `intelligent_ci`, and `deploy_for_testing` start at the same time.
 #
 # - Workflow/Job Relationship: The workflow itself is the overall process
 #   defined by this file. The jobs are the individual, executable components
@@ -557,6 +557,61 @@ jobs:
             done
           done
           echo "--- CI Complete ---"
+
+  #
+  # CONCEPT DEMONSTRATION: Parallel Test Deployment Job
+  # ---------------------------------------------------
+  # This job runs in parallel to the main deployment and CI jobs. It uses a
+  # matrix to simulate deploying each discovered application to multiple
+  # "testing" environments (dev, qa, staging). This provides a way to run
+  # environment-specific validation or integration tests without affecting
+  # the primary deployment pipeline.
+  #
+  deploy_for_testing:
+    name: "Deploy for Testing"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, qa, staging]
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Install jq"
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: "Scan for Apps to Test-Deploy"
+        id: scan_for_test
+        run: |
+          set -e
+          APP_DETAILS_ARRAY=()
+          APP_BASE_DIRS="homepage-app"
+          for BASE_DIR in $APP_BASE_DIRS; do
+            if [ ! -d "$BASE_DIR" ]; then
+              echo "::error::Base directory '$BASE_DIR' not found."
+              continue
+            fi
+            FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
+            for APP_DIR in $FOUND_DIRS; do
+              APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "unknown")
+              APP_JSON_OBJ="{\"name\":\"$APP_NAME\", \"app_dir\":\"$APP_DIR\"}"
+              APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
+            done
+          done
+          APP_DETAILS_JSON_OUTPUT=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
+          printf "app_list=%s\n" "$APP_DETAILS_JSON_OUTPUT" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: "Simulate Deployment to ${{ matrix.environment }}"
+        run: |
+          apps=$(echo '${{ steps.scan_for_test.outputs.app_list }}' | jq -c '.[]')
+          for app in $apps; do
+            app_name=$(echo "$app" | jq -r '.name')
+            app_dir=$(echo "$app" | jq -r '.app_dir')
+            echo "Simulating deployment of '$app_name' (from $app_dir) to ${{ matrix.environment }} environment."
+            # In a real scenario, you might run integration tests or smoke tests here
+            sleep 2 # Simulate deployment time
+          done
 
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
