@@ -40,7 +40,7 @@ on:
   push:
     branches:
       - main
-      - underlying-permission
+      - masterclassing-github-actions
     paths:
       - '**'
 
