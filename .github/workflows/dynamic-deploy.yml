@@ -1,7 +1,7 @@
 name: Full App Discovery, Docs & Deploy
 
 #
-# CONCEPT DEMONSTRATION: Naming the Workflow 
+# CONCEPT DEMONSTRATION: Naming the Workflow (1.2.1)
 # ---------------------------------------------------
 # The `name` key provides a clear, human-readable name for the workflow.
 # This name is what appears in the GitHub Actions UI, making it easy to
@@ -9,7 +9,7 @@ name: Full App Discovery, Docs & Deploy
 #
 
 #
-# CONCEPT DEMONSTRATION: The 'on' Event Trigger
+# CONCEPT DEMONSTRATION: The 'on' Event Trigger (1.2.2)
 # ---------------------------------------------------
 # The `on` key defines the event(s) that will trigger the workflow. This workflow
 # demonstrates several types of triggers:
@@ -45,15 +45,15 @@ on:
       - '**'
 
 #
-# CONCEPT DEMONSTRATION: Defining Jobs 
+# CONCEPT DEMONSTRATION: Defining Jobs (1.2.3)
 # ---------------------------------------------------
 # The `jobs` key contains all the major units of work for the workflow. Each
 # key under `jobs` (e.g., `find_apps`, `prepare_deploy_matrix`) is a separate
 # job that runs on a fresh virtual machine.
 #
 # - Parallel Execution: By default, all jobs without a `needs` dependency
-#   run in parallel. In this workflow, `find_apps` and `prepare_deploy_matrix`
-#   start at the same time, demonstrating this parallel execution.
+#   run in parallel. In this workflow, `find_apps`, `prepare_deploy_matrix`,
+#   and the new `intelligent_ci` job start at the same time.
 #
 # - Workflow/Job Relationship: The workflow itself is the overall process
 #   defined by this file. The jobs are the individual, executable components
@@ -62,7 +62,7 @@ on:
 jobs:
   find_apps:
     #
-    # CONCEPT DEMONSTRATION: The Runner (`runs-on`)
+    # CONCEPT DEMONSTRATION: The Runner (`runs-on`) (1.2.4)
     # ---------------------------------------------------
     # The `runs-on` key specifies the type of virtual machine, or "runner,"
     # that the job will execute on.
@@ -83,7 +83,7 @@ jobs:
       force_apps_json_upload: ${{ steps.manage_workflow_state.outputs.force_apps_json_upload_for_generator }}
       workflow_state_json: ${{ steps.manage_workflow_state.outputs.workflow_state_output }}
     #
-    # CONCEPT DEMONSTRATION: Environment Variables (`env`)
+    # CONCEPT DEMONSTRATION: Environment Variables (`env`) (1.2.6)
     # ---------------------------------------------------
     # The `env` key is used to set environment variables. They can be defined
     # at the workflow, job, or step level.
@@ -95,7 +95,7 @@ jobs:
       APP_BASE_DIRS: "homepage-app"
 
     #
-    # CONCEPT DEMONSTRATION: Steps 
+    # CONCEPT DEMONSTRATION: Steps (1.2.5)
     # ---------------------------------------------------
     # The `steps` key contains a sequence of the individual tasks that make
     # up a job. They are executed in order.
@@ -418,7 +418,7 @@ jobs:
         if: steps.update_state_file_content.outcome == 'success' && (steps.generate_content_py.outputs.apps_md_updated_flag == 'true' || steps.generate_content_py.outputs.apps_json_updated_flag == 'true' || steps.update_state_file_content.outputs.state_file_changed == 'true')
         uses: stefanzweifel/git-auto-commit-action@v5
         #
-        # CONCEPT DEMONSTRATION: Environment Variables (`env`)
+        # CONCEPT DEMONSTRATION: Environment Variables (`env`) (1.2.6)
         # ---------------------------------------------------
         # - Step-Level `env`: These variables (`GIT_TRACE`, `GIT_CURL_VERBOSE`)
         #   are defined only for this specific step. They are set conditionally
@@ -444,6 +444,90 @@ jobs:
           echo "::warning::2. Repository Permissions: Verify 'Settings' > 'Actions' > 'General' has 'Workflow permissions' set to 'Read and write permissions'."
           echo "::warning::3. Fork Permissions: If this workflow is running on a fork, its token is read-only by default."
           echo "::warning::4. Organization Rules: If this repository is part of an organization, check the organization's settings for policies that may be overriding repository permissions."
+
+  #
+  # CONCEPT DEMONSTRATION: "Intelligent CI" Job (Part 2)
+  # ---------------------------------------------------
+  # This job serves as a Continuous Integration (CI) check for all applications
+  # in the repository. It runs in parallel with the documentation and deployment
+  # jobs to provide fast feedback.
+  #
+  # Note on CI/CD Order: In a typical linear pipeline, the deployment job would
+  # depend on this CI job completing successfully (`needs: intelligent_ci`).
+  # This workflow runs them in parallel to keep the deployment flow independent.
+  #
+  intelligent_ci:
+    name: "Intelligent CI"
+    runs-on: ubuntu-latest
+    #
+    # CONCEPT DEMONSTRATION: The Matrix Strategy (2.2.2)
+    # ---------------------------------------------------
+    # This `strategy` block creates a "matrix" of jobs. The `intelligent_ci`
+    # job will be run three separate times, in parallel. Each run will have a
+    # different value for `matrix.node-version`, allowing us to test our code
+    # across multiple Node.js environments simultaneously.
+    #
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      #
+      # CONCEPT DEMONSTRATION: Checkout and Setup (2.1.1, 2.1.2)
+      # ---------------------------------------------------
+      # - `actions/checkout`: The essential first step to get the code.
+      # - `actions/setup-node`: Prepares the runner with a specific Node.js
+      #   version, pulling the version directly from the matrix context.
+      #
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js ${{ matrix.node-version }}"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      #
+      # CONCEPT DEMONSTRATION: Caching Dependencies (2.2.1)
+      # ---------------------------------------------------
+      # This step uses `actions/cache` to dramatically speed up the workflow.
+      # - `path`: Specifies the directory to save/restore (`~/.npm`).
+      # - `key`: Creates a unique identifier for the cache. It includes the
+      #   runner's OS, the Node.js version, and a hash of all package-lock.json
+      #   files. If any lockfile changes, the hash changes, and a new cache
+      #   is created.
+      # - `restore-keys`: Provides a fallback key for partial matches.
+      #
+      - name: "Cache node modules"
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-
+
+      - name: "Install Dependencies and Run Tests for All Apps"
+        run: |
+          echo "--- Starting CI for all apps ---"
+          # This is the same logic as the find_apps job, adapted for CI.
+          # It makes this job self-contained and independent.
+          APP_BASE_DIRS="homepage-app"
+          for BASE_DIR in $APP_BASE_DIRS; do
+            if [ ! -d "$BASE_DIR" ]; then
+              echo "::error::Base directory '$BASE_DIR' not found."
+              continue
+            fi
+            FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
+            for APP_DIR in $FOUND_DIRS; do
+              echo "--- Testing app in: $APP_DIR ---"
+              echo "Installing dependencies..."
+              npm install --prefix "$APP_DIR"
+              echo "Running tests..."
+              # Use --if-present to avoid errors if a 'test' script doesn't exist
+              npm test --if-present --prefix "$APP_DIR"
+            done
+          done
+          echo "--- CI Complete ---"
 
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
@@ -584,12 +668,13 @@ jobs:
         shell: bash
 
   #
-  # CONCEPT DEMONSTRATION: Identifying Automation Opportunities
+  # CONCEPT DEMONSTRATION: The "Continuous Deployment" (CD) Job (2.3)
   # --------------------------------------------------------------------
-  # This job automates the deployment process for all applications discovered
-  # in the `find_apps` job. By dynamically generating a deployment matrix,
-  # it removes the need to manually add or remove deployment jobs as
-  # applications are added or removed from the repository.
+  # This job handles the Continuous Deployment (CD) part of the pipeline.
+  # - It depends on the `prepare_deploy_matrix` job to know which apps to deploy.
+  # - It uses a dynamic matrix to deploy each application in parallel.
+  # - This conceptually covers building, packaging (implicitly by Heroku),
+  #   and deploying to a cloud provider.
   #
   deploy_all_apps:
     needs: prepare_deploy_matrix
