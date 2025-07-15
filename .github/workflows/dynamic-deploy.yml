@@ -426,6 +426,13 @@ jobs:
           path: homepage-app/apps/apps.json
           retention-days: 7
 
+      - name: Copy State File for Web App Access
+        if: steps.update_state_file_content.outcome == 'success'
+        run: |
+          mkdir -p homepage-app/apps
+          cp .github/workflow_state.json homepage-app/apps/workflow_state.json
+          echo "State file copied to homepage-app/apps/"
+
       #
       # CONCEPT DEMONSTRATION: Deep Ecosystem Integration
       # --------------------------------------------------------------------
@@ -453,7 +460,7 @@ jobs:
           GIT_CURL_VERBOSE: ${{ steps.read_diag_flag.outputs.is_enabled == 'true' && '1' || '' }}
         with:
           commit_message: "Docs: Update deployed app links and JSON list and workflow state [skip ci]"
-          file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
+          file_pattern: "apps.md homepage-app/apps/apps.json homepage-app/apps/workflow_state.json .github/workflow_state.json"
           skip_dirty_check: true
           push_options: "--force"
         continue-on-error: true
