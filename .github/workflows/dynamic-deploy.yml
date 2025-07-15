@@ -263,6 +263,22 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
+      #
+      # CONCEPT DEMONSTRATION: Advanced State Management & Versioning
+      # --------------------------------------------------------------------
+      # This step is the core of the workflow's intelligence. It uses a
+      # sophisticated `jq` script to manage a persistent state file.
+      #
+      # - State Migration: It automatically upgrades the state file from an
+      #   old format to a new one on the fly.
+      # - Run ID Promotion: It manages `current`, `last`, and `historical`
+      #   run IDs to track artifact history.
+      # - Semantic Versioning: It implements a full versioning system
+      #   (MAJOR.MINOR.TWEAK) for artifacts, which can be controlled both
+      #   automatically (tweaks) and manually (minor/major bumps) via the
+      #   state file. This ensures every deployment is tied to a specific,
+      #   traceable version.
+      #
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
@@ -281,15 +297,17 @@ jobs:
           UC_KEY="apps_json_upload_count"
           DT_KEY="apps_json_download_threshold"
           DIAG_KEY="required_diagnostics"
-          # Define NEW object keys
+          # Versioning keys
+          VERSION_KEY="artifact_version"
+          STRATEGY_KEY="version_update_strategy"
+          # Object keys
           LAST_RUN_KEY="last_successful_artifact_run"
           CURRENT_RUN_KEY="current_successful_artifact_run"
           HISTORICAL_RUN_KEY="historical_artifact_run"
-          # Define LEGACY string keys for migration
+          # Legacy string keys
           LEGACY_LARI_KEY="last_successful_apps_json_artifact_run_id"
           LEGACY_CARI_KEY="current_apps_json_artifact_run_id"
 
-          # This jq script now handles the migration from old format to new
           UPDATED_STATE=$(jq -n \
             --argjson incoming_state "$INCOMING_STATE" \
             --arg apps_json_updated "$APPS_JSON_UPDATED_THIS_RUN" \
@@ -301,73 +319,76 @@ jobs:
             --arg uc_key "$UC_KEY" \
             --arg dt_key "$DT_KEY" \
             --arg diag_key "$DIAG_KEY" \
+            --arg version_key "$VERSION_KEY" \
+            --arg strategy_key "$STRATEGY_KEY" \
             --arg last_run_key "$LAST_RUN_KEY" \
             --arg current_run_key "$CURRENT_RUN_KEY" \
             --arg historical_run_key "$HISTORICAL_RUN_KEY" \
             --arg legacy_lari_key "$LEGACY_LARI_KEY" \
             --arg legacy_cari_key "$LEGACY_CARI_KEY" \
             '
-            # --- START MIGRATION LOGIC ---
-            # Function to safely upgrade a run record from string to object
+            # --- MIGRATION LOGIC ---
             def upgrade_run_object($legacy_key; $new_key):
-              # If new key exists and is an object, it is already in the new format.
-              if $incoming_state | has($new_key) and ($incoming_state[$new_key] | type == "object") then
-                $incoming_state[$new_key]
-              # Elif legacy key exists and is a string, convert it to the new object format.
-              elif $incoming_state | has($legacy_key) and ($incoming_state[$legacy_key] | type == "string") then
-                { "id": $incoming_state[$legacy_key], "timestamp": null }
-              # Else, create a clean, empty object.
-              else
-                { "id": null, "timestamp": null }
+              if $incoming_state | has($new_key) and ($incoming_state[$new_key] | type == "object") then $incoming_state[$new_key]
+              elif $incoming_state | has($legacy_key) and ($incoming_state[$legacy_key] | type == "string") then { "id": $incoming_state[$legacy_key], "timestamp": null }
+              else { "id": null, "timestamp": null }
               end;
 
-            # Perform the migration for all tracked runs
             (
               upgrade_run_object($legacy_lari_key; $last_run_key) as $migrated_last_run |
               upgrade_run_object($legacy_cari_key; $current_run_key) as $migrated_current_run |
-              # Historical run has no legacy key, so just check for its existence.
               (if $incoming_state | has($historical_run_key) and ($incoming_state[$historical_run_key] | type == "object") then $incoming_state[$historical_run_key] else { "id": null, "timestamp": null } end) as $migrated_historical_run |
 
-            # --- END MIGRATION LOGIC ---
-
-            # --- START STATE UPDATE LOGIC ---
+            # --- STATE UPDATE LOGIC ---
             (
-              # Determine new values for "last" and "current" runs
-              if $apps_json_updated == "true" then
-                {
-                  "new_last_run": $migrated_current_run,
-                  "new_current_run": { "id": $current_run_id, "timestamp": $current_ts_iso }
-                }
-              else
-                {
-                  "new_last_run": $migrated_last_run,
-                  "new_current_run": $migrated_current_run
-                }
+              if $apps_json_updated == "true" then { "new_last_run": $migrated_current_run, "new_current_run": { "id": $current_run_id, "timestamp": $current_ts_iso } }
+              else { "new_last_run": $migrated_last_run, "new_current_run": $migrated_current_run }
               end
             ) as $promoted_runs |
 
             (
-              # Determine new value for "historical" run
               if ($promoted_runs.new_last_run.timestamp != null) and (($current_ts_epoch | tonumber) - ($promoted_runs.new_last_run.timestamp | fromdate) > 3600) then
                 $promoted_runs.new_last_run
               else
                 $migrated_historical_run
               end
             ) as $new_historical_run |
-            
-            # --- START COUNTER/FLAG LOGIC ---
+
+            # --- VERSIONING LOGIC ---
+            (
+              ($incoming_state[$version_key] // "0.1.0") as $current_version |
+              ($incoming_state[$strategy_key] // "DEVELOPING") as $strategy |
+              # Only update version if the historical run was just updated (i.e., time condition met)
+              if $new_historical_run.id == $promoted_runs.new_last_run.id and $new_historical_run.id != $migrated_historical_run.id then
+                (
+                  $current_version | split(".") | map(tonumber) as $parts |
+                  if $strategy == "NEW_MAJOR_VERSION" then { "v": "\($parts[0] + 1).0.0", "s": "DEVELOPING" }
+                  elif $strategy == "NEW_MINOR_VERSION" then { "v": "\($parts[0]).\($parts[1] + 1).0", "s": "DEVELOPING" }
+                  # DEVELOPING strategy
+                  elif $parts[2] < 9 then { "v": "\($parts[0]).\($parts[1]).\($parts[2] + 1)", "s": $strategy }
+                  # Tweak is 9, so roll over to next minor
+                  else { "v": "\($parts[0]).\($parts[1] + 1).0", "s": $strategy }
+                  end
+                )
+              else
+                { "v": $current_version, "s": $strategy }
+              end
+            ) as $version_info |
+
+            # --- COUNTER/FLAG LOGIC ---
             ($incoming_state[$dt_key] // 0) as $download_threshold |
             {
               ($dc_key): (if $download_threshold == 0 or $apps_json_updated == "true" then 0 else ($incoming_state[$dc_key] // 0) + 1 end),
               ($fu_key): (if $download_threshold == 0 then true else false end),
               ($uc_key): (if $apps_json_updated == "true" then ($incoming_state[$uc_key] // 0) + 1 else ($incoming_state[$uc_key] // 0) end),
               ($dt_key): $download_threshold,
-              ($diag_key): ($incoming_state[$diag_key] // false) # Preserve the diagnostics flag
-            } as $counters |
+              ($diag_key): ($incoming_state[$diag_key] // false),
+              ($version_key): $version_info.v,
+              ($strategy_key): $version_info.s
+            } as $counters_and_version |
 
-            # --- START FINAL ASSEMBLY ---
-            # Combine counters and all run objects into the final state
-            $counters + {
+            # --- FINAL ASSEMBLY ---
+            $counters_and_version + {
               ($last_run_key): $promoted_runs.new_last_run,
               ($current_run_key): $promoted_runs.new_current_run,
               ($historical_run_key): $new_historical_run
