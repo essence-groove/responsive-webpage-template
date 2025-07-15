@@ -271,16 +271,15 @@ jobs:
       #
       # - Automatic Initialization: If versioning or other keys are not present
       #   in the state file, they are automatically initialized on the first
-      #   run with default values (e.g., version "0.1.0").
-      # - State Migration: It automatically upgrades the state file from an
-      #   old format to a new one on the fly.
+      #   run with default values.
+      # - State Migration: It automatically upgrades legacy string-based run
+      #   IDs to the new object format on the fly.
       # - Run ID Promotion: It manages `current`, `last`, and `historical`
       #   run IDs to track artifact history.
-      # - Semantic Versioning: It implements a full versioning system
-      #   (MAJOR.MINOR.TWEAK) for artifacts, which can be controlled both
-      #   automatically (tweaks) and manually (minor/major bumps) via the
-      #   state file. This ensures every deployment is tied to a specific,
-      #   traceable version.
+      # - Semantic Versioning: It implements a versioning system where the
+      #   version is stored directly within the run record that produced it.
+      #   This versioning can be controlled both automatically (tweaks) and
+      #   manually (minor/major bumps) via the state file.
       #
       - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
@@ -300,14 +299,11 @@ jobs:
           UC_KEY="apps_json_upload_count"
           DT_KEY="apps_json_download_threshold"
           DIAG_KEY="required_diagnostics"
-          # Versioning keys
           VERSION_KEY="artifact_version"
           STRATEGY_KEY="version_update_strategy"
-          # Object keys
           LAST_RUN_KEY="last_successful_artifact_run"
           CURRENT_RUN_KEY="current_successful_artifact_run"
           HISTORICAL_RUN_KEY="historical_artifact_run"
-          # Legacy string keys
           LEGACY_LARI_KEY="last_successful_apps_json_artifact_run_id"
           LEGACY_CARI_KEY="current_apps_json_artifact_run_id"
 
@@ -333,14 +329,14 @@ jobs:
             # --- MIGRATION LOGIC ---
             def upgrade_run_object($legacy_key; $new_key):
               if $incoming_state | has($new_key) and ($incoming_state[$new_key] | type == "object") then $incoming_state[$new_key]
-              elif $incoming_state | has($legacy_key) and ($incoming_state[$legacy_key] | type == "string") then { "id": $incoming_state[$legacy_key], "timestamp": null }
-              else { "id": null, "timestamp": null }
+              elif $incoming_state | has($legacy_key) and ($incoming_state[$legacy_key] | type == "string") then { "id": $incoming_state[$legacy_key], "timestamp": null, ($version_key): ($incoming_state[$version_key] // "0.1.0") }
+              else { "id": null, "timestamp": null, ($version_key): "0.1.0" }
               end;
 
             (
               upgrade_run_object($legacy_lari_key; $last_run_key) as $migrated_last_run |
               upgrade_run_object($legacy_cari_key; $current_run_key) as $migrated_current_run |
-              (if $incoming_state | has($historical_run_key) and ($incoming_state[$historical_run_key] | type == "object") then $incoming_state[$historical_run_key] else { "id": null, "timestamp": null } end) as $migrated_historical_run |
+              (if $incoming_state | has($historical_run_key) and ($incoming_state[$historical_run_key] | type == "object") then $incoming_state[$historical_run_key] else { "id": null, "timestamp": null, ($version_key): "0.1.0" } end) as $migrated_historical_run |
 
             # --- STATE UPDATE LOGIC ---
             (
@@ -359,17 +355,14 @@ jobs:
 
             # --- VERSIONING LOGIC ---
             (
-              ($incoming_state[$version_key] // "0.1.0") as $current_version |
+              ($migrated_current_run[$version_key] // "0.1.0") as $current_version |
               ($incoming_state[$strategy_key] // "DEVELOPING") as $strategy |
-              # Only update version if the historical run was just updated (i.e., time condition met)
               if $new_historical_run.id == $promoted_runs.new_last_run.id and $new_historical_run.id != $migrated_historical_run.id then
                 (
                   $current_version | split(".") | map(tonumber) as $parts |
                   if $strategy == "NEW_MAJOR_VERSION" then { "v": "\($parts[0] + 1).0.0", "s": "DEVELOPING" }
                   elif $strategy == "NEW_MINOR_VERSION" then { "v": "\($parts[0]).\($parts[1] + 1).0", "s": "DEVELOPING" }
-                  # DEVELOPING strategy
                   elif $parts[2] < 9 then { "v": "\($parts[0]).\($parts[1]).\($parts[2] + 1)", "s": $strategy }
-                  # Tweak is 9, so roll over to next minor
                   else { "v": "\($parts[0]).\($parts[1] + 1).0", "s": $strategy }
                   end
                 )
@@ -386,14 +379,19 @@ jobs:
               ($uc_key): (if $apps_json_updated == "true" then ($incoming_state[$uc_key] // 0) + 1 else ($incoming_state[$uc_key] // 0) end),
               ($dt_key): $download_threshold,
               ($diag_key): ($incoming_state[$diag_key] // false),
-              ($version_key): $version_info.v,
               ($strategy_key): $version_info.s
-            } as $counters_and_version |
+            } as $counters_and_strategy |
 
             # --- FINAL ASSEMBLY ---
-            $counters_and_version + {
+            $counters_and_strategy + {
               ($last_run_key): $promoted_runs.new_last_run,
-              ($current_run_key): $promoted_runs.new_current_run,
+              ($current_run_key): (
+                if $apps_json_updated == "true" then
+                  $promoted_runs.new_current_run + { ($version_key): $version_info.v }
+                else
+                  $promoted_runs.new_current_run
+                end
+              ),
               ($historical_run_key): $new_historical_run
             }
             ) # End top-level migration block
