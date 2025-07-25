@@ -58,6 +58,7 @@ on:
     branches:
       - main
       - bugs
+      - cpp
     paths:
       - '**'
 
