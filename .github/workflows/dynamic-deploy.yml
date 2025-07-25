@@ -660,10 +660,10 @@ jobs:
         id: find_exe
         if: steps.scan_cpp.outputs.project_found == 'true'
         run: |
-          # Extracts the project name from the 'project(name)' line in CMakeLists.txt
-          EXE_NAME=$(grep -oP 'project\(\K[^)\s]+' CMakeLists.txt | head -n 1)
+          # Extracts the executable name from the 'add_executable(name ...)' line
+          EXE_NAME=$(grep -oP 'add_executable\(\s*\K[^)\s]+' CMakeLists.txt | head -n 1)
           if [ -z "$EXE_NAME" ]; then
-            echo "::error::Could not determine executable name from CMakeLists.txt."
+            echo "::error::Could not determine executable name from add_executable() in CMakeLists.txt."
             exit 1
           fi
           echo "Found executable name: $EXE_NAME"
