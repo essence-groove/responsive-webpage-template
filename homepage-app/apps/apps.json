@@ -1,24 +1,18 @@
 {
   "apps": [
     {
-      "app_dir": "homepage-app",
-      "name": "homepage-app",
-      "herokuAppName": "apm-essence-groove-h002",
-      "url": "https://apm-essence-groove-h002-7cc826ef4a8c.herokuapp.com/"
-    },
-    {
       "app_dir": "homepage-app/to_do_list",
+      "app_type": "nodejs",
       "name": "to_do_list",
       "herokuAppName": "apm-essence-groove-h004",
       "url": "https://apm-essence-groove-h004-fc1ff5ff5de7.herokuapp.com/"
     }
   ],
   "metadata": {
-    "last_generated_run_id": "16245627267",
-    "generated_at": "94cd710ab465ddc647772affe0652d5111c74120",
+    "last_generated_run_id": "16527032184",
+    "generated_at": "fb5d46a792babe97694f69ac4b34995b44edbd9e",
     "timestamp": "",
-    "workflow_name": "Dynamic Multi-App Discovery",
-    "workflow_run_url": "https://github.com/apm-essence-groove/responsive-webpage-template/actions/runs/16245627267"
-
+    "workflow_name": "Full App Discovery, Docs & Deploy",
+    "workflow_run_url": "https://github.com/apmw-essence-groove/responsive-webpage-template/actions/runs/16527032184"
   }
 }
