@@ -58,7 +58,6 @@ on:
     branches:
       - main
       - bugs
-      - cpp
     paths:
       - '**'
 
@@ -334,7 +333,7 @@ jobs:
   deploy_all_apps:
     needs: prepare_deploy_matrix
     runs-on: ubuntu-latest
-    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run\":true,\"deploy_app\":false}]' }}
+    if: ${{ needs.prepare_deploy_matrix.outputs.app_data_json != '[{"dummy_run":true,"deploy_app":false}]' }}
     strategy:
       fail-fast: false
       matrix:
