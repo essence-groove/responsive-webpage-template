@@ -58,7 +58,7 @@ on:
   push:
     branches:
       - main
-      - masterclassing-github-actions
+      - bugs
     paths:
       - '**'
 
