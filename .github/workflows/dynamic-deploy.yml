@@ -1,29 +1,21 @@
 #
- # Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward) (https://github.com/apm-essence-groove/apm-essence-groove-ci-cd)
- #
- # This program is free software: you can redistribute it and/or modify
- # it under the terms of the GNU Affero General Public License as published by
- # the Free Software Foundation, either version 3 of the License, or
- # (at your option) any later version.
- #
- # This program is distributed in the hope that it will be useful,
- # but WITHOUT ANY WARRANTY; without even the implied warranty of
- # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- # GNU Affero General Public License for more details.
- #
- # You should have received a copy of the GNU Affero General Public License
- # along with this program.  If not, see <https://www.gnu.org/licenses/>.
- #
+# Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward) (https://github.com/apm-essence-groove/apm-essence-groove-ci-cd)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
 
 name: Full App Discovery, Docs & Deploy
-
-#
-# CONCEPT DEMONSTRATION: Naming the Workflow (1.2.1)
-# ---------------------------------------------------
-# The `name` key provides a clear, human-readable name for the workflow.
-# This name is what appears in the GitHub Actions UI, making it easy to
-# identify and distinguish from other workflows in the repository.
-#
 
 #
 # CONCEPT DEMONSTRATION: The 'on' Event Trigger (1.2.2)
@@ -72,7 +64,8 @@ on:
 #
 # - Parallel Execution: By default, all jobs without a `needs` dependency
 #   run in parallel. In this workflow, `find_apps`, `prepare_deploy_matrix`,
-#   `intelligent_ci`, and `deploy_for_testing` start at the same time.
+#   `intelligent_ci`, `deploy_for_testing`, and now `build_cpp_app` start at
+#   the same time.
 #
 # - Workflow/Job Relationship: The workflow itself is the overall process
 #   defined by this file. The jobs are the individual, executable components
@@ -631,6 +624,44 @@ jobs:
             # In a real scenario, you might run integration tests or smoke tests here
             sleep 2 # Simulate deployment time
           done
+  
+  #
+  # NEW FEATURE: C++ Application Build Job
+  # ---------------------------------------------------
+  # This job runs in parallel with the other jobs to scan for and build
+  # a C++ application using CMake.
+  #
+  build_cpp_app:
+    name: "Build C++ App"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Check for C++ Project"
+        id: scan_cpp
+        run: |
+          if [ -f "CMakeLists.txt" ]; then
+            echo "::notice::CMakeLists.txt found. Proceeding with C++ build."
+            echo "project_found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No C++ project (CMakeLists.txt) found in the root. Skipping build."
+            echo "project_found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "Install C++ Build Tools"
+        if: steps.scan_cpp.outputs.project_found == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+      
+      - name: "Configure and Build with CMake"
+        if: steps.scan_cpp.outputs.project_found == 'true'
+        run: |
+          echo "--- Configuring C++ project with CMake ---"
+          cmake -S . -B build
+          echo "--- Building C++ project ---"
+          cmake --build build
 
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
