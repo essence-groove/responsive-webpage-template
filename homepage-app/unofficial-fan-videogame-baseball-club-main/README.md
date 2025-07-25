@@ -1,6 +1,12 @@
 # APMW Baseball Simulator (unofficial-fan-videogame-baseball-club)
 
-This is an unofficial fan-made baseball video game, serving as the C++ 3.5.0 core for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven logic, and deep lore integration.
+This is an unofficial fan-made baseball video game, serving as the C++ 3.5.0 core for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven-logic, and deep lore integration.
+
+## Generated Schedule
+
+📄 **[View the Latest Generated Schedule](schedule_report.md)**
+
+*This report is automatically generated and updated by our CI/CD workflow on every push to the `cpp` branch.*
 
 ## Features
 
