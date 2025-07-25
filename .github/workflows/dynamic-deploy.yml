@@ -64,7 +64,7 @@ on:
 #
 # - Parallel Execution: By default, all jobs without a `needs` dependency
 #   run in parallel. In this workflow, `find_apps`, `prepare_deploy_matrix`,
-#   `intelligent_ci`, `deploy_for_testing`, and now `build_cpp_app` start at
+#   `intelligent_ci`, `deploy_for_testing`, and `build_cpp_app` start at
 #   the same time.
 #
 # - Workflow/Job Relationship: The workflow itself is the overall process
@@ -629,10 +629,11 @@ jobs:
   # NEW FEATURE: C++ Application Build Job
   # ---------------------------------------------------
   # This job runs in parallel with the other jobs to scan for and build
-  # a C++ application using CMake.
+  # a C++ application using CMake. It now also runs the generated
+  # executable and commits the output file.
   #
   build_cpp_app:
-    name: "Build C++ App"
+    name: "Build C++ App and Commit Report"
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout code"
@@ -662,6 +663,23 @@ jobs:
           cmake -S . -B build
           echo "--- Building C++ project ---"
           cmake --build build
+
+      - name: Run C++ Application to Generate Report
+        id: run_cpp_app
+        if: steps.scan_cpp.outputs.project_found == 'true'
+        run: |
+          # Assuming the executable is named 'schedule_generator' as defined in CMakeLists.txt
+          ./build/schedule_generator
+        continue-on-error: true
+
+      - name: Commit and Push Schedule Report
+        if: steps.run_cpp_app.outcome == 'success'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Bot: Add/Update C++ generated schedule report [skip ci]"
+          file_pattern: "schedule_report.md"
+          skip_dirty_check: true
+          push_options: "--force"
 
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
