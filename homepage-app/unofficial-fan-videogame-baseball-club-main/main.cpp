@@ -25,6 +25,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream> // Added for file output operations
 #include "scheduling/league_scheduler_2.h"    // Includes the LeagueSchedulerNS namespace
 #include "money_and_players/game_data.h"      // For Game and ResidencyBlock structs
 // Note: team_data.h and player_data.h are included via game_data.h
@@ -79,8 +80,13 @@ int main() {
 
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, games_per_team);
 
+    // Open a file stream to write the Markdown report
+    std::ofstream reportFile("schedule_report.md");
+    reportFile << "# APMW Season Schedule Report\n\n";
+
     std::cout << "\n--- Sample Season Schedule ---" << std::endl;
     for (const auto& block : season_schedule) {
+        // --- Console Output ---
         std::cout << "--------------------------------------" << std::endl;
         std::cout << "Residency Block: " << block.host_team.city << " Host "
                   << (block.is_apex_residency ? "(APEX RESIDENCY)" : "") << std::endl;
@@ -91,23 +97,51 @@ int main() {
         std::cout << std::endl;
         std::cout << "  Dates: " << block.start_date << " to " << block.end_date << std::endl;
         std::cout << "  Games (" << block.games.size() << "):" << std::endl;
+
+        // --- Markdown File Output ---
+        reportFile << "## Residency Block: " << block.host_team.city << " Host "
+                   << (block.is_apex_residency ? "(APEX RESIDENCY)" : "") << "\n\n";
+        reportFile << "**Visiting Residents:** ";
+        for (const auto& visitor : block.visiting_residents) {
+            reportFile << visitor.city << " ";
+        }
+        reportFile << "\n\n";
+        reportFile << "**Dates:** " << block.start_date << " to " << block.end_date << "\n\n";
+        reportFile << "**Games (" << block.games.size() << "):**\n\n";
+
         for (const auto& game : block.games) {
+            // --- Console Output ---
             std::cout << "    - " << game.date << ": "
                       << game.team1.city << " (Away/First Bat) vs. "
                       << game.team2.city << " (Home/Second Bat) "
                       << " at " << game.actual_host_stadium.city << " Stadium. Type: ";
+            
+            // --- Markdown File Output (build the string first for both) ---
+            std::string game_type_str;
             if (game.game_type == GameType::REGULAR_SEASON) {
-                std::cout << "REGULAR_SEASON";
+                game_type_str = "REGULAR_SEASON";
             } else if (game.game_type == GameType::CROSSROADS_GAME) {
-                std::cout << "CROSSROADS_GAME";
+                game_type_str = "CROSSROADS_GAME";
             } else if (game.game_type == GameType::APEX_RESIDENCY_GAME) {
-                std::cout << "APEX_RESIDENCY_GAME";
+                game_type_str = "APEX_RESIDENCY_GAME";
             }
-            std::cout << std::endl;
+            
+            std::cout << game_type_str << std::endl;
+
+            reportFile << "- **" << game.date << ":** "
+                       << game.team1.city << " (Away/First Bat) vs. "
+                       << game.team2.city << " (Home/Second Bat) "
+                       << " at " << game.actual_host_stadium.city << " Stadium. **Type:** "
+                       << game_type_str << "\n";
         }
+        reportFile << "\n";
     }
 
     std::cout << "\nSchedule generation complete." << std::endl;
+
+    // Close the file and notify the user
+    reportFile.close();
+    std::cout << "Schedule report also written to schedule_report.md" << std::endl;
 
     return 0;
 }
