@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Application Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple animation for cards appearing */
+        .card-enter {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .card-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Application Hub</h1>
+            <p class="mt-3 text-lg text-gray-600">A central directory of all deployed applications in this project.</p>
+        </header>
+
+        <main>
+            <!-- Development Status Banner -->
+            <div id="dev-status-banner" class="hidden mb-8 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg" role="alert">
+                <p class="font-bold">Development In Progress</p>
+                <p>The applications listed below are currently in active development. Features may change and occasional instability is expected.</p>
+            </div>
+
+            <!-- Container for the app list -->
+            <div id="apps-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Apps will be dynamically inserted here -->
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loading" class="text-center py-10">
+                <svg class="animate-spin h-8 w-8 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="mt-2 text-gray-500">Loading applications...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="hidden text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                <strong class="font-bold">Error:</strong>
+                <span class="block sm:inline" id="error-text"></span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const appsListContainer = document.getElementById('apps-list');
+            const loadingIndicator = document.getElementById('loading');
+            const errorMessageContainer = document.getElementById('error-message');
+            const errorTextElement = document.getElementById('error-text');
+            const statusBanner = document.getElementById('dev-status-banner');
+
+            // --- Function to create an application card ---
+            function createAppCard(app) {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 card-enter';
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between mb-4';
+                
+                const title = document.createElement('h2');
+                title.className = 'text-xl font-bold text-gray-900';
+                title.textContent = app.name;
+
+                const icon = `<svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>`;
+                header.innerHTML = icon;
+                header.prepend(title);
+
+                const dirInfo = document.createElement('p');
+                dirInfo.className = 'text-sm text-gray-500 mb-4';
+                dirInfo.innerHTML = `Source: <code class="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs">${app.app_dir}</code>`;
+
+                const link = document.createElement('a');
+                link.href = app.url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'inline-block w-full text-center bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-300';
+                link.textContent = 'Launch App';
+
+                card.appendChild(header);
+                card.appendChild(dirInfo);
+                card.appendChild(link);
+
+                return card;
+            }
+
+            // --- Function to load development status ---
+            // This assumes the workflow copies the state file to the apps directory.
+            async function loadDevStatus() {
+                try {
+                    const response = await fetch('./apps/workflow_state.json');
+                    if (response.ok) {
+                        const stateData = await response.json();
+                        if (stateData.version_update_strategy === 'DEVELOPING') {
+                            statusBanner.classList.remove('hidden');
+                        }
+                    } else {
+                        console.warn(`Could not load workflow_state.json (Status: ${response.status}). Development status banner will not be shown.`);
+                    }
+                } catch (error) {
+                    console.warn('Error fetching workflow_state.json. Development status banner will not be shown.', error);
+                }
+            }
+
+            // --- Fetch and render the applications ---
+            async function loadApps() {
+                try {
+                    const response = await fetch('./apps/apps.json');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load apps.json. Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    loadingIndicator.classList.add('hidden');
+
+                    if (data && data.apps && data.apps.length > 0) {
+                        appsListContainer.innerHTML = '';
+                        data.apps.forEach((app, index) => {
+                            const card = createAppCard(app);
+                            appsListContainer.appendChild(card);
+                            setTimeout(() => card.classList.add('card-enter-active'), index * 100);
+                        });
+                    } else {
+                        throw new Error('No applications found in the list. The apps.json file might be empty.');
+                    }
+                } catch (error) {
+                    loadingIndicator.classList.add('hidden');
+                    errorTextElement.textContent = error.message;
+                    errorMessageContainer.classList.remove('hidden');
+                    console.error('Error loading applications:', error);
+                }
+            }
+
+            // --- Initial load ---
+            loadDevStatus();
+            loadApps();
+        });
+    </script>
+
+</body>
+</html>
