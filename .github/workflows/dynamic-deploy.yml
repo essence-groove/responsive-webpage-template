@@ -124,7 +124,8 @@ jobs:
       # CONCEPT DEMONSTRATION: Multi-Language App Discovery
       # ---------------------------------------------------
       # This step dynamically scans for apps by looking for characteristic files
-      # (`package.json` for Node.js, `CMakeLists.txt` for C++).
+      # (`package.json` for Node.js, `CMakeLists.txt` for C++). It now includes
+      # logic to identify parent C++ projects and ignore their subdirectories.
       #
       - name: Scan for Node.js and C++ Apps
         id: scan
@@ -135,6 +136,10 @@ jobs:
           HAS_CPP="false"
           echo "--- Starting App Scan for Node.js and C++ projects ---"
           
+          # Pre-scan to identify top-level C++ project roots
+          CPP_ROOT_DIRS=$(find $APP_BASE_DIRS -mindepth 1 -maxdepth 1 -type d -exec test -f '{}/CMakeLists.txt' \; -print)
+          echo "Found potential C++ root directories: $CPP_ROOT_DIRS"
+
           POTENTIAL_DIRS=$(find $APP_BASE_DIRS -mindepth 1 -maxdepth 2 -type d)
 
           for APP_DIR in $POTENTIAL_DIRS; do
@@ -142,6 +147,19 @@ jobs:
             APP_NAME=""
             HEROKU_APP_NAME=""
             DEPLOYED_URL=""
+
+            # Check if this directory is a subdirectory of an already identified C++ root
+            IS_SUB_PROJECT=false
+            for ROOT_DIR in $CPP_ROOT_DIRS; do
+              if [[ "$APP_DIR" != "$ROOT_DIR" && "$APP_DIR" == "$ROOT_DIR/"* ]]; then
+                IS_SUB_PROJECT=true
+                echo "Skipping $APP_DIR as it is a subdirectory of C++ project $ROOT_DIR"
+                break
+              fi
+            done
+            if [ "$IS_SUB_PROJECT" = true ]; then
+              continue
+            fi
 
             if [ -f "$APP_DIR/package.json" ]; then
               APP_TYPE="nodejs"
