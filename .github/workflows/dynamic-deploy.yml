@@ -656,6 +656,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake
       
+      - name: "Determine Executable Name from CMake"
+        id: find_exe
+        if: steps.scan_cpp.outputs.project_found == 'true'
+        run: |
+          # Extracts the project name from the 'project(name)' line in CMakeLists.txt
+          EXE_NAME=$(grep -oP 'project\(\K[^)\s]+' CMakeLists.txt | head -n 1)
+          if [ -z "$EXE_NAME" ]; then
+            echo "::error::Could not determine executable name from CMakeLists.txt."
+            exit 1
+          fi
+          echo "Found executable name: $EXE_NAME"
+          echo "exe_name=$EXE_NAME" >> "$GITHUB_OUTPUT"
+
       - name: "Configure and Build with CMake"
         if: steps.scan_cpp.outputs.project_found == 'true'
         run: |
@@ -666,14 +679,25 @@ jobs:
 
       - name: Run C++ Application to Generate Report
         id: run_cpp_app
-        if: steps.scan_cpp.outputs.project_found == 'true'
+        if: steps.scan_cpp.outputs.project_found == 'true' && steps.find_exe.outputs.exe_name
         run: |
-          # Assuming the executable is named 'schedule_generator' as defined in CMakeLists.txt
-          ./build/schedule_generator
+          ./build/${{ steps.find_exe.outputs.exe_name }}
         continue-on-error: true
 
-      - name: Commit and Push Schedule Report
+      - name: "Check for Generated Report"
+        id: check_report
         if: steps.run_cpp_app.outcome == 'success'
+        run: |
+          if [ -f "schedule_report.md" ]; then
+            echo "::notice::schedule_report.md was generated successfully."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::schedule_report.md was not found after running the C++ application."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and Push Schedule Report
+        if: steps.check_report.outputs.exists == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Bot: Add/Update C++ generated schedule report [skip ci]"
