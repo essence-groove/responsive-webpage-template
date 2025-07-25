@@ -270,11 +270,42 @@ jobs:
           echo "--- Starting C++ CI ---"
           echo "$APP_DETAILS" | jq -c '.[] | select(.app_type == "cpp")' | while read -r app; do
             APP_DIR=$(echo "$app" | jq -r '.app_dir')
+            echo "--- Building app in: $APP_DIR ---"
             mkdir -p "$APP_DIR/build"
             cmake -S "$APP_DIR" -B "$APP_DIR/build"
             cmake --build "$APP_DIR/build"
           done
-          echo "--- C++ CI Complete ---"
+          echo "--- C++ Build Complete ---"
+      
+      #
+      # CONCEPT DEMONSTRATION: Persisting Build Artifacts
+      # ---------------------------------------------------
+      # This section demonstrates how to persist files generated during the
+      # build process.
+      # 1. Run Executable: The compiled C++ application is executed to
+      #    generate its output file.
+      # 2. Commit Output: The `git-auto-commit-action` is used to commit
+      #    the newly generated file directly back to the repository.
+      #
+      - name: "Run C++ Apps to Generate Output"
+        env:
+          APP_DETAILS: ${{ needs.find_apps.outputs.app_details_json }}
+        run: |
+          echo "$APP_DETAILS" | jq -c '.[] | select(.app_type == "cpp")' | while read -r app; do
+            APP_DIR=$(echo "$app" | jq -r '.app_dir')
+            APP_NAME=$(echo "$app" | jq -r '.name')
+            echo "--- Running app: $APP_NAME ---"
+            # Execute the compiled program, assuming its name matches the app name.
+            # IMPORTANT: Your C++ code must be updated to write to "schedule_report.md".
+            "$APP_DIR/build/$APP_NAME"
+          done
+      
+      - name: "Commit C++ Outputs"
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "CI: Add C++ build outputs [skip ci]"
+          # Use a glob pattern to find all schedule_report.md files
+          file_pattern: "**/schedule_report.md"
 
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
