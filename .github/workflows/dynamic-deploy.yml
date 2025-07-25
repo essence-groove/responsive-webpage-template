@@ -294,10 +294,20 @@ jobs:
           echo "$APP_DETAILS" | jq -c '.[] | select(.app_type == "cpp")' | while read -r app; do
             APP_DIR=$(echo "$app" | jq -r '.app_dir')
             APP_NAME=$(echo "$app" | jq -r '.name')
-            echo "--- Running app: $APP_NAME ---"
-            # Execute the compiled program, assuming its name matches the app name.
-            # IMPORTANT: Your C++ code must be updated to write to "schedule_report.md".
-            "$APP_DIR/build/$APP_NAME"
+            echo "--- Finding and running executable for app: $APP_NAME ---"
+            
+            # Find the executable file in the build directory. This is more robust
+            # than assuming the executable name matches the directory name.
+            EXECUTABLE_PATH=$(find "$APP_DIR/build" -maxdepth 1 -type f -executable | head -n 1)
+            
+            if [ -n "$EXECUTABLE_PATH" ]; then
+              echo "Found executable: $EXECUTABLE_PATH"
+              # Execute the found program.
+              "$EXECUTABLE_PATH"
+            else
+              echo "::error::No executable found in $APP_DIR/build for app $APP_NAME."
+              exit 1
+            fi
           done
       
       - name: "Commit C++ Outputs"
