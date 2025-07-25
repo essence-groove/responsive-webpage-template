@@ -642,11 +642,13 @@ jobs:
       - name: "Check for C++ Project"
         id: scan_cpp
         run: |
-          if [ -f "CMakeLists.txt" ]; then
-            echo "::notice::CMakeLists.txt found. Proceeding with C++ build."
+          CPP_PROJECT_DIR="homepage-app/unofficial-fan-videogame-baseball-club-main"
+          if [ -d "$CPP_PROJECT_DIR" ] && [ -f "$CPP_PROJECT_DIR/CMakeLists.txt" ]; then
+            echo "::notice::C++ project found in $CPP_PROJECT_DIR. Proceeding with C++ build."
             echo "project_found=true" >> "$GITHUB_OUTPUT"
+            echo "project_dir=$CPP_PROJECT_DIR" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::No C++ project (CMakeLists.txt) found in the root. Skipping build."
+            echo "::notice::No C++ project found in $CPP_PROJECT_DIR. Skipping build."
             echo "project_found=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -659,6 +661,7 @@ jobs:
       - name: "Determine Executable Name from CMake"
         id: find_exe
         if: steps.scan_cpp.outputs.project_found == 'true'
+        working-directory: ${{ steps.scan_cpp.outputs.project_dir }}
         run: |
           # Extracts the executable name from the 'add_executable(name ...)' line
           EXE_NAME=$(grep -oP 'add_executable\(\s*\K[^)\s]+' CMakeLists.txt | head -n 1)
@@ -671,6 +674,7 @@ jobs:
 
       - name: "Configure and Build with CMake"
         if: steps.scan_cpp.outputs.project_found == 'true'
+        working-directory: ${{ steps.scan_cpp.outputs.project_dir }}
         run: |
           echo "--- Configuring C++ project with CMake ---"
           cmake -S . -B build
@@ -680,6 +684,7 @@ jobs:
       - name: Run C++ Application to Generate Report
         id: run_cpp_app
         if: steps.scan_cpp.outputs.project_found == 'true' && steps.find_exe.outputs.exe_name
+        working-directory: ${{ steps.scan_cpp.outputs.project_dir }}
         run: |
           ./build/${{ steps.find_exe.outputs.exe_name }}
         continue-on-error: true
@@ -687,6 +692,7 @@ jobs:
       - name: "Check for Generated Report"
         id: check_report
         if: steps.run_cpp_app.outcome == 'success'
+        working-directory: ${{ steps.scan_cpp.outputs.project_dir }}
         run: |
           if [ -f "schedule_report.md" ]; then
             echo "::notice::schedule_report.md was generated successfully."
@@ -701,7 +707,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Bot: Add/Update C++ generated schedule report [skip ci]"
-          file_pattern: "schedule_report.md"
+          file_pattern: "${{ steps.scan_cpp.outputs.project_dir }}/schedule_report.md"
           skip_dirty_check: true
           push_options: "--force"
 
