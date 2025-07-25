@@ -235,6 +235,14 @@ jobs:
           echo "state_file_changed=true" >> "$GITHUB_OUTPUT" # Assume change for simplicity
         shell: bash
 
+      - name: Upload latest-apps-json as Artifact
+        if: steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest-apps-json
+          path: homepage-app/apps/apps.json
+          retention-days: 7
+
       - name: Commit and Push generated files
         uses: stefanzweifel/git-auto-commit-action@v5
         if: steps.update_state_file_content.outputs.state_file_changed == 'true'
