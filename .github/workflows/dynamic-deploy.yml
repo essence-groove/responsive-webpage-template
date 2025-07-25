@@ -59,9 +59,6 @@ on:
       - cpp
     paths:
       - '**'
-  schedule:
-    # Runs at 00:00 on Sunday
-    - cron: '0 0 * * 0'
 
 #
 # CONCEPT DEMONSTRATION: Defining Jobs (1.2.3)
@@ -69,8 +66,8 @@ on:
 # The `jobs` key contains all the major units of work for the workflow. Each
 # job runs on a fresh virtual machine.
 #
-# - Parallel Execution: `find_apps` and `prepare_deploy_matrix` start at the
-#   same time, as they have no `needs` dependency on each other.
+# - Parallel Execution: `find_apps`, `prepare_deploy_matrix`,
+#   `intelligent_ci`, and `deploy_for_testing` start at the same time.
 #
 jobs:
   find_apps:
@@ -84,8 +81,6 @@ jobs:
     outputs:
       app_details_json: ${{ steps.scan.outputs.app_details_json }}
       workflow_state_json: ${{ steps.manage_workflow_state.outputs.workflow_state_output }}
-      has_nodejs_apps: ${{ steps.scan.outputs.has_nodejs_apps }}
-      has_cpp_apps: ${{ steps.scan.outputs.has_cpp_apps }}
     #
     # CONCEPT DEMONSTRATION: Environment Variables (`env`) (1.2.6)
     # ---------------------------------------------------
@@ -120,72 +115,32 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      #
-      # CONCEPT DEMONSTRATION: Multi-Language App Discovery
-      # ---------------------------------------------------
-      # This step dynamically scans for apps by looking for characteristic files
-      # (`package.json` for Node.js, `CMakeLists.txt` for C++). It now includes
-      # logic to identify parent C++ projects and ignore their subdirectories.
-      #
-      - name: Scan for Node.js and C++ Apps
+      - name: Scan for Apps and Collect Details
         id: scan
         run: |
           set -e
           APP_DETAILS_ARRAY=()
-          HAS_NODEJS="false"
-          HAS_CPP="false"
-          echo "--- Starting App Scan for Node.js and C++ projects ---"
-          
-          # Pre-scan to identify top-level C++ project roots
-          CPP_ROOT_DIRS=$(find $APP_BASE_DIRS -mindepth 1 -maxdepth 1 -type d -exec test -f '{}/CMakeLists.txt' \; -print)
-          echo "Found potential C++ root directories: $CPP_ROOT_DIRS"
-
-          POTENTIAL_DIRS=$(find $APP_BASE_DIRS -mindepth 1 -maxdepth 2 -type d)
-
-          for APP_DIR in $POTENTIAL_DIRS; do
-            APP_TYPE=""
-            APP_NAME=""
-            HEROKU_APP_NAME=""
-            DEPLOYED_URL=""
-
-            # Check if this directory is a subdirectory of an already identified C++ root
-            IS_SUB_PROJECT=false
-            for ROOT_DIR in $CPP_ROOT_DIRS; do
-              if [[ "$APP_DIR" != "$ROOT_DIR" && "$APP_DIR" == "$ROOT_DIR/"* ]]; then
-                IS_SUB_PROJECT=true
-                echo "Skipping $APP_DIR as it is a subdirectory of C++ project $ROOT_DIR"
-                break
-              fi
-            done
-            if [ "$IS_SUB_PROJECT" = true ]; then
+          echo "--- Starting App Scan ---"
+          for BASE_DIR in $APP_BASE_DIRS; do
+            if [ ! -d "$BASE_DIR" ]; then
+              echo "::error::Base directory '$BASE_DIR' not found."
               continue
             fi
-
-            if [ -f "$APP_DIR/package.json" ]; then
-              APP_TYPE="nodejs"
-              HAS_NODEJS="true"
-              APP_NAME=$(jq -r '.name' "$APP_DIR/package.json" || echo "")
-              HEROKU_APP_NAME=$(jq -r '.herokuAppName' "$APP_DIR/package.json" || echo "")
-              DEPLOYED_URL=$(jq -r '.deployedUrl' "$APP_DIR/package.json" || echo "")
+            FOUND_DIRS=$(find "$BASE_DIR" -type f -name "package.json" -exec dirname {} \;)
+            for APP_DIR in $FOUND_DIRS; do
+              PACKAGE_JSON_PATH="$APP_DIR/package.json"
+              APP_NAME=$(jq -r '.name' "$PACKAGE_JSON_PATH" || echo "")
+              HEROKU_APP_NAME=$(jq -r '.herokuAppName' "$PACKAGE_JSON_PATH" || echo "")
+              DEPLOYED_URL=$(jq -r '.deployedUrl' "$PACKAGE_JSON_PATH" || echo "")
               if [ -z "$APP_NAME" ] || [ "$APP_NAME" == "null" ]; then continue; fi
-            elif [ -f "$APP_DIR/CMakeLists.txt" ]; then
-              APP_TYPE="cpp"
-              HAS_CPP="true"
-              APP_NAME=$(basename "$APP_DIR")
-            else
-              continue
-            fi
-
-            APP_JSON_OBJ=$(jq -n --arg ad "$APP_DIR" --arg at "$APP_TYPE" --arg n "$APP_NAME" --arg han "$HEROKU_APP_NAME" --arg url "$DEPLOYED_URL" \
-              '{app_dir: $ad, app_type: $at, name: $n, herokuAppName: $han, url: $url}')
-            
-            APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
+              
+              APP_JSON_OBJ=$(jq -n --arg ad "$APP_DIR" --arg n "$APP_NAME" --arg han "$HEROKU_APP_NAME" --arg url "$DEPLOYED_URL" \
+                '{app_dir: $ad, name: $n, herokuAppName: $han, url: $url}')
+              APP_DETAILS_ARRAY+=("$APP_JSON_OBJ")
+            done
           done
-
           APP_DETAILS_JSON_OUTPUT=$(printf "%s\n" "${APP_DETAILS_ARRAY[@]}" | jq -s -c .)
           echo "app_details_json=$APP_DETAILS_JSON_OUTPUT" >> "$GITHUB_OUTPUT"
-          echo "has_nodejs_apps=$HAS_NODEJS" >> "$GITHUB_OUTPUT"
-          echo "has_cpp_apps=$HAS_CPP" >> "$GITHUB_OUTPUT"
         shell: bash
 
   generate_docs_files:
@@ -204,11 +159,25 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
 
-      - name: Install Tools
+      - name: Read Diagnostic Flag from State
+        id: read_diag_flag
         run: |
-          sudo apt-get update && sudo apt-get install -y jq
-          python -m pip install --upgrade pip
-      
+          diag_flag=$(echo '${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}' | jq -r '.required_diagnostics // false')
+          echo "is_enabled=$diag_flag" >> "$GITHUB_OUTPUT"
+
+      - name: Note on Diagnostics
+        if: steps.read_diag_flag.outputs.is_enabled == 'true'
+        run: |
+          echo "::warning::Note: The diagnostic features in this workflow are not yet fully implemented."
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+        
       - name: Generate apps.md and apps.json Content
         id: generate_content_py
         run: python .github/scripts/generate_app_list.py
@@ -224,18 +193,78 @@ jobs:
           echo "$APPS_MD_SECTION_CONTENT" > apps.md
         shell: bash
 
-      - name: Update Workflow State File
+      - name: Update Workflow State File and Determine Commit
         id: update_state_file_content
         run: |
-          # This step contains the full jq script to manage state and versioning.
-          # It has been restored from previous versions.
+          # This is the full, restored jq script for state management and versioning
           INCOMING_STATE='${{ env.WORKFLOW_STATE_FROM_FIND_APPS }}'
           STATE_FILE=".github/workflow_state.json"
-          # ... (Full jq script from previous versions goes here) ...
-          echo "state_file_changed=true" >> "$GITHUB_OUTPUT" # Assume change for simplicity
+          APPS_JSON_UPDATED_THIS_RUN="${{ steps.generate_content_py.outputs.apps_json_updated_flag }}"
+          CURRENT_WORKFLOW_RUN_ID="${{ github.run_id }}"
+          CURRENT_TIMESTAMP_ISO=$(date -u -Iseconds)
+          CURRENT_TIMESTAMP_EPOCH=$(date -u +%s)
+          
+          UPDATED_STATE=$(jq -n \
+            --argjson incoming_state "$INCOMING_STATE" \
+            --arg apps_json_updated "$APPS_JSON_UPDATED_THIS_RUN" \
+            --arg current_run_id "$CURRENT_WORKFLOW_RUN_ID" \
+            --arg current_ts_iso "$CURRENT_TIMESTAMP_ISO" \
+            --arg current_ts_epoch "$CURRENT_TIMESTAMP_EPOCH" \
+            '
+            # Define keys
+            def keys: {
+              dc: "apps_json_download_count", fu: "force_next_upload", uc: "apps_json_upload_count",
+              dt: "apps_json_download_threshold", diag: "required_diagnostics", version: "artifact_version",
+              strategy: "version_update_strategy", last_run: "last_successful_artifact_run",
+              current_run: "current_successful_artifact_run", historical_run: "historical_artifact_run",
+              legacy_lari: "last_successful_apps_json_artifact_run_id", legacy_cari: "current_apps_json_artifact_run_id"
+            };
+            def upgrade(legacy_key; new_key):
+              if $incoming_state | has(new_key) and ($incoming_state[new_key] | type == "object") then $incoming_state[new_key]
+              elif $incoming_state | has(legacy_key) and ($incoming_state[legacy_key] | type == "string") then { id: $incoming_state[legacy_key], timestamp: null, (keys.version): ($incoming_state[keys.version] // "0.1.0") }
+              else { id: null, timestamp: null, (keys.version): "0.1.0" }
+              end;
+            (
+              upgrade(keys.legacy_lari; keys.last_run) as $migrated_last |
+              upgrade(keys.legacy_cari; keys.current_run) as $migrated_current |
+              (if $incoming_state | has(keys.historical_run) and ($incoming_state[keys.historical_run] | type == "object") then $incoming_state[keys.historical_run] else { id: null, timestamp: null, (keys.version): "0.1.0" } end) as $migrated_historical |
+              (if $apps_json_updated == "true" then { new_last: $migrated_current, new_current: { id: $current_run_id, timestamp: $current_ts_iso } } else { new_last: $migrated_last, new_current: $migrated_current } end) as $promoted |
+              (if $promoted.new_last.timestamp != null and (($current_ts_epoch | tonumber) - ($promoted.new_last.timestamp | fromdate) > 3600) then $promoted.new_last else $migrated_historical end) as $new_historical |
+              (($migrated_current[keys.version] // "0.1.0") as $current_version | ($incoming_state[keys.strategy] // "DEVELOPING") as $strategy |
+              if $new_historical.id == $promoted.new_last.id and $new_historical.id != $migrated_historical.id then
+                ($current_version | split(".") | map(tonumber) as $parts |
+                if $strategy == "NEW_MAJOR_VERSION" then { v: "\($parts[0] + 1).0.0", s: "DEVELOPING" }
+                elif $strategy == "NEW_MINOR_VERSION" then { v: "\($parts[0]).\($parts[1] + 1).0", s: "DEVELOPING" }
+                elif $parts[2] < 9 then { v: "\($parts[0]).\($parts[1]).\($parts[2] + 1)", s: $strategy }
+                else { v: "\($parts[0]).\($parts[1] + 1).0", s: $strategy }
+                end)
+              else { v: $current_version, s: $strategy }
+              end) as $version_info |
+              {
+                (keys.dc): (if ($incoming_state[keys.dt] // 0) == 0 or $apps_json_updated == "true" then 0 else ($incoming_state[keys.dc] // 0) + 1 end),
+                (keys.fu): (if ($incoming_state[keys.dt] // 0) == 0 then true else false end),
+                (keys.uc): (if $apps_json_updated == "true" then ($incoming_state[keys.uc] // 0) + 1 else ($incoming_state[keys.uc] // 0) end),
+                (keys.dt): ($incoming_state[keys.dt] // 0),
+                (keys.diag): ($incoming_state[keys.diag] // false),
+                (keys.strategy): $version_info.s
+              } + {
+                (keys.last_run): $promoted.new_last,
+                (keys.current_run): (if $apps_json_updated == "true" then $promoted.new_current + { (keys.version): $version_info.v } else $promoted.new_current end),
+                (keys.historical_run): $new_historical
+              }
+            )
+            '
+          )
+          echo "NEW STATE: $UPDATED_STATE"
+          echo "$UPDATED_STATE" > "$STATE_FILE"
+          if [ -z "$(diff -q <(echo "$INCOMING_STATE" | jq '.') "$STATE_FILE")" ]; then
+             echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
+          else
+             echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
+          fi
         shell: bash
 
-      - name: Upload latest-apps-json as Artifact
+      - name: Upload homepage-app/apps/apps.json as Artifact
         if: steps.generate_content_py.outputs.apps_json_updated_flag == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -243,24 +272,25 @@ jobs:
           path: homepage-app/apps/apps.json
           retention-days: 7
 
+      - name: Copy State File for Web App Access
+        run: |
+          mkdir -p homepage-app/apps
+          cp .github/workflow_state.json homepage-app/apps/workflow_state.json
+
       - name: Commit and Push generated files
         uses: stefanzweifel/git-auto-commit-action@v5
         if: steps.update_state_file_content.outputs.state_file_changed == 'true'
         with:
           commit_message: "Docs: Update app lists and workflow state [skip ci]"
-          file_pattern: "apps.md homepage-app/apps/apps.json .github/workflow_state.json"
+          file_pattern: "apps.md homepage-app/apps/apps.json homepage-app/apps/workflow_state.json .github/workflow_state.json"
 
   ci_nodejs:
     needs: find_apps
     name: "CI for Node.js"
     runs-on: ubuntu-latest
-    if: needs.find_apps.outputs.has_nodejs_apps == 'true'
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
-        include:
-          - node-version: 22.x
-            experimental: true
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -279,58 +309,11 @@ jobs:
         env:
           APP_DETAILS: ${{ needs.find_apps.outputs.app_details_json }}
         run: |
-          echo "--- Starting Node.js CI (Experimental: ${{ matrix.experimental || false }}) ---"
-          echo "$APP_DETAILS" | jq -c '.[] | select(.app_type == "nodejs")' | while read -r app; do
+          echo "$APP_DETAILS" | jq -c '.[]' | while read -r app; do
             APP_DIR=$(echo "$app" | jq -r '.app_dir')
             npm install --prefix "$APP_DIR"
             npm test --if-present --prefix "$APP_DIR"
           done
-          echo "--- Node.js CI Complete ---"
-
-  ci_cpp:
-    needs: find_apps
-    name: "CI for C++"
-    runs-on: ubuntu-latest
-    if: needs.find_apps.outputs.has_cpp_apps == 'true'
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-      - name: "Install C++ Build Tools"
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake
-      - name: "Build C++ Apps"
-        env:
-          APP_DETAILS: ${{ needs.find_apps.outputs.app_details_json }}
-        run: |
-          echo "--- Starting C++ CI ---"
-          echo "$APP_DETAILS" | jq -c '.[] | select(.app_type == "cpp")' | while read -r app; do
-            APP_DIR=$(echo "$app" | jq -r '.app_dir')
-            mkdir -p "$APP_DIR/build"
-            cmake -S "$APP_DIR" -B "$APP_DIR/build"
-            cmake --build "$APP_DIR/build"
-          done
-          echo "--- C++ Build Complete ---"
-      
-      - name: "Run C++ Apps to Generate Output"
-        env:
-          APP_DETAILS: ${{ needs.find_apps.outputs.app_details_json }}
-        run: |
-          echo "$APP_DETAILS" | jq -c '.[] | select(.app_type == "cpp")' | while read -r app; do
-            APP_DIR=$(echo "$app" | jq -r '.app_dir')
-            APP_NAME=$(echo "$app" | jq -r '.name')
-            EXECUTABLE_PATH=$(find "$APP_DIR/build" -maxdepth 1 -type f -executable | head -n 1)
-            if [ -n "$EXECUTABLE_PATH" ]; then
-              "$EXECUTABLE_PATH"
-            else
-              echo "::error::No executable found in $APP_DIR/build for app $APP_NAME."
-              exit 1
-            fi
-          done
-      
-      - name: "Commit C++ Outputs"
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "CI: Add C++ build outputs [skip ci]"
-          file_pattern: "**/schedule_report.md"
 
   prepare_deploy_matrix:
     runs-on: ubuntu-latest
@@ -420,28 +403,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        if: matrix.app_data.app_type == 'nodejs'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install Heroku CLI
-        if: matrix.app_data.app_type == 'nodejs'
         run: curl -L https://cli-assets.heroku.com/install.sh | sh
         shell: bash
 
-      - name: Deploy Node.js App to Heroku
-        if: matrix.app_data.app_type == 'nodejs'
+      - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           heroku_app_name: ${{ matrix.app_data.herokuAppName }}
           appdir: ${{ matrix.app_data.app_dir }}
-
-      - name: Build and Package C++ App (Placeholder)
-        if: matrix.app_data.app_type == 'cpp'
-        run: |
-          echo "Simulating build and packaging for C++ app: ${{ matrix.app_data.name }}"
-          echo "A real deployment would involve creating a distributable (e.g., a .zip or .deb file) and uploading it to a release."
-          sleep 5
