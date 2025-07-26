@@ -1,3 +1,17 @@
+/**
+ * @file player_data.h
+ * @brief Defines the data structure for a single player (v3.7.0).
+ * @author  Eeshvar Das (Erik Douglas Ward)
+ * @date 2025-Jul-25
+ *
+ * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
+ *
+ * @license SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Note: The structure of a player is unchanged in v3.7.0, as the updates
+ * focus on high-level league scheduling logic rather than player attributes.
+ */
+
 #ifndef PLAYER_DATA_H
 #define PLAYER_DATA_H
 
@@ -5,9 +19,15 @@
 #include <vector>
 #include <map>
 
-// Represents a single player in the league.
-// This structure holds attributes that can be used by the One-Game Simulation Agent
-// and other agents to consider individual player performance and financial impact.
+namespace LeagueSchedulerNS {
+
+/**
+ * @struct Player
+ * @brief Represents a single player in the league.
+ *
+ * This structure holds attributes that can be used by game simulation agents
+ * to consider individual player performance and financial impact.
+ */
 struct Player {
     int id;
     std::string name;
@@ -34,5 +54,7 @@ struct Player {
         : id(_id), name(_name), skill_rating(_skill_rating), games_played_season(0), fatigue_level(0.0),
           salary(_salary), market_value(_market_value), is_star_player(_is_star_player) {}
 };
+
+} // namespace LeagueSchedulerNS
 
 #endif // PLAYER_DATA_H

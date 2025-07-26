@@ -50,8 +50,7 @@ on:
   push:
     branches:
       - main
-      - bugs
-      - cpp
+      - cpp-apmw-parity-correction
     paths:
       - '**'
 
@@ -415,11 +414,11 @@ jobs:
 
           # Check if the file content actually changed before setting output
           if [ -z "$(diff -q <(echo "$INCOMING_STATE" | jq '.') "$STATE_FILE")" ]; then
-             echo "::notice::.github/workflow_state.json content is identical."
-             echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::.github/workflow_state.json content is identical."
+              echo "state_file_changed=false" >> "$GITHUB_OUTPUT"
           else
-             echo "::notice::.github/workflow_state.json content has changed."
-             echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
+              echo "::notice::.github/workflow_state.json content has changed."
+              echo "state_file_changed=true" >> "$GITHUB_OUTPUT"
           fi
         shell: bash
         continue-on-error: true
@@ -657,7 +656,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake
-      
+        
       - name: "Determine Executable Name from CMake"
         id: find_exe
         if: steps.scan_cpp.outputs.project_found == 'true'
@@ -694,11 +693,13 @@ jobs:
         if: steps.run_cpp_app.outcome == 'success'
         working-directory: ${{ steps.scan_cpp.outputs.project_dir }}
         run: |
-          if [ -f "schedule_report.md" ]; then
-            echo "::notice::schedule_report.md was generated successfully."
+          REPORT_FILE="schedule_report_v3.7.0.md"
+          if [ -f "$REPORT_FILE" ]; then
+            echo "::notice::$REPORT_FILE was generated successfully."
             echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "report_name=$REPORT_FILE" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::schedule_report.md was not found after running the C++ application."
+            echo "::warning::$REPORT_FILE was not found after running the C++ application."
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -706,8 +707,8 @@ jobs:
         if: steps.check_report.outputs.exists == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Bot: Add/Update C++ generated schedule report [skip ci]"
-          file_pattern: "${{ steps.scan_cpp.outputs.project_dir }}/schedule_report.md"
+          commit_message: "Bot: Add/Update C++ generated schedule report (v3.7.0) [skip ci]"
+          file_pattern: "${{ steps.scan_cpp.outputs.project_dir }}/${{ steps.check_report.outputs.report_name }}"
           skip_dirty_check: true
           push_options: "--force"
 

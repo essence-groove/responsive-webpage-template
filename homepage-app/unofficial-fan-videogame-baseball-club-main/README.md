@@ -1,49 +1,68 @@
 # APMW Baseball Simulator (unofficial-fan-videogame-baseball-club)
 
-This is an unofficial fan-made baseball video game, serving as the C++ 3.5.0 core for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven-logic, and deep lore integration.
+This is an unofficial fan-made baseball video game, serving as the **C++ 3.7.0 core** for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven-logic, and deep lore integration.
 
 ## Generated Schedule
 
-📄 **[View the Latest Generated Schedule](schedule_report.md)**
+📄 [**View the Latest Generated Schedule (v3.7.0)**](schedule_report_v3.7.0.md)
 
-*This report is automatically generated and updated by our CI/CD workflow on every push to the `cpp` branch.*
+*This report is automatically generated and updated by our CI/CD workflow on every push to the `main` branch.*
 
-## Features
+## Features (v3.7.0)
 
 * **Modular C++ Core:** Built with a clean separation of concerns, separating data structures (like players, teams, and games) from the scheduling logic.
+
 * **18-Team League Structure:** Simulates a full league with two unions (Atlantic and Pacific) and unique fictional regions, as defined by the project lore.
-* **"Money and Players" Concept:** Includes detailed `Player` data structures with skill ratings, fatigue, and financial attributes (salary, market value), allowing for player-centric simulation.
-* **Advanced Scheduling Agent:** The `LeagueScheduler2` class acts as a "League Agent" to generate complex season schedules based on a "Residency Block" model.
-* **"Crossroads Games" Logic:** Implements the lore-specific "alternating first bat" rule for games played between two visiting teams at a neutral site.
+
+* **Advanced Scheduling Agent (`LeagueScheduler2`):**
+
+  * **Extended Residency Blocks:** Generates complex, multi-week residency blocks where a host team stays home to play multiple visiting teams, reducing travel and enhancing narrative depth.
+
+  * **"Regional Games":** Formally incorporates a new game type where two visiting teams from the same region play a neutral-site game, creating opportunities for local rivalries on the road.
+
+  * **"Crossroads Games":** Manages neutral-site games between visiting teams from different regions, implementing the lore-specific "alternating first bat" rule for fairness.
+
+* **Reduced Season Length:** Targets a \~94-102 game season to increase the significance of each game and align with the league's environmental and risk-management goals.
+
+* **"Money and Players" Concept:** Includes detailed `Player` data structures with skill ratings, fatigue, and financial attributes (salary, market value), allowing for future player-centric simulation.
+
 * **CMake Build System:** Uses a modern CMake configuration for robust and scalable builds.
 
 ## How to Build and Run
 
 This project uses CMake. You will need a C++ compiler (like G++, Clang, or MSVC) and CMake installed.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/your-username/unofficial-fan-videogame-baseball-club.git](https://github.com/your-username/unofficial-fan-videogame-baseball-club.git)
-    cd unofficial-fan-videogame-baseball-club
-    ```
+1. **Clone the repository:**
 
-2.  **Configure the project with CMake:**
-    ```bash
-    # This creates a 'build' directory and generates the build files inside it.
-    cmake -S . -B build
-    ```
+   ```
+   git clone https://github.com/your-username/unofficial-fan-videogame-baseball-club.git
+   cd unofficial-fan-videogame-baseball-club
+   
+   ```
 
-3.  **Compile the code:**
-    ```bash
-    # This runs the actual compilation process.
-    cmake --build build
-    ```
+2. **Configure the project with CMake:**
 
-4.  **Run the executable:**
-    ```bash
-    # The executable will be inside the 'build' directory.
-    ./build/apmw_baseball_simulator
-    ```
+   ```
+   # This creates a 'build' directory and generates the build files inside it.
+   cmake -S . -B build
+   
+   ```
+
+3. **Compile the code:**
+
+   ```
+   # This runs the actual compilation process.
+   cmake --build build
+   
+   ```
+
+4. **Run the executable:**
+
+   ```
+   # The executable will be inside the 'build' directory.
+   ./build/apmw_baseball_simulator
+   
+   ```
 
 ## License
 

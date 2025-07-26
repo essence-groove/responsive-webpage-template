@@ -25,16 +25,32 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <fstream> // Added for file output operations
-#include "scheduling/league_scheduler_2.h"    // Includes the LeagueSchedulerNS namespace
-#include "money_and_players/game_data.h"      // For Game and ResidencyBlock structs
+#include <fstream> // For file output operations
+#include "scheduling/league_scheduler_2.h"   // Includes the LeagueSchedulerNS namespace
+#include "money_and_players/game_data.h"     // For Game and ResidencyBlock structs
 // Note: team_data.h and player_data.h are included via game_data.h
 
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
 
+// Helper function to convert GameType enum to string for clean output
+std::string getGameTypeString(GameType type) {
+    switch (type) {
+        case GameType::REGIONAL_GAME:
+            return "REGIONAL_GAME";
+        case GameType::CROSSROADS_GAME:
+            return "CROSSROADS_GAME";
+        case GameType::APEX_RESIDENCY_GAME:
+            return "APEX_RESIDENCY_GAME";
+        case GameType::REGULAR_SEASON:
+        default:
+            return "REGULAR_SEASON";
+    }
+}
+
 int main() {
-    std::cout << "Starting APMW League Schedule Generation (C++ 3.5.0 with Money & Players)" << std::endl;
+    // Version 3.7.0 introduces extended residencies and Regional Games.
+    std::cout << "Starting APMW League Schedule Generation (C++ 3.7.0 with Money & Players)" << std::endl;
 
     // Initialize the 18 teams with cities and mascot/fan theme placeholders
     std::vector<Team> all_teams;
@@ -76,15 +92,16 @@ int main() {
     }
 
     LeagueScheduler2 scheduler;
-    int games_per_team = 110;
+    // Per v3.6.0+, season length is reduced to enhance game meaningfulness and reduce carbon footprint.
+    int games_per_team = 98; // Target is ~94-102 games.
 
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, games_per_team);
 
     // Open a file stream to write the Markdown report
-    std::ofstream reportFile("schedule_report.md");
-    reportFile << "# APMW Season Schedule Report\n\n";
+    std::ofstream reportFile("schedule_report_v3.7.0.md");
+    reportFile << "# APMW Season Schedule Report (v3.7.0)\n\n";
 
-    std::cout << "\n--- Sample Season Schedule ---" << std::endl;
+    std::cout << "\n--- Sample Season Schedule (v3.7.0) ---" << std::endl;
     for (const auto& block : season_schedule) {
         // --- Console Output ---
         std::cout << "--------------------------------------" << std::endl;
@@ -110,29 +127,32 @@ int main() {
         reportFile << "**Games (" << block.games.size() << "):**\n\n";
 
         for (const auto& game : block.games) {
+            // v3.7.0: Use `designated_home_team_for_batting` for fairness in all game types.
+            // FIX: Use the overloaded == operator on the Team struct, which compares the correct 'id' member.
+            const Team& home_batting_team = game.designated_home_team_for_batting;
+            const Team& away_batting_team = (game.team1 == home_batting_team) ? game.team2 : game.team1;
+            
+            // v3.7.0: Handle the new `REGIONAL_GAME` type.
+            std::string game_type_str = getGameTypeString(game.game_type);
+
             // --- Console Output ---
             std::cout << "    - " << game.date << ": "
-                      << game.team1.city << " (Away/First Bat) vs. "
-                      << game.team2.city << " (Home/Second Bat) "
-                      << " at " << game.actual_host_stadium.city << " Stadium. Type: ";
+                      << away_batting_team.city << " (First Bat) vs. "
+                      << home_batting_team.city << " (Second Bat)"
+                      << " at " << game.actual_host_stadium.city << " Stadium. Type: "
+                      << game_type_str << std::endl;
             
-            // --- Markdown File Output (build the string first for both) ---
-            std::string game_type_str;
-            if (game.game_type == GameType::REGULAR_SEASON) {
-                game_type_str = "REGULAR_SEASON";
-            } else if (game.game_type == GameType::CROSSROADS_GAME) {
-                game_type_str = "CROSSROADS_GAME";
-            } else if (game.game_type == GameType::APEX_RESIDENCY_GAME) {
-                game_type_str = "APEX_RESIDENCY_GAME";
-            }
-            
-            std::cout << game_type_str << std::endl;
-
+            // --- Markdown File Output ---
             reportFile << "- **" << game.date << ":** "
-                       << game.team1.city << " (Away/First Bat) vs. "
-                       << game.team2.city << " (Home/Second Bat) "
+                       << away_batting_team.city << " (First Bat) vs. "
+                       << home_batting_team.city << " (Second Bat)"
                        << " at " << game.actual_host_stadium.city << " Stadium. **Type:** "
                        << game_type_str << "\n";
+            
+            // Add a special note for the new Regional Game type in the report.
+            if (game.game_type == GameType::REGIONAL_GAME) {
+                reportFile << "  - *Note (v3.7.0 Feature): This is a **Regional Game**, where two visiting teams from the same region compete at a neutral host city.*\n";
+            }
         }
         reportFile << "\n";
     }
@@ -141,7 +161,7 @@ int main() {
 
     // Close the file and notify the user
     reportFile.close();
-    std::cout << "Schedule report also written to schedule_report.md" << std::endl;
+    std::cout << "Schedule report also written to schedule_report_v3.7.0.md" << std::endl;
 
     return 0;
 }
