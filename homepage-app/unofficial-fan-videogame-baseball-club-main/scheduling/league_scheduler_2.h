@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.h
- * @brief Header for the v3.7.1 league scheduling logic.
+ * @brief Header for the v3.8.0 league scheduling logic.
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-25
  *
@@ -19,15 +19,17 @@
 #include <map>
 #include "../money_and_players/game_data.h" 
 #include "../money_and_players/team_data.h" 
+#include "../money_and_players/geography_data.h"
 
 namespace LeagueSchedulerNS { 
 
 /**
  * @class LeagueScheduler2
- * @brief Manages the generation of the APMW season schedule for v3.7.1.
+ * @brief Manages the generation of the APMW season schedule for v3.8.0.
  *
- * This version introduces parallel scheduling to allow multiple residency blocks
- * to occur simultaneously, correcting the season length inconsistencies of v3.7.0.
+ * This version introduces a sophisticated, concurrent scheduling algorithm to
+ * manage multiple residency blocks in parallel, ensuring a balanced and
+ * realistically timed season.
  */
 class LeagueScheduler2 {
 public:
@@ -35,11 +37,18 @@ public:
     LeagueScheduler2();
 
     // Main function to generate the season schedule
-    std::vector<ResidencyBlock> generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team);
+    std.vector<ResidencyBlock> generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team);
 
 private:
+    // v3.8.0: New private helper struct to track team status
+    struct TeamScheduleStatus {
+        int available_day = 1;
+        int games_scheduled = 0;
+        int host_blocks_assigned = 0;
+    };
+
     /**
-     * @brief Helper to create a residency block starting on a specific day.
+     * @brief Helper to create an extended residency block.
      * @param host The host team for the residency.
      * @param visitors A vector of visiting teams.
      * @param start_day The day the block begins.
