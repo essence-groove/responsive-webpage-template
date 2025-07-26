@@ -17,9 +17,11 @@
 #include <random>
 #include <algorithm>
 #include <map>
-#include "../money_and_players/game_data.h" 
-#include "../money_and_players/team_data.h" 
-#include "../money_and_players/geography_data.h"
+// FIX v3.8.0: Changed include paths to be direct instead of relative.
+// CMake is configured to know where these files are.
+#include "game_data.h" 
+#include "team_data.h" 
+#include "geography_data.h"
 
 namespace LeagueSchedulerNS { 
 
