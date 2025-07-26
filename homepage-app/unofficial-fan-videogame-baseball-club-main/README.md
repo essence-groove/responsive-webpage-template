@@ -67,5 +67,5 @@ This project uses CMake. You will need a C++ compiler (like G++, Clang, or MSVC)
 
 ## License
 
-This project is licensed under the GNU Affero General Public License v3.0. See the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
+This project is licensed under the GNU Affero General Public License v3.0. See the [LICENSE](LICENSE) file for details.
 </code>
