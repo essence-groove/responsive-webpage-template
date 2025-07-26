@@ -1,4 +1,3 @@
-<code language="cpp">
 /**
  * @file league_scheduler_2.h
  * @brief Header for the v3.7.0 league scheduling logic.
@@ -17,8 +16,8 @@
 #include <string>
 #include <random>
 #include <algorithm>
-#include "../money_and_players/team_data.h" 
 #include "../money_and_players/game_data.h" 
+#include "../money_and_players/team_data.h" 
 
 namespace LeagueSchedulerNS { 
 
@@ -70,4 +69,3 @@ private:
 } // namespace LeagueSchedulerNS
 
 #endif // LEAGUE_SCHEDULER_2_H
-```
