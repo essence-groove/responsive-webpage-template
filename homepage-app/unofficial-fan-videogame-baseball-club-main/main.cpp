@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief Main entry point for the unofficial-fan-videogame-baseball-club game.
+ * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.7.3).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-25
  *
@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <fstream> // For file output operations
+#include <algorithm> // For std::sort
 #include "scheduling/league_scheduler_2.h"   // Includes the LeagueSchedulerNS namespace
 #include "money_and_players/game_data.h"     // For Game and ResidencyBlock structs
 // Note: team_data.h and player_data.h are included via game_data.h
@@ -35,9 +36,19 @@ std::string getGameTypeString(GameType type) {
     }
 }
 
+// Helper to extract the day number from a "Day X" string
+int getDayNumber(const std::string& day_str) {
+    try {
+        return std::stoi(day_str.substr(4));
+    } catch (const std::exception& e) {
+        return -1; // Should not happen with valid data
+    }
+}
+
+
 int main() {
-    // Version 3.7.1 introduces parallel residency block scheduling.
-    std::cout << "Starting APMW League Schedule Generation (C++ 3.7.1 with Money & Players)" << std::endl;
+    // Version 3.7.3 enhances the report to explicitly show Travel/Rest days.
+    std::cout << "Starting APMW League Schedule Generation (C++ 3.7.3 with Money & Players)" << std::endl;
 
     // Initialize the 18 teams with cities and mascot/fan theme placeholders
     std::vector<Team> all_teams;
@@ -65,17 +76,11 @@ int main() {
     all_teams.emplace_back(current_team_id++, "St. Louis", "Archer Aim", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
     all_teams.emplace_back(current_team_id++, "Kansas City", "Monarch Reign", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
 
-    // Populate teams with some players, including "star players"
+    // Populate teams with some players
     int current_player_id = 1;
     for (auto& team : all_teams) {
         team.players.emplace_back(current_player_id++, "PlayerA_" + team.city, 85.0, 5000000, 10000000, false);
         team.players.emplace_back(current_player_id++, "PlayerB_" + team.city, 80.0, 3000000, 5000000, false);
-        team.players.emplace_back(current_player_id++, "PlayerC_" + team.city, 75.0, 2000000, 3000000, false);
-        if (team.city == "Los Angeles" || team.city == "New York" || team.city == "Austin") {
-            team.players.emplace_back(current_player_id++, "StarPlayer_" + team.city, 95.0, 15000000, 25000000, true);
-        } else {
-            team.players.emplace_back(current_player_id++, "PlayerD_" + team.city, 70.0, 1000000, 2000000, false);
-        }
     }
 
     LeagueScheduler2 scheduler;
@@ -83,57 +88,61 @@ int main() {
 
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, games_per_team);
 
-    // Open a file stream to write the Markdown report with the generalized v3.7 name
+    // Sort the entire schedule by start date for a chronological season report
+    std::sort(season_schedule.begin(), season_schedule.end(), [](const ResidencyBlock& a, const ResidencyBlock& b){
+        return getDayNumber(a.start_date) < getDayNumber(b.start_date);
+    });
+
+    // Open a file stream to write the Markdown report
     std::ofstream reportFile("schedule_report_v3.7.md");
     reportFile << "# APMW Season Schedule Report (v3.7)\n\n";
 
-    std::cout << "\n--- Sample Season Schedule (v3.7.1) ---" << std::endl;
+    std::cout << "\n--- Sample Season Schedule (v3.7.3) ---" << std::endl;
     for (const auto& block : season_schedule) {
-        // --- Console Output ---
+        // --- Console/File Output Headers ---
         std::cout << "--------------------------------------" << std::endl;
-        std::cout << "Residency Block: " << block.host_team.city << " Host "
-                  << (block.is_apex_residency ? "(APEX RESIDENCY)" : "") << std::endl;
-        std::cout << "  Visiting Residents: ";
-        for (const auto& visitor : block.visiting_residents) {
-            std::cout << visitor.city << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "  Dates: " << block.start_date << " to " << block.end_date << std::endl;
-        std::cout << "  Games (" << block.games.size() << "):" << std::endl;
+        std::cout << "Residency Block: " << block.host_team.city << " Host (" << block.start_date << " to " << block.end_date << ")" << std::endl;
+        reportFile << "## Residency Block: " << block.host_team.city << " Host (" << block.start_date << " to " << block.end_date << ")\n\n";
 
-        // --- Markdown File Output ---
-        reportFile << "## Residency Block: " << block.host_team.city << " Host "
-                   << (block.is_apex_residency ? "(APEX RESIDENCY)" : "") << "\n\n";
-        reportFile << "**Visiting Residents:** ";
-        for (const auto& visitor : block.visiting_residents) {
-            reportFile << visitor.city << " ";
-        }
-        reportFile << "\n\n";
-        reportFile << "**Dates:** " << block.start_date << " to " << block.end_date << "\n\n";
-        reportFile << "**Games (" << block.games.size() << "):**\n\n";
+        // --- v3.7.3: Explicitly print games and rest days chronologically ---
+        int last_printed_day = getDayNumber(block.start_date) - 1;
 
         for (const auto& game : block.games) {
+            int current_game_day = getDayNumber(game.date);
+
+            // Identify and print any rest days between the last event and this game
+            if (current_game_day > last_printed_day + 1) {
+                for (int day = last_printed_day + 1; day < current_game_day; ++day) {
+                    std::string day_str = "Day " + std::to_string(day);
+                    std::string note = "Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.";
+                    std::cout << "    - " << day_str << ": TRAVEL / REST DAY" << std::endl;
+                    reportFile << "- **" << day_str << ":** TRAVEL / REST DAY. **Environmental Adjustment Note:** " << note << "\n";
+                }
+            }
+
+            // Print the game details
             const Team& home_batting_team = game.designated_home_team_for_batting;
             const Team& away_batting_team = (game.team1 == home_batting_team) ? game.team2 : game.team1;
-            
             std::string game_type_str = getGameTypeString(game.game_type);
 
-            // --- Console Output ---
-            std::cout << "    - " << game.date << ": "
-                      << away_batting_team.city << " (First Bat) vs. "
-                      << home_batting_team.city << " (Second Bat)"
-                      << " at " << game.actual_host_stadium.city << " Stadium. Type: "
-                      << game_type_str << std::endl;
-            
-            // --- Markdown File Output ---
-            reportFile << "- **" << game.date << ":** "
-                       << away_batting_team.city << " (First Bat) vs. "
-                       << home_batting_team.city << " (Second Bat)"
-                       << " at " << game.actual_host_stadium.city << " Stadium. **Type:** "
-                       << game_type_str << "\n";
+            std::cout << "    - " << game.date << ": " << away_batting_team.city << " vs. " << home_batting_team.city << " (Type: " << game_type_str << ")" << std::endl;
+            reportFile << "- **" << game.date << ":** " << away_batting_team.city << " (First Bat) vs. " << home_batting_team.city << " (Second Bat) at " << game.actual_host_stadium.city << " Stadium. **Type:** " << game_type_str << "\n";
             
             if (game.game_type == GameType::REGIONAL_GAME) {
-                reportFile << "  - *Note (v3.7.1 Feature): This is a **Regional Game**, where two visiting teams from the same region compete at a neutral host city.*\n";
+                reportFile << "  - *Note: This is a **Regional Game**, where two visiting teams from the same region compete at a neutral host city.*\n";
+            }
+
+            last_printed_day = current_game_day;
+        }
+
+        // Identify and print any rest days at the end of the block
+        int block_end_day = getDayNumber(block.end_date);
+        if (block_end_day > last_printed_day) {
+             for (int day = last_printed_day + 1; day <= block_end_day; ++day) {
+                std::string day_str = "Day " + std::to_string(day);
+                std::string note = "Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.";
+                std::cout << "    - " << day_str << ": TRAVEL / REST DAY" << std::endl;
+                reportFile << "- **" << day_str << ":** TRAVEL / REST DAY. **Environmental Adjustment Note:** " << note << "\n";
             }
         }
         reportFile << "\n";
