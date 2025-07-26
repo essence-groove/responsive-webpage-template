@@ -9,7 +9,7 @@
  * @license SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-#include "league_scheduler_2.h" // v3.8.0: Update to include the local header
+#include "league_scheduler_2.h"
 #include <iostream>
 #include <chrono>
 #include <algorithm>
@@ -24,6 +24,11 @@ LeagueScheduler2::LeagueScheduler2() : rng(std::chrono::steady_clock::now().time
 
 /**
  * @brief Generates the full season schedule using a sophisticated concurrent algorithm.
+ *
+ * v3.8.0: This function is completely overhauled to manage multiple concurrent
+ * "scheduling windows". It tracks each team's availability, game count, and host
+ * block assignments to create a balanced, geographically distributed, and
+ * realistically timed season schedule.
  */
 std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
     std::vector<ResidencyBlock> season_schedule;
@@ -37,6 +42,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
     const int MAX_HOST_BLOCKS = (games_per_team * all_teams.size()) / (18 * 12);
 
     while (current_day < MAX_SEASON_DAYS) {
+        // Find all teams available on the current day
         std::vector<Team*> available_teams;
         for (auto& team : all_teams) {
             if (team_statuses[team.id].available_day <= current_day) {
@@ -46,16 +52,19 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
         
         std::shuffle(available_teams.begin(), available_teams.end(), rng);
 
+        // Attempt to form as many concurrent residency blocks as possible
         while (available_teams.size() >= 4) {
+            // --- Select a Host ---
             Team* host = nullptr;
             auto host_it = std::find_if(available_teams.begin(), available_teams.end(), [&](Team* t){
                 return team_statuses[t->id].host_blocks_assigned < MAX_HOST_BLOCKS;
             });
 
-            if (host_it == available_teams.end()) break;
+            if (host_it == available_teams.end()) break; // No eligible hosts left
             host = *host_it;
             available_teams.erase(host_it);
 
+            // --- Select Geographically Diverse Visitors ---
             std::vector<Team> visitors;
             std::sort(available_teams.begin(), available_teams.end(), [&](Team* a, Team* b){
                 return GeographyData::calculateDistance(host->city, a->city) > GeographyData::calculateDistance(host->city, b->city);
@@ -66,15 +75,17 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
                 available_teams.erase(available_teams.begin());
             }
 
-            if (visitors.size() < 3) {
+            if (visitors.size() < 3) { // Not enough visitors, put host back and stop for this day
                 available_teams.push_back(host);
                 break; 
             }
 
+            // --- Create and record the block ---
             int block_duration = 0;
             ResidencyBlock block = createResidencyBlock(*host, visitors, current_day, block_duration);
             season_schedule.push_back(block);
             
+            // --- Update statuses for all participating teams ---
             int end_day = current_day + block_duration;
             team_statuses[host->id].available_day = end_day;
             team_statuses[host->id].games_scheduled += block.games.size();
@@ -86,6 +97,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             }
         }
 
+        // Advance to the next day a team becomes available
         int next_free_day = MAX_SEASON_DAYS + 1;
         bool all_done = true;
         for(const auto& pair : team_statuses) {
@@ -96,7 +108,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
                 }
             }
         }
-        if (all_done) break;
+        if (all_done) break; // All teams have enough games
         current_day = (next_free_day > MAX_SEASON_DAYS) ? current_day + 1 : next_free_day;
     }
 
