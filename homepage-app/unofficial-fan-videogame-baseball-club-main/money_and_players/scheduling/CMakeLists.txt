@@ -10,7 +10,7 @@ target_include_directories(scheduling_lib PUBLIC
 )
 
 # FIX v3.8.0: Explicitly link against the data library from the parent module.
-# Using PUBLIC is crucial here. It ensures that the include directories
-# from 'money_and_players_data' are passed to this library and any other
-# target that uses it, resolving the transitive dependency issue.
-target_link_libraries(scheduling_lib PUBLIC money_and_players_data)
+# Using PRIVATE is the correct scope here, as the data headers are an
+# internal implementation detail of the scheduling library, not part of its
+# public interface. This resolves the transitive dependency issue.
+target_link_libraries(scheduling_lib PRIVATE money_and_players_data)
