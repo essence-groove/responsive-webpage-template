@@ -9,9 +9,8 @@ target_include_directories(scheduling_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# DIRECT FIX: Explicitly add the absolute path to the parent 'money_and_players' directory.
-# This tells the compiler exactly where to find game_data.h, team_data.h, etc.,
-# bypassing any issues with transitive dependency propagation.
-target_include_directories(scheduling_lib PRIVATE
-    ${CMAKE_SOURCE_DIR}/money_and_players
-)
+# Link against the data library from the parent module. The PRIVATE keyword
+# is correct here, as the data headers are an internal implementation detail
+# of the scheduling library. The INTERFACE properties of the data library
+# ensure the include paths are correctly passed for compilation.
+target_link_libraries(scheduling_lib PRIVATE money_and_players_data)
