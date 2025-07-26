@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.h
- * @brief Header for the v3.7.0 league scheduling logic.
+ * @brief Header for the v3.7.1 league scheduling logic.
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-25
  *
@@ -16,6 +16,7 @@
 #include <string>
 #include <random>
 #include <algorithm>
+#include <map>
 #include "../money_and_players/game_data.h" 
 #include "../money_and_players/team_data.h" 
 
@@ -23,10 +24,10 @@ namespace LeagueSchedulerNS {
 
 /**
  * @class LeagueScheduler2
- * @brief Manages the generation of the APMW season schedule for v3.7.0.
+ * @brief Manages the generation of the APMW season schedule for v3.7.1.
  *
- * This version is enhanced to create extended residency blocks (3+ weeks)
- * and formally incorporates "Regional Games" into the scheduling logic.
+ * This version introduces parallel scheduling to allow multiple residency blocks
+ * to occur simultaneously, correcting the season length inconsistencies of v3.7.0.
  */
 class LeagueScheduler2 {
 public:
@@ -34,19 +35,18 @@ public:
     LeagueScheduler2();
 
     // Main function to generate the season schedule
-    std::vector<ResidencyBlock> generateSeasonSchedule(const std::vector<Team>& all_teams, int games_per_team);
+    std::vector<ResidencyBlock> generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team);
 
 private:
     /**
-     * @brief Helper to create an extended residency block.
+     * @brief Helper to create a residency block starting on a specific day.
      * @param host The host team for the residency.
      * @param visitors A vector of visiting teams.
-     * @param day_counter A reference to a counter to track game dates across the season.
+     * @param start_day The day the block begins.
+     * @param out_duration_days An output parameter that will be set to the block's total duration.
      * @return A fully populated ResidencyBlock.
-     *
-     * v3.7.0: Signature updated to manage date progression for longer, staggered blocks.
      */
-    ResidencyBlock createResidencyBlock(const Team& host, const std::vector<Team>& visitors, int& day_counter);
+    ResidencyBlock createResidencyBlock(const Team& host, const std::vector<Team>& visitors, int start_day, int& out_duration_days);
 
     /**
      * @brief Generates a series of neutral-site games (Crossroads or Regional).
@@ -55,12 +55,11 @@ private:
      * @param host_stadium The team whose stadium hosts the neutral game.
      * @param num_games The number of games in the series.
      * @param game_type The type of game (CROSSROADS_GAME or REGIONAL_GAME).
-     * @param day_counter A reference to the season's day counter.
+     * @param start_day The day the series begins.
+     * @param day_offset An initial offset for game days within the series.
      * @return A vector of Game objects for the series.
-     *
-     * v3.7.0: New generalized helper function to create different types of neutral-site games.
      */
-    std::vector<Game> generateNeutralSiteSeries(const Team& visitor1, const Team& visitor2, const Team& host_stadium, int num_games, GameType game_type, int& day_counter);
+    std::vector<Game> generateNeutralSiteSeries(const Team& visitor1, const Team& visitor2, const Team& host_stadium, int num_games, GameType game_type, int start_day, int& day_offset);
 
     // Random number generator for shuffling teams and determining batting order.
     std::mt19937 rng;
