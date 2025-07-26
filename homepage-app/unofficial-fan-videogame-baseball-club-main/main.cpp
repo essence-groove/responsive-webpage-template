@@ -16,7 +16,7 @@
 #include <algorithm> // For std::sort
 #include <iomanip>   // For std::fixed and std::setprecision
 // v3.8.0: Update include path for the new nested scheduler location.
-#include "money_and_players/scheduling/league_scheduler_2.h"
+#include "money_and_players/league_scheduler_2.h"
 #include "money_and_players/game_data.h"
 #include "money_and_players/geography_data.h"
 
