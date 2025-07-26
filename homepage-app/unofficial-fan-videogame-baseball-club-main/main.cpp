@@ -128,8 +128,9 @@ int main() {
 
         for (const auto& game : block.games) {
             // v3.7.0: Use `designated_home_team_for_batting` for fairness in all game types.
+            // FIX: Use the overloaded == operator on the Team struct, which compares the correct 'id' member.
             const Team& home_batting_team = game.designated_home_team_for_batting;
-            const Team& away_batting_team = (game.team1.team_id == home_batting_team.team_id) ? game.team2 : game.team1;
+            const Team& away_batting_team = (game.team1 == home_batting_team) ? game.team2 : game.team1;
             
             // v3.7.0: Handle the new `REGIONAL_GAME` type.
             std::string game_type_str = getGameTypeString(game.game_type);
