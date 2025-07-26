@@ -37,10 +37,10 @@ public:
     LeagueScheduler2();
 
     // Main function to generate the season schedule
-    std.vector<ResidencyBlock> generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team);
+    std::vector<ResidencyBlock> generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team);
 
 private:
-    // v3.8.0: New private helper struct to track team status
+    // v3.8.0: New private helper struct to track team status during scheduling.
     struct TeamScheduleStatus {
         int available_day = 1;
         int games_scheduled = 0;
