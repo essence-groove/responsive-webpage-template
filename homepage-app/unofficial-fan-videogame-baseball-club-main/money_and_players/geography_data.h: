@@ -1,0 +1,52 @@
+/**
+ * @file geography_data.h
+ * @brief Defines data structures for geographical information (v3.7.4).
+ * @author  Eeshvar Das (Erik Douglas Ward)
+ * @date 2025-Jul-25
+ *
+ * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
+ *
+ * @license SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+#ifndef GEOGRAPHY_DATA_H
+#define GEOGRAPHY_DATA_H
+
+#include <string>
+#include <map>
+#include <cmath> // For sqrt in distance calculation
+
+namespace LeagueSchedulerNS {
+
+/**
+ * @struct Coordinates
+ * @brief Represents geographical coordinates for a city.
+ */
+struct Coordinates {
+    double latitude;
+    double longitude;
+};
+
+/**
+ * @class GeographyData
+ * @brief A utility class to manage geographical data and calculations.
+ */
+class GeographyData {
+public:
+    /**
+     * @brief Calculates the approximate distance between two coordinates.
+     * This is a simplified Euclidean distance for demonstration purposes.
+     * @param coord1 The first set of coordinates.
+     * @param coord2 The second set of coordinates.
+     * @return The calculated distance.
+     */
+    static double calculateDistance(const Coordinates& coord1, const Coordinates& coord2) {
+        double lat_diff = coord1.latitude - coord2.latitude;
+        double lon_diff = coord1.longitude - coord2.longitude;
+        return std::sqrt(lat_diff * lat_diff + lon_diff * lon_diff);
+    }
+};
+
+} // namespace LeagueSchedulerNS
+
+#endif // GEOGRAPHY_DATA_H
