@@ -1,19 +1,20 @@
 # MyAPMWProject/money_and_players/CMakeLists.txt
 
-# 1. Process the nested scheduling module first. This creates the 'scheduling_lib' target.
-add_subdirectory(scheduling)
-
-# 2. Create money_and_players_lib as an INTERFACE library. This allows it to
-#    bundle usage requirements (include directories, linked libraries) without
-#    needing its own source files to compile.
-add_library(money_and_players_lib INTERFACE)
-
-# 3. Expose the current directory for its own headers (player_data.h, team_data.h, etc.)
-target_include_directories(money_and_players_lib INTERFACE
+# 1. Define an INTERFACE library specifically for the data headers in this directory.
+#    This makes its include paths available to child modules.
+add_library(money_and_players_data INTERFACE)
+target_include_directories(money_and_players_data INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# 4. Link the scheduling logic library into the money_and_players interface library.
-#    This ensures that any target linking against money_and_players_lib (like the
-#    main executable) also gets the properties and link dependency of scheduling_lib.
-target_link_libraries(money_and_players_lib INTERFACE scheduling_lib)
+# 2. Now, process the nested scheduling module. It will be able to link against
+#    the 'money_and_players_data' library we just defined.
+add_subdirectory(scheduling)
+
+# 3. Create the main library for this module. This bundles the data headers and the
+#    compiled scheduling logic together for the main executable.
+add_library(money_and_players_lib INTERFACE)
+target_link_libraries(money_and_players_lib INTERFACE
+    money_and_players_data
+    scheduling_lib
+)
