@@ -27,7 +27,7 @@ on:
   push:
     branches:
       - main
-      - cpp-apmw-environmental-impact
+      - cpp-apmw-3_8_0
     paths:
       - '**'
 
@@ -480,7 +480,8 @@ jobs:
         if: steps.run_cpp_app.outcome == 'success'
         working-directory: ${{ steps.scan_cpp.outputs.project_dir }}
         run: |
-          REPORT_FILE="schedule_report_v3.7.md"
+          # FIX: Look for the correct v3.8 report file
+          REPORT_FILE="schedule_report_v3.8.md"
           if [ -f "$REPORT_FILE" ]; then
             echo "::notice::$REPORT_FILE was generated successfully."
             echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -494,7 +495,8 @@ jobs:
         if: steps.check_report.outputs.exists == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Bot: Add/Update C++ generated schedule report (v3.7.x) [skip ci]"
+          # FIX: Update commit message and file pattern for v3.8
+          commit_message: "Bot: Add/Update C++ generated schedule report (v3.8.x) [skip ci]"
           file_pattern: "${{ steps.scan_cpp.outputs.project_dir }}/${{ steps.check_report.outputs.report_name }}"
           skip_dirty_check: true
           push_options: "--force"

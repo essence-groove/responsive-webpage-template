@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.h
- * @brief Header for the v3.7.1 league scheduling logic.
+ * @brief Header for the v3.8.0 league scheduling logic.
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-25
  *
@@ -17,17 +17,16 @@
 #include <random>
 #include <algorithm>
 #include <map>
-#include "../money_and_players/game_data.h" 
-#include "../money_and_players/team_data.h" 
+// v3.8.0 FIX: Use direct includes for the new flattened directory structure.
+#include "game_data.h" 
+#include "team_data.h" 
+#include "geography_data.h"
 
 namespace LeagueSchedulerNS { 
 
 /**
  * @class LeagueScheduler2
- * @brief Manages the generation of the APMW season schedule for v3.7.1.
- *
- * This version introduces parallel scheduling to allow multiple residency blocks
- * to occur simultaneously, correcting the season length inconsistencies of v3.7.0.
+ * @brief Manages the generation of the APMW season schedule for v3.8.0.
  */
 class LeagueScheduler2 {
 public:
@@ -38,26 +37,20 @@ public:
     std::vector<ResidencyBlock> generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team);
 
 private:
+    // Private helper struct to track team status during scheduling.
+    struct TeamScheduleStatus {
+        int available_day = 1;
+        int games_scheduled = 0;
+        int host_blocks_assigned = 0;
+    };
+
     /**
-     * @brief Helper to create a residency block starting on a specific day.
-     * @param host The host team for the residency.
-     * @param visitors A vector of visiting teams.
-     * @param start_day The day the block begins.
-     * @param out_duration_days An output parameter that will be set to the block's total duration.
-     * @return A fully populated ResidencyBlock.
+     * @brief Helper to create an extended residency block.
      */
     ResidencyBlock createResidencyBlock(const Team& host, const std::vector<Team>& visitors, int start_day, int& out_duration_days);
 
     /**
      * @brief Generates a series of neutral-site games (Crossroads or Regional).
-     * @param visitor1 The first visiting team.
-     * @param visitor2 The second visiting team.
-     * @param host_stadium The team whose stadium hosts the neutral game.
-     * @param num_games The number of games in the series.
-     * @param game_type The type of game (CROSSROADS_GAME or REGIONAL_GAME).
-     * @param start_day The day the series begins.
-     * @param day_offset An initial offset for game days within the series.
-     * @return A vector of Game objects for the series.
      */
     std::vector<Game> generateNeutralSiteSeries(const Team& visitor1, const Team& visitor2, const Team& host_stadium, int num_games, GameType game_type, int start_day, int& day_offset);
 

@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.7.3).
+ * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.8.0).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-25
  *
@@ -12,11 +12,13 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <fstream> // For file output operations
+#include <fstream>   // For file output operations
 #include <algorithm> // For std::sort
-#include "scheduling/league_scheduler_2.h"   // Includes the LeagueSchedulerNS namespace
-#include "money_and_players/game_data.h"     // For Game and ResidencyBlock structs
-// Note: team_data.h and player_data.h are included via game_data.h
+#include <iomanip>   // For std::fixed and std::setprecision
+// v3.8.0: Update include path for the new nested scheduler location.
+#include "money_and_players/league_scheduler_2.h"
+#include "money_and_players/game_data.h"
+#include "money_and_players/geography_data.h"
 
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
@@ -24,15 +26,10 @@ using namespace LeagueSchedulerNS;
 // Helper function to convert GameType enum to string for clean output
 std::string getGameTypeString(GameType type) {
     switch (type) {
-        case GameType::REGIONAL_GAME:
-            return "REGIONAL_GAME";
-        case GameType::CROSSROADS_GAME:
-            return "CROSSROADS_GAME";
-        case GameType::APEX_RESIDENCY_GAME:
-            return "APEX_RESIDENCY_GAME";
-        case GameType::REGULAR_SEASON:
-        default:
-            return "REGULAR_SEASON";
+        case GameType::REGIONAL_GAME: return "REGIONAL_GAME";
+        case GameType::CROSSROADS_GAME: return "CROSSROADS_GAME";
+        case GameType::APEX_RESIDENCY_GAME: return "APEX_RESIDENCY_GAME";
+        case GameType::REGULAR_SEASON: default: return "REGULAR_SEASON";
     }
 }
 
@@ -41,20 +38,20 @@ int getDayNumber(const std::string& day_str) {
     try {
         return std::stoi(day_str.substr(4));
     } catch (const std::exception& e) {
-        return -1; // Should not happen with valid data
+        return -1;
     }
 }
 
 
 int main() {
-    // Version 3.7.3 enhances the report to explicitly show Travel/Rest days.
-    std::cout << "Starting APMW League Schedule Generation (C++ 3.7.3 with Money & Players)" << std::endl;
+    // Version 3.8.0 introduces a sophisticated concurrent scheduling engine.
+    std::cout << "Starting APMW League Schedule Generation (C++ 3.8.0 with Money & Players)" << std::endl;
 
-    // Initialize the 18 teams with cities and mascot/fan theme placeholders
+    // Initialize the 18 teams
     std::vector<Team> all_teams;
     int current_team_id = 1;
 
-    // Atlantic Union (9 teams)
+    // Atlantic Union
     all_teams.emplace_back(current_team_id++, "Maine", "Lumberjack Spirit", UnionType::ATLANTIC, RegionType::KEYSTONE);
     all_teams.emplace_back(current_team_id++, "New York", "Metropolitan Spirit", UnionType::ATLANTIC, RegionType::KEYSTONE);
     all_teams.emplace_back(current_team_id++, "Philadelphia", "Founder Spirit", UnionType::ATLANTIC, RegionType::KEYSTONE);
@@ -65,7 +62,7 @@ int main() {
     all_teams.emplace_back(current_team_id++, "Cleveland", "Guardian Resolve", UnionType::ATLANTIC, RegionType::THE_CONFLUENCE);
     all_teams.emplace_back(current_team_id++, "Detroit", "Automaker Drive", UnionType::ATLANTIC, RegionType::THE_CONFLUENCE);
 
-    // Pacific Union (9 teams)
+    // Pacific Union
     all_teams.emplace_back(current_team_id++, "Los Angeles", "Star Radiance", UnionType::PACIFIC, RegionType::GOLDEN_PENNANT);
     all_teams.emplace_back(current_team_id++, "San Diego", "Surf Vibe", UnionType::PACIFIC, RegionType::GOLDEN_PENNANT);
     all_teams.emplace_back(current_team_id++, "San Francisco", "Seal Endurance", UnionType::PACIFIC, RegionType::GOLDEN_PENNANT);
@@ -88,29 +85,24 @@ int main() {
 
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, games_per_team);
 
-    // Sort the entire schedule by start date for a chronological season report
     std::sort(season_schedule.begin(), season_schedule.end(), [](const ResidencyBlock& a, const ResidencyBlock& b){
         return getDayNumber(a.start_date) < getDayNumber(b.start_date);
     });
 
-    // Open a file stream to write the Markdown report
-    std::ofstream reportFile("schedule_report_v3.7.md");
-    reportFile << "# APMW Season Schedule Report (v3.7)\n\n";
+    std::ofstream reportFile("schedule_report_v3.8.md");
+    reportFile << "# APMW Season Schedule Report (v3.8)\n\n";
 
-    std::cout << "\n--- Sample Season Schedule (v3.7.3) ---" << std::endl;
+    std::cout << "\n--- Sample Season Schedule (v3.8.0) ---" << std::endl;
     for (const auto& block : season_schedule) {
-        // --- Console/File Output Headers ---
         std::cout << "--------------------------------------" << std::endl;
         std::cout << "Residency Block: " << block.host_team.city << " Host (" << block.start_date << " to " << block.end_date << ")" << std::endl;
         reportFile << "## Residency Block: " << block.host_team.city << " Host (" << block.start_date << " to " << block.end_date << ")\n\n";
 
-        // --- v3.7.3: Explicitly print games and rest days chronologically ---
         int last_printed_day = getDayNumber(block.start_date) - 1;
 
         for (const auto& game : block.games) {
             int current_game_day = getDayNumber(game.date);
 
-            // Identify and print any rest days between the last event and this game
             if (current_game_day > last_printed_day + 1) {
                 for (int day = last_printed_day + 1; day < current_game_day; ++day) {
                     std::string day_str = "Day " + std::to_string(day);
@@ -120,7 +112,6 @@ int main() {
                 }
             }
 
-            // Print the game details
             const Team& home_batting_team = game.designated_home_team_for_batting;
             const Team& away_batting_team = (game.team1 == home_batting_team) ? game.team2 : game.team1;
             std::string game_type_str = getGameTypeString(game.game_type);
@@ -129,13 +120,19 @@ int main() {
             reportFile << "- **" << game.date << ":** " << away_batting_team.city << " (First Bat) vs. " << home_batting_team.city << " (Second Bat) at " << game.actual_host_stadium.city << " Stadium. **Type:** " << game_type_str << "\n";
             
             if (game.game_type == GameType::REGIONAL_GAME) {
-                reportFile << "  - *Note: This is a **Regional Game**, where two visiting teams from the same region compete at a neutral host city.*\n";
+                double distance = GeographyData::calculateDistance(away_batting_team.city, home_batting_team.city);
+                std::string travel_note;
+                if (distance < 5.0) { // Arbitrary threshold for "short" travel
+                    travel_note = "This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.";
+                } else {
+                    travel_note = "This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.";
+                }
+                reportFile << "  - *Note: This is a **Regional Game**. **Environmental Enhancement:** " << travel_note << "*\n";
             }
 
             last_printed_day = current_game_day;
         }
 
-        // Identify and print any rest days at the end of the block
         int block_end_day = getDayNumber(block.end_date);
         if (block_end_day > last_printed_day) {
              for (int day = last_printed_day + 1; day <= block_end_day; ++day) {
@@ -151,7 +148,7 @@ int main() {
     std::cout << "\nSchedule generation complete." << std::endl;
 
     reportFile.close();
-    std::cout << "Schedule report also written to schedule_report_v3.7.md" << std::endl;
+    std::cout << "Schedule report also written to schedule_report_v3.8.md" << std::endl;
 
     return 0;
 }
