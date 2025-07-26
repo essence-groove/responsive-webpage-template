@@ -106,7 +106,8 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
             std::vector<Game> series;
 
             // v3.7.0: Check if visitors are from the same region to schedule a REGIONAL_GAME
-            if (visitor1.region == visitor2.region) {
+            // FIX: Use the correct member name 'region_type' instead of 'region'.
+            if (visitor1.region_type == visitor2.region_type) {
                 series = generateNeutralSiteSeries(visitor1, visitor2, host, 2, GameType::REGIONAL_GAME, day_counter);
             } else {
                 series = generateNeutralSiteSeries(visitor1, visitor2, host, 2, GameType::CROSSROADS_GAME, day_counter);
