@@ -17,11 +17,10 @@
 #include <random>
 #include <algorithm>
 #include <map>
-// v3.8.0 FIX: Use direct includes. The CMake configuration now correctly
-// provides the search path via the linked 'money_and_players_data' library.
-#include "game_data.h" 
-#include "team_data.h" 
-#include "geography_data.h"
+// v3.8.0: Use relative paths to include headers from the parent directory.
+#include "../game_data.h" 
+#include "../team_data.h" 
+#include "../geography_data.h"
 
 namespace LeagueSchedulerNS { 
 
