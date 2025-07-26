@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.cpp
- * @brief Implements the scheduling logic for the APMW baseball league (v3.7.1).
+ * @brief Implements the scheduling logic for the APMW baseball league (v3.7.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-25
  *
@@ -24,9 +24,8 @@ LeagueScheduler2::LeagueScheduler2() : rng(std::chrono::steady_clock::now().time
 /**
  * @brief Generates the full season schedule using parallel block scheduling.
  *
- * v3.7.1: This function is the core of the parallel scheduling logic. It manages a
- * calendar and team availability to schedule multiple residency blocks concurrently,
- * ensuring a realistic season length.
+ * v3.7.1 logic for parallel scheduling is maintained. It manages a calendar and
+ * team availability to schedule multiple residency blocks concurrently.
  */
 std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
     std::vector<ResidencyBlock> season_schedule;
@@ -38,7 +37,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
     int total_games_scheduled = 0;
     const int total_games_target = (all_teams.size() * games_per_team) / 2;
     int current_day = 1;
-    const int MAX_SEASON_DAYS = 250; // Safety break to prevent infinite loops
+    const int MAX_SEASON_DAYS = 250; // Safety break for a reasonable season length
 
     while (total_games_scheduled < total_games_target && current_day < MAX_SEASON_DAYS) {
         std::vector<Team*> available_teams;
@@ -48,7 +47,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             }
         }
 
-        if (available_teams.size() >= 4) { // Need at least 1 host and 3 visitors
+        if (available_teams.size() >= 4) { // Need at least 1 host and 3 visitors for a rich block
             std::shuffle(available_teams.begin(), available_teams.end(), rng);
 
             Team* host = available_teams[0];
@@ -59,14 +58,14 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             season_schedule.push_back(block);
             total_games_scheduled += block.games.size();
 
-            // Mark all participating teams as unavailable for the duration of the block
+            // Mark all participating teams as unavailable for the full duration of the block
             int end_day = current_day + block_duration;
             team_availability[host->id] = end_day;
             for (const auto& visitor : visitors) {
                 team_availability[visitor.id] = end_day;
             }
         } else {
-            // If not enough teams are available, advance to the next day a team becomes free
+            // If not enough teams are available, advance time to the next day any team becomes free
             int next_free_day = MAX_SEASON_DAYS;
             for(const auto& pair : team_availability) {
                 if (pair.second > current_day) {
@@ -82,10 +81,11 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
 }
 
 /**
- * @brief Creates a single residency block and calculates its duration.
+ * @brief Creates a single residency block with explicit travel/rest days.
  *
- * v3.7.1: This function now calculates the duration of the created block and returns it
- * via an output parameter.
+ * v3.7.2: This function is meticulously adjusted to explicitly account for and
+ * schedule travel/rest days between game series. This ensures the block's
+ * duration is realistic and consistent.
  */
 ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const std::vector<Team>& visitors, int start_day, int& out_duration_days) {
     ResidencyBlock block;
@@ -93,19 +93,27 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     block.visiting_residents = visitors;
     block.start_date = "Day " + std::to_string(start_day);
 
-    int day_offset = 0; // Tracks days within this block
+    int day_offset = 0; // Tracks days elapsed *within this block*
+
+    // Day 0: Assumed arrival day for visitors
 
     // Schedule games between the host and each visiting team
     for (const auto& visitor : visitors) {
+        // Play a 2-game series
         Game g1, g2;
         g1 = {.team1 = visitor, .team2 = host, .designated_home_team_for_batting = host, .actual_host_stadium = host, .date = "Day " + std::to_string(start_day + day_offset++), .game_type = GameType::REGULAR_SEASON};
         g2 = {.team1 = host, .team2 = visitor, .designated_home_team_for_batting = visitor, .actual_host_stadium = host, .date = "Day " + std::to_string(start_day + day_offset++), .game_type = GameType::REGULAR_SEASON};
         block.games.push_back(g1);
         block.games.push_back(g2);
-        day_offset++; // Travel/Rest Day
+        
+        // Explicitly add a rest day after each host vs. visitor series
+        day_offset++; 
     }
 
-    // Schedule neutral-site games between all pairs of visiting teams
+    // Add another rest day before the neutral-site games begin
+    day_offset++;
+
+    // Schedule neutral-site games (Crossroads/Regional) between all pairs of visiting teams
     for (size_t i = 0; i < visitors.size(); ++i) {
         for (size_t j = i + 1; j < visitors.size(); ++j) {
             const auto& visitor1 = visitors[i];
@@ -121,19 +129,22 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
         }
     }
     
+    // Sort games by date for a clean, chronological report
     std::sort(block.games.begin(), block.games.end(), [](const Game& a, const Game& b){
-        return a.date.length() < b.date.length() || (a.date.length() == b.date.length() && a.date < b.date);
+        int day_a = std::stoi(a.date.substr(4));
+        int day_b = std::stoi(b.date.substr(4));
+        return day_a < day_b;
     });
 
-    out_duration_days = day_offset + 2; // Total days for the block plus rest days
+    out_duration_days = day_offset + 1; // Total days for the block plus a final departure/rest day
     block.end_date = "Day " + std::to_string(start_day + out_duration_days - 1);
     return block;
 }
 
 /**
- * @brief Generates a series of neutral-site games (Crossroads or Regional).
+ * @brief Generates a series of neutral-site games with rest days.
  *
- * v3.7.1: Signature updated to correctly handle day offsets for parallel scheduling.
+ * v3.7.2: Logic adjusted to ensure there's a rest day between neutral-site games.
  */
 std::vector<Game> LeagueScheduler2::generateNeutralSiteSeries(const Team& visitor1, const Team& visitor2, const Team& host_stadium, int num_games, GameType game_type, int start_day, int& day_offset) {
     std::vector<Game> series_games;
@@ -158,7 +169,9 @@ std::vector<Game> LeagueScheduler2::generateNeutralSiteSeries(const Team& visito
             game.designated_home_team_for_batting = visitor2;
         }
         series_games.push_back(game);
-        day_offset += 2; // Each neutral game takes time, including a rest day
+        
+        // Advance the day offset. Add an extra day for rest between games in the series.
+        day_offset += 2; 
     }
     return series_games;
 }
