@@ -4,7 +4,7 @@ This is an unofficial fan-made baseball video game, serving as the **C++ 3.7.0 c
 
 ## Generated Schedule
 
-📄 [**View the Latest Generated Schedule (v3.7.0)**](schedule_report_v3.7.0.md)
+📄 [**View the Latest Generated Schedule (v3.7.0)**](schedule_report_v3.7.md)
 
 *This report is automatically generated and updated by our CI/CD workflow on every push to the `main` branch.*
 
