@@ -7,17 +7,17 @@ set(CMAKE_CXX_STANDARD 23) # Using C++23 standard
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_HINT_PREFER_PATHS OFF) # Ensure strict standard compliance
 
-# Add project modules (subdirectories)
-# This processes the CMakeLists.txt in each respective directory
+# Add the top-level project module. This will now handle its own
+# subdirectories, including the new nested 'scheduling' module.
 add_subdirectory(money_and_players)
-add_subdirectory(scheduling)
 
-# Create the main executable from main.cpp located at the root
+# Create the main executable. The orchestrator/scheduler logic is now
+# part of a library, so it's no longer listed here.
 add_executable(apmw_baseball_simulator main.cpp)
 
 # Link the executable against the libraries created by the modules.
-# CMake will automatically handle the include paths defined by the libraries.
+# We only need to link against the top-level library, and CMake will
+# handle the transitive dependencies (like the scheduling logic).
 target_link_libraries(apmw_baseball_simulator PRIVATE
-    money_and_players_lib # Provides Player, Team, Game structures
-    scheduling_lib        # Provides LeagueScheduler2 logic
+    money_and_players_lib 
 )
