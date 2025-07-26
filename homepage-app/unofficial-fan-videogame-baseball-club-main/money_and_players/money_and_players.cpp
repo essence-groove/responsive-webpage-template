@@ -13,5 +13,16 @@
  * simplifying the dependency chain for its child modules.
  */
 
-// This file can be left intentionally blank or can be used for future
-// implementations related to the data structures.
+#include <string>
+
+// v3.8.0: Add a simple function to give this compilation unit substance.
+// This ensures the library is non-empty and correctly linked by the build system.
+namespace LeagueSchedulerNS {
+    /**
+     * @brief Get the version of the money_and_players data module.
+     * @return A string literal representing the current version.
+     */
+    const char* getMoneyAndPlayersVersion() {
+        return "3.8.0";
+    }
+}
