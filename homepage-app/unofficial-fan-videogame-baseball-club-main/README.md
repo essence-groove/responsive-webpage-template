@@ -1,21 +1,26 @@
 # APMW Baseball Simulator (unofficial-fan-videogame-baseball-club)
 
-This is an unofficial fan-made baseball video game, serving as the C++ 3.5.0 core for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven-logic, and deep lore integration.
+This is an unofficial fan-made baseball video game, serving as the **C++ 3.8.0 core** for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven-logic, and deep lore integration.
 
 ## Generated Schedule
 
-📄 **[View the Latest Generated Schedule](schedule_report.md)**
+📄 [**View the Latest Generated Schedule (v3.8.0)**](schedule_report_v3.8.md)
 
-*This report is automatically generated and updated by our CI/CD workflow on every push to the `cpp` branch.*
+*This report is automatically generated and updated by our CI/CD workflow on every push to the `main` branch.*
 
-## Features
+## Features (v3.8.0)
 
-* **Modular C++ Core:** Built with a clean separation of concerns, separating data structures (like players, teams, and games) from the scheduling logic.
-* **18-Team League Structure:** Simulates a full league with two unions (Atlantic and Pacific) and unique fictional regions, as defined by the project lore.
-* **"Money and Players" Concept:** Includes detailed `Player` data structures with skill ratings, fatigue, and financial attributes (salary, market value), allowing for player-centric simulation.
-* **Advanced Scheduling Agent:** The `LeagueScheduler2` class acts as a "League Agent" to generate complex season schedules based on a "Residency Block" model.
-* **"Crossroads Games" Logic:** Implements the lore-specific "alternating first bat" rule for games played between two visiting teams at a neutral site.
-* **CMake Build System:** Uses a modern CMake configuration for robust and scalable builds.
+* **Sophisticated Concurrent Scheduling Engine:** The core of v3.8.0 is a completely re-architected `LeagueScheduler2` agent. It now manages multiple concurrent "scheduling windows," allowing several multi-week residency blocks to happen at the same time. This ensures a balanced, geographically distributed, and realistically timed season.
+
+* **Flawless Extended Residency Consistency:** The scheduling algorithm has been meticulously refined to ensure the accurate calculation and distribution of all games (Regular, Crossroads, and Regional) within the complex, extended residency blocks.
+
+* **Precise Rest Day Management:** The system now precisely accounts for and schedules travel/rest days, ensuring player wellness and logistical realism are built directly into the schedule's DNA.
+
+* **Location-Aware Environmentalism:** Leverages geographical data to provide more nuanced and meaningful environmental notes in the schedule report, particularly for fan travel during Regional Games.
+
+* **Hierarchical Modular Architecture:** The project is structured with a clear, hierarchical dependency flow, where the scheduling logic is a child of the data module it depends on.
+
+* **CMake Build System:** Uses a modern CMake configuration (C++23 standard) for robust and scalable builds.
 
 ## How to Build and Run
 

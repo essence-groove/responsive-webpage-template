@@ -1,8 +1,13 @@
 # MyAPMWProject/money_and_players/CMakeLists.txt
-add_library(money_and_players_lib INTERFACE)
 
-# Expose the current directory as an include path for anyone using this library.
-# This allows #include "player_data.h" or "team_data.h" etc.
-target_include_directories(money_and_players_lib
-    INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+# v3.8.0: Simplified architecture.
+# Create a single library from all source files in this directory.
+add_library(money_and_players_lib
+    league_scheduler_2.cpp
+)
+
+# Expose the current directory so that any target linking against this library
+# (like the main executable) can find all the header files within it.
+target_include_directories(money_and_players_lib PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
