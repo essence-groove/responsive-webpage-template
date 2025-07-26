@@ -1,9 +1,9 @@
 # Root/MyAPMWProject/CMakeLists.txt
 cmake_minimum_required(VERSION 3.31) # Minimum CMake version
-project(MyAPMWProject VERSION 3.7.0 LANGUAGES CXX) # Project name and version
+project(MyAPMWProject VERSION 3.8.0 LANGUAGES CXX) # Project name and version
 
 # Set the C++ standard for the entire project
-set(CMAKE_CXX_STANDARD 23) # Using C++20 standard
+set(CMAKE_CXX_STANDARD 23) # Using C++23 standard
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_HINT_PREFER_PATHS OFF) # Ensure strict standard compliance
 
