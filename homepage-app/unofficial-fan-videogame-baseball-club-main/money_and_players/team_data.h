@@ -1,4 +1,3 @@
-<code language="cpp">
 /**
  * @file team_data.h
  * @brief Defines the data structure for a single team (v3.7.0).
@@ -76,4 +75,3 @@ struct Team {
 } // namespace LeagueSchedulerNS
 
 #endif // TEAM_DATA_H
-```
