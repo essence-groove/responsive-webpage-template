@@ -9,9 +9,6 @@ target_include_directories(scheduling_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# FIX v3.8.0: Explicitly add the parent directory as an include path.
-# This tells the compiler where to find headers like game_data.h and
-# geography_data.h, which are required by league_scheduler_2.h.
-target_include_directories(scheduling_lib PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/.."
-)
+# FIX v3.8.0: Explicitly link against the data library from the parent module.
+# This is the correct way to inherit the necessary include paths.
+target_link_libraries(scheduling_lib PRIVATE money_and_players_data)
