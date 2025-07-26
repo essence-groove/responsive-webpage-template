@@ -1,4 +1,3 @@
-<code language="cpp">
 /**
  * @file player_data.h
  * @brief Defines the data structure for a single player (v3.7.0).
@@ -59,4 +58,3 @@ struct Player {
 } // namespace LeagueSchedulerNS
 
 #endif // PLAYER_DATA_H
-```
