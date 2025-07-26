@@ -18,7 +18,7 @@ This is an unofficial fan-made baseball video game, serving as the **C++ 3.8.0 c
 
 * **Location-Aware Environmentalism:** Leverages geographical data to provide more nuanced and meaningful environmental notes in the schedule report, particularly for fan travel during Regional Games.
 
-* **Modular C++ Core:** Built with a clean separation of concerns, separating data structures (players, teams, geography) from the advanced scheduling logic.
+* **Hierarchical Modular Architecture:** The project is structured with a clear, hierarchical dependency flow, where the scheduling logic is a child of the data module it depends on.
 
 * **CMake Build System:** Uses a modern CMake configuration (C++23 standard) for robust and scalable builds.
 
