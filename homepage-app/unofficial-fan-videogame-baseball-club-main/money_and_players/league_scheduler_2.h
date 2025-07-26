@@ -17,7 +17,7 @@
 #include <random>
 #include <algorithm>
 #include <map>
-// v3.8.0: Use relative paths to include headers from the parent directory.
+// v3.8.0 FIX: Use direct includes for the new flattened directory structure.
 #include "game_data.h" 
 #include "team_data.h" 
 #include "geography_data.h"
