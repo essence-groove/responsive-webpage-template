@@ -1,7 +1,6 @@
 # MyAPMWProject/money_and_players/CMakeLists.txt
 
-# 1. Process the nested scheduling module first to create the 'scheduling_lib' target.
-add_subdirectory(scheduling)
+
 
 # 2. Define money_and_players_lib as a standard library, compiling the new .cpp file.
 add_library(money_and_players_lib league_scheduler_2.cpp)
