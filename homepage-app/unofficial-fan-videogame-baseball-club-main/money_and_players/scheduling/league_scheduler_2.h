@@ -17,11 +17,11 @@
 #include <random>
 #include <algorithm>
 #include <map>
-// v3.8.0: Update include paths for the new nested structure.
-// These headers are in the parent directory.
-#include "../game_data.h" 
-#include "../team_data.h" 
-#include "../geography_data.h"
+// v3.8.0 FIX: Use direct includes. The CMake configuration already provides the
+// necessary search path to the parent 'money_and_players' directory.
+#include "game_data.h" 
+#include "team_data.h" 
+#include "geography_data.h"
 
 namespace LeagueSchedulerNS { 
 
