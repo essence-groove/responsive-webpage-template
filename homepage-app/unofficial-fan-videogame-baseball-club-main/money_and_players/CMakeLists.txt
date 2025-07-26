@@ -10,7 +10,3 @@ target_include_directories(money_and_players_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# 4. Link the compiled scheduling logic into this library.
-#    Using PUBLIC ensures that the executable that links to this library
-#    can also see the headers from scheduling_lib.
-target_link_libraries(money_and_players_lib PUBLIC scheduling_lib)
