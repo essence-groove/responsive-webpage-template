@@ -1,4 +1,3 @@
-<code language="cpp">
 /**
  * @file game_data.h
  * @brief Defines core data structures for games and residency blocks (v3.7.0).
@@ -63,4 +62,3 @@ struct ResidencyBlock {
 } // namespace LeagueSchedulerNS
 
 #endif // GAME_DATA_H
-```
