@@ -17,8 +17,8 @@
 #include <random>
 #include <algorithm>
 #include <map>
-// v3.8.0 FIX: Use direct includes. The CMake configuration already provides the
-// necessary search path to the parent 'money_and_players' directory.
+// v3.8.0 FIX: Use direct includes. The new CMake configuration correctly
+// provides the search path via the 'money_and_players_data' library.
 #include "game_data.h" 
 #include "team_data.h" 
 #include "geography_data.h"
