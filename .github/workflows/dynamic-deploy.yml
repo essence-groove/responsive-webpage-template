@@ -50,8 +50,7 @@ on:
   push:
     branches:
       - main
-      - bugs
-      - cpp
+      - cpp-apmw-parity-correction
     paths:
       - '**'
 
