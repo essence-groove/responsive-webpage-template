@@ -9,8 +9,8 @@ target_include_directories(scheduling_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# FIX v3.8.0: Explicitly add the include directory from the parent module,
-# which is passed in via the MONEY_AND_PLAYERS_INCLUDE_DIR variable.
-target_include_directories(scheduling_lib PRIVATE
-    ${MONEY_AND_PLAYERS_INCLUDE_DIR}
-)
+# FIX v3.8.0: Explicitly link against the data library from the parent module.
+# Using PUBLIC is crucial here. It ensures that the include directories
+# from 'money_and_players_data' are passed to this library and any other
+# target that uses it (like the main executable).
+target_link_libraries(scheduling_lib PUBLIC money_and_players_data)
