@@ -7,19 +7,6 @@
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
  * @license SPDX-License-Identifier: AGPL-3.0-or-later
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <iostream>
@@ -49,8 +36,8 @@ std::string getGameTypeString(GameType type) {
 }
 
 int main() {
-    // Version 3.7.0 introduces extended residencies and Regional Games.
-    std::cout << "Starting APMW League Schedule Generation (C++ 3.7.0 with Money & Players)" << std::endl;
+    // Version 3.7.1 introduces parallel residency block scheduling.
+    std::cout << "Starting APMW League Schedule Generation (C++ 3.7.1 with Money & Players)" << std::endl;
 
     // Initialize the 18 teams with cities and mascot/fan theme placeholders
     std::vector<Team> all_teams;
@@ -92,16 +79,15 @@ int main() {
     }
 
     LeagueScheduler2 scheduler;
-    // Per v3.6.0+, season length is reduced to enhance game meaningfulness and reduce carbon footprint.
-    int games_per_team = 98; // Target is ~94-102 games.
+    int games_per_team = 98;
 
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, games_per_team);
 
-    // Open a file stream to write the Markdown report
-    std::ofstream reportFile("schedule_report_v3.7.0.md");
-    reportFile << "# APMW Season Schedule Report (v3.7.0)\n\n";
+    // Open a file stream to write the Markdown report with the generalized v3.7 name
+    std::ofstream reportFile("schedule_report_v3.7.md");
+    reportFile << "# APMW Season Schedule Report (v3.7)\n\n";
 
-    std::cout << "\n--- Sample Season Schedule (v3.7.0) ---" << std::endl;
+    std::cout << "\n--- Sample Season Schedule (v3.7.1) ---" << std::endl;
     for (const auto& block : season_schedule) {
         // --- Console Output ---
         std::cout << "--------------------------------------" << std::endl;
@@ -127,12 +113,9 @@ int main() {
         reportFile << "**Games (" << block.games.size() << "):**\n\n";
 
         for (const auto& game : block.games) {
-            // v3.7.0: Use `designated_home_team_for_batting` for fairness in all game types.
-            // FIX: Use the overloaded == operator on the Team struct, which compares the correct 'id' member.
             const Team& home_batting_team = game.designated_home_team_for_batting;
             const Team& away_batting_team = (game.team1 == home_batting_team) ? game.team2 : game.team1;
             
-            // v3.7.0: Handle the new `REGIONAL_GAME` type.
             std::string game_type_str = getGameTypeString(game.game_type);
 
             // --- Console Output ---
@@ -149,9 +132,8 @@ int main() {
                        << " at " << game.actual_host_stadium.city << " Stadium. **Type:** "
                        << game_type_str << "\n";
             
-            // Add a special note for the new Regional Game type in the report.
             if (game.game_type == GameType::REGIONAL_GAME) {
-                reportFile << "  - *Note (v3.7.0 Feature): This is a **Regional Game**, where two visiting teams from the same region compete at a neutral host city.*\n";
+                reportFile << "  - *Note (v3.7.1 Feature): This is a **Regional Game**, where two visiting teams from the same region compete at a neutral host city.*\n";
             }
         }
         reportFile << "\n";
@@ -159,9 +141,8 @@ int main() {
 
     std::cout << "\nSchedule generation complete." << std::endl;
 
-    // Close the file and notify the user
     reportFile.close();
-    std::cout << "Schedule report also written to schedule_report_v3.7.0.md" << std::endl;
+    std::cout << "Schedule report also written to schedule_report_v3.7.md" << std::endl;
 
     return 0;
 }
