@@ -1,25 +1,21 @@
 # APMW Baseball Simulator (unofficial-fan-videogame-baseball-club)
 
-This is an unofficial fan-made baseball video game, serving as the **C++ 3.8.0 core** for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven-logic, and deep lore integration.
+This is an unofficial fan-made baseball video game, serving as the **C++ 3.9.0 core** for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league's season schedule, built with a focus on modularity, agent-driven-logic, and deep lore integration.
 
 ## Generated Schedule
 
-📄 [**View the Latest Generated Schedule (v3.8.0)**](schedule_report_v3.8.md)
+📄 [**View the Latest Generated Schedule (v3.9.0)**](schedule_report_v3.9.md)
 
 *This report is automatically generated and updated by our CI/CD workflow on every push to the `main` branch.*
 
-## Features (v3.8.0)
+## Features (v3.9.0)
 
-* **Sophisticated Concurrent Scheduling Engine:** The core of v3.8.0 is a completely re-architected `LeagueScheduler2` agent. It now manages multiple concurrent "scheduling windows," allowing several multi-week residency blocks to happen at the same time. This ensures a balanced, geographically distributed, and realistically timed season.
-
-* **Flawless Extended Residency Consistency:** The scheduling algorithm has been meticulously refined to ensure the accurate calculation and distribution of all games (Regular, Crossroads, and Regional) within the complex, extended residency blocks.
-
-* **Precise Rest Day Management:** The system now precisely accounts for and schedules travel/rest days, ensuring player wellness and logistical realism are built directly into the schedule's DNA.
-
-* **Location-Aware Environmentalism:** Leverages geographical data to provide more nuanced and meaningful environmental notes in the schedule report, particularly for fan travel during Regional Games.
-
+* **Advanced Apex Residency Mechanics:** The core of v3.9.0 is a new strategic layer built around the season-ending Apex Residency event.
+    * **Dynamic "Earned Participation":** Players are now selected for the Apex event based on a simulated regular season performance, ensuring a different lineup of teams and players in every simulation.
+    * **Strategic "Capture the Flag" System:** Teams earn "Apex Points" based on their performance in the event. These points are then used in a weighted lottery system to influence which teams get to host residency blocks in the *next* season, creating a dynamic, multi-season strategic loop.
+* **Sophisticated Concurrent Scheduling Engine:** The scheduler manages multiple concurrent "scheduling windows," allowing several multi-week residency blocks to happen at the same time, ensuring a balanced, geographically distributed, and realistically timed season.
+* **Prioritized Regional Matchups:** The scheduling algorithm is now refined to increase the frequency of regional games, reinforcing the league's environmental goals.
 * **Hierarchical Modular Architecture:** The project is structured with a clear, hierarchical dependency flow, where the scheduling logic is a child of the data module it depends on.
-
 * **CMake Build System:** Uses a modern CMake configuration (C++23 standard) for robust and scalable builds.
 
 ## How to Build and Run
