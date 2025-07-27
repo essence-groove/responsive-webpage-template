@@ -27,7 +27,7 @@ LeagueScheduler2::LeagueScheduler2() : rng(std::chrono::steady_clock::now().time
 /**
  * @brief Generates the full season schedule, including a strategically timed Apex event.
  */
-std.vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
+std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
     std::vector<ResidencyBlock> season_schedule;
     std::map<int, TeamScheduleStatus> team_statuses;
     for(const auto& team : all_teams) {
@@ -48,17 +48,47 @@ std.vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<
             }
         }
         
-        std::shuffle(available_teams.begin(), available_teams.end(), rng);
+        // No need to shuffle here, as selection is now weighted
+        // std::shuffle(available_teams.begin(), available_teams.end(), rng);
 
         while (available_teams.size() >= 4) {
+            // --- v3.9.0: "Capture the Flag" Host Selection ---
             Team* host = nullptr;
-            auto host_it = std::find_if(available_teams.begin(), available_teams.end(), [&](Team* t){
-                return team_statuses[t->id].host_blocks_assigned < MAX_HOST_BLOCKS;
-            });
+            
+            // 1. Get a list of eligible hosts
+            std::vector<Team*> eligible_hosts;
+            for(auto* team : available_teams) {
+                if (team_statuses[team->id].host_blocks_assigned < MAX_HOST_BLOCKS) {
+                    eligible_hosts.push_back(team);
+                }
+            }
 
-            if (host_it == available_teams.end()) break;
-            host = *host_it;
-            available_teams.erase(host_it);
+            if (eligible_hosts.empty()) break; // No eligible hosts left
+
+            // 2. Calculate total weight for the lottery (1 base point + apex_points)
+            int total_weight = 0;
+            for(auto* team : eligible_hosts) {
+                total_weight += (1 + team->apex_points);
+            }
+
+            // 3. Run the lottery
+            std::uniform_int_distribution<> distrib(1, total_weight);
+            int winning_ticket = distrib(rng);
+
+            int current_weight = 0;
+            for(auto* team : eligible_hosts) {
+                current_weight += (1 + team->apex_points);
+                if (winning_ticket <= current_weight) {
+                    host = team;
+                    break;
+                }
+            }
+            if (!host) host = eligible_hosts.back(); // Fallback
+
+            // 4. Remove the selected host from the available pool
+            available_teams.erase(std::remove_if(available_teams.begin(), available_teams.end(), 
+                [&](Team* t){ return t->id == host->id; }), available_teams.end());
+
 
             // --- Integrated Visitor Selection Logic ---
             std::vector<Team> visitors;
@@ -117,7 +147,6 @@ std.vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<
             ResidencyBlock apex_block = createApexResidency(participants, APEX_EVENT_START_DAY);
             season_schedule.push_back(apex_block);
             
-            // v3.9.0: Simulate the event outcome and award points
             simulateApexEventAndAwardPoints(apex_block, all_teams);
 
             apex_event_scheduled = true;
@@ -245,28 +274,25 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
 }
 
 /**
- * @brief v3.9.0: Simulates the outcome of the Apex event and awards points to teams.
+ * @brief Simulates the outcome of the Apex event and awards points to teams.
  */
 void LeagueScheduler2::simulateApexEventAndAwardPoints(const ResidencyBlock& apex_block, std::vector<Team>& all_teams) {
-    std::map<int, int> apex_wins; // Map team_id to wins in the event
+    std::map<int, int> apex_wins;
 
-    // Simulate each game
     std::uniform_int_distribution<> distrib(0, 1);
     for (const auto& game : apex_block.games) {
         int winner_id = (distrib(rng) == 0) ? game.team1.id : game.team2.id;
         apex_wins[winner_id]++;
     }
 
-    // Convert map to vector for sorting
     std::vector<std::pair<int, int>> sorted_teams;
     for (auto const& [team_id, wins] : apex_wins) {
         sorted_teams.push_back({team_id, wins});
     }
     std::sort(sorted_teams.begin(), sorted_teams.end(), [](const auto& a, const auto& b){
-        return a.second > b.second; // Sort by wins descending
+        return a.second > b.second;
     });
 
-    // Award points based on rank
     const int WINNER_POINTS = 10;
     const int RUNNER_UP_POINTS = 5;
     const int PARTICIPATION_POINTS = 1;
@@ -283,7 +309,6 @@ void LeagueScheduler2::simulateApexEventAndAwardPoints(const ResidencyBlock& ape
             points_to_award = PARTICIPATION_POINTS;
         }
 
-        // Find the team in the main vector and update its points
         auto it = std::find_if(all_teams.begin(), all_teams.end(), [team_id](const Team& t){
             return t.id == team_id;
         });
