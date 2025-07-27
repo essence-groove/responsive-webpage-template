@@ -6,7 +6,6 @@
 #include <vector> // Required for std::vector
 
 // Forward-declarations of the types used in the class interface
-struct YourDateType;
 struct Game_4; // Changed from Game
 
 namespace LeagueSchedulerNS {
