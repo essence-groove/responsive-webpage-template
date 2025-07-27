@@ -56,6 +56,11 @@ private:
      * @brief Selects teams for the Apex event based on performance (placeholder logic).
      */
     std::vector<Team*> selectApexParticipants(std::vector<Team>& all_teams);
+    
+    /**
+     * @brief Simulates the outcome of the Apex event and awards points to teams.
+     */
+    void simulateApexEventAndAwardPoints(const ResidencyBlock& apex_block, std::vector<Team>& all_teams);
 
     /**
      * @brief Helper to create a standard residency block.

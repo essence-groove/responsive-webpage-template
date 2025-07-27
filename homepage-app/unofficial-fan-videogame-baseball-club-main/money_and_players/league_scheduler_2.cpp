@@ -25,7 +25,7 @@ namespace LeagueSchedulerNS {
 LeagueScheduler2::LeagueScheduler2() : rng(std::chrono::steady_clock::now().time_since_epoch().count()) {}
 
 /**
- * @brief Generates the full season schedule, now including a strategically timed Apex event.
+ * @brief Generates the full season schedule, including a strategically timed Apex event.
  */
 std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
     std::vector<ResidencyBlock> season_schedule;
@@ -35,12 +35,12 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
     }
 
     int current_day = 1;
-    const int APEX_EVENT_START_DAY = 150;
-    const int MAX_REGULAR_SEASON_DAYS = 149;
+    const int APEX_EVENT_START_DAY = 160; // Pushed back to allow for a fuller regular season
+    const int MAX_REGULAR_SEASON_DAYS = 159;
     const int MAX_HOST_BLOCKS = 5;
 
     // --- Phase 1: Schedule the Regular Season up to the Apex Event ---
-    while (current_day < APEX_EVENT_START_DAY) {
+    while (current_day < MAX_REGULAR_SEASON_DAYS) {
         std::vector<Team*> available_teams;
         for (auto& team : all_teams) {
             if (team_statuses[team.id].available_day <= current_day) {
@@ -168,12 +168,14 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
 }
 
 /**
- * @brief v3.9.0: Creates the special, extended Apex Residency block.
+ * @brief v3.9.0: Creates the special, extended Apex Residency block with a double round-robin format.
  */
 ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& participants, int start_day) {
     ResidencyBlock block;
     block.is_apex_residency = true;
     
+    if (participants.empty()) return block;
+
     // The first participant's city is chosen as the host location
     block.host_team = *participants[0]; 
     for(size_t i = 1; i < participants.size(); ++i) {
@@ -182,24 +184,35 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
 
     block.start_date = "Day " + std::to_string(start_day);
     int day_offset = 1;
-    const int APEX_DURATION_DAYS = 35; // Extended duration, ~5 weeks
-
-    // Simple round-robin for Apex games
+    
+    // --- Double Round-Robin Tournament ---
     for (size_t i = 0; i < participants.size(); ++i) {
         for (size_t j = i + 1; j < participants.size(); ++j) {
-             if (day_offset > APEX_DURATION_DAYS - 5) break;
-            Game game;
-            game.team1 = *participants[i];
-            game.team2 = *participants[j];
-            game.designated_home_team_for_batting = *participants[j];
-            game.actual_host_stadium = block.host_team;
-            game.date = "Day " + std::to_string(start_day + day_offset);
-            game.game_type = GameType::APEX_RESIDENCY_GAME;
-            block.games.push_back(game);
-            day_offset += 2;
+            // Game 1: i vs j
+            Game game1;
+            game1.team1 = *participants[i];
+            game1.team2 = *participants[j];
+            game1.designated_home_team_for_batting = *participants[j];
+            game1.actual_host_stadium = block.host_team;
+            game1.date = "Day " + std::to_string(start_day + day_offset);
+            game1.game_type = GameType::APEX_RESIDENCY_GAME;
+            block.games.push_back(game1);
+            day_offset += 2; // Game day + rest day
+
+            // Game 2: j vs i
+            Game game2;
+            game2.team1 = *participants[j];
+            game2.team2 = *participants[i];
+            game2.designated_home_team_for_batting = *participants[i];
+            game2.actual_host_stadium = block.host_team;
+            game2.date = "Day " + std::to_string(start_day + day_offset);
+            game2.game_type = GameType::APEX_RESIDENCY_GAME;
+            block.games.push_back(game2);
+            day_offset += 2; // Game day + rest day
         }
     }
 
+    const int APEX_DURATION_DAYS = day_offset + 5; // Total days based on games + final rest/departure days
     block.end_date = "Day " + std::to_string(start_day + APEX_DURATION_DAYS);
     return block;
 }
@@ -208,7 +221,6 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
  * @brief v3.9.0: Selects teams for the Apex event based on individual player performance.
  */
 std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& all_teams) {
-    // 1. Create a flat list of all players, keeping a pointer to their team.
     std::vector<std::pair<Player*, Team*>> all_players;
     for (auto& team : all_teams) {
         for (auto& player : team.players) {
@@ -216,19 +228,16 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         }
     }
 
-    // 2. Sort the list of players by performance score in descending order.
     std::sort(all_players.begin(), all_players.end(), [](const auto& a, const auto& b) {
         return a.first->performance_score > b.first->performance_score;
     });
 
-    // 3. Select the top N players for the event.
     const int NUM_APEX_PLAYERS = 16;
     std::set<Team*> participating_teams_set;
     for (int i = 0; i < NUM_APEX_PLAYERS && i < all_players.size(); ++i) {
         participating_teams_set.insert(all_players[i].second);
     }
 
-    // 4. Convert the set of unique teams to a vector.
     std::vector<Team*> participants(participating_teams_set.begin(), participating_teams_set.end());
     
     std::cout << "Selected " << participants.size() << " teams for the Apex Residency based on the top " << NUM_APEX_PLAYERS << " players." << std::endl;
