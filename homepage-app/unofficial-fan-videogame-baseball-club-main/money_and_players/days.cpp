@@ -5,6 +5,9 @@
 // IMPORTANT: Include the header that provides the full definition of the 'Game' struct
 // For example: #include "game.h"
 
+// All implementations for DateConverter must be inside this namespace
+namespace LeagueSchedulerNS {
+
 // Implementation for the string overload (to fix the current error)
 int DateConverter::getDayNumber(const std::string& date_str) const {
     size_t space_pos = date_str.find(' ');
@@ -38,3 +41,14 @@ void DateConverter::sortGames(std::vector<Game>& games) const {
         return a.time < b.time;
     });
 }
+} // namespace LeagueSchedulerNS
+
+// All implementations for DateConverter_4 must be inside this namespace
+namespace LeagueScheduler_4_NS {
+
+    void DateConverter_4::sortGames_4(std::vector<Game_4>& games) const {
+        // TODO: Implement sorting logic for Game_4
+    }
+
+} // namespace LeagueScheduler_4_NS
+
