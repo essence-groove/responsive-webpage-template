@@ -1,3 +1,12 @@
+/**
+ * @file game_sorter.cpp
+ * @brief Implements the GameSorter class.
+ * @author Eeshvar Das (Erik Douglas Ward)
+ * @date 2025-Jul-26
+ *
+ * @warning This is a PREVIEW FEATURE and is not intended for production use
+ * until v3.9.0.
+ */
 #include "game_sorter.h"
 #include <algorithm> // For std::ranges::sort
 #include <ranges>    // Required for ranges library
