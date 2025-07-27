@@ -4,13 +4,23 @@
 // IMPORTANT: Include the header that provides the full definition of the 'Game' struct
 // For example: #include "game.h"
 
-// Define the implementation of the getDayNumber method.
+// Implementation for the string overload (to fix the current error)
+int DateConverter::getDayNumber(const std::string& date_str) const {
+    size_t space_pos = date_str.find(' ');
+    if (space_pos == std::string::npos) { return 0; }
+    try {
+        return std::stoi(date_str.substr(space_pos + 1));
+    } catch (const std::exception& e) {
+        return 0;
+    }
+}
+
+// Implementation for the YourDateType overload
 int DateConverter::getDayNumber(const YourDateType& date) const {
-    // TODO: Add your actual logic here to convert the date into an integer.
-    // This is just a placeholder example.
-    // For example: return date.year * 365 + date.month * 30 + date.day;
-    
-    return 1; // Placeholder return
+    // TODO: Implement the logic to get the day number from your actual date object.
+    // For example:
+    // return date.day_of_year;
+    return 0; // Placeholder
 }
 
 // Implementation of the custom sorting method
