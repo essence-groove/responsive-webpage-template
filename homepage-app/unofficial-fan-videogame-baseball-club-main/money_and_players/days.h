@@ -1,6 +1,7 @@
 #ifndef DAYS_H
 #define DAYS_H
 
+#include game_data.h
 #include <string>  // <-- ADD THIS LINE
 #include <vector> // Required for std::vector
 
