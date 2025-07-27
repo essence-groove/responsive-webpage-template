@@ -1,13 +1,9 @@
-# MyAPMWProject/money_and_players/CMakeLists.txt
-
-# v3.8.0: Simplified architecture.
-# Create a single library from all source files in this directory.
 add_library(money_and_players_lib
     league_scheduler_2.cpp
+    environmental_agent.cpp
+    days.cpp # <-- Add your new source file here
 )
 
-# Expose the current directory so that any target linking against this library
-# (like the main executable) can find all the header files within it.
 target_include_directories(money_and_players_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

@@ -28,7 +28,7 @@ on:
     branches:
       - main
       - cpp-apmw-3_8_0
-      - bugs
+      - cpp-apmw-environmental-impact
     paths:
       - '**'
 

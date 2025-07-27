@@ -2,7 +2,7 @@
  * @file game_data.h
  * @brief Defines core data structures for games and residency blocks (v3.7.0).
  * @author  Eeshvar Das (Erik Douglas Ward)
- * @date 2025-Jul-25
+ * @date 2025-Jul-26
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
@@ -41,6 +41,7 @@ struct Game {
     Team designated_home_team_for_batting; // Crucial for alternating first bat rule in neutral-site games.
     Team actual_host_stadium;              // The team whose city the game is played in.
     std::string date;
+    std::string time;
     GameType game_type;
 };
 
