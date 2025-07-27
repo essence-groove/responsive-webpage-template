@@ -9,9 +9,12 @@ struct Game;
 
 class DateConverter {
 public:
+    // Overload 1: Handles a date object (as you already have)
     int getDayNumber(const YourDateType& date) const;
 
-    // Declaration for the new custom sorting method
+    // Overload 2: Handles a date string
+    int getDayNumber(const std::string& date_str) const;
+
     void sortGames(std::vector<Game>& games) const;
 };
 
