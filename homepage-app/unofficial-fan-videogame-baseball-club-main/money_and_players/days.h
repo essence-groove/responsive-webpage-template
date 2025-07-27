@@ -1,6 +1,7 @@
 #ifndef DAYS_H
 #define DAYS_H
 
+#include <string>  // <-- ADD THIS LINE
 #include <vector> // Required for std::vector
 
 // Forward-declarations of the types used in the class interface
