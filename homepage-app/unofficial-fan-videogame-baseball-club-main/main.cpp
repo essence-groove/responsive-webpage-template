@@ -15,6 +15,8 @@
 #include <fstream>
 #include <algorithm>
 #include <iomanip>
+#include <random> // Required for performance simulation
+#include <chrono> // Required for seeding random generator
 #include "money_and_players/league_scheduler_2.h"
 #include "money_and_players/game_data.h"
 #include "money_and_players/geography_data.h"
@@ -72,19 +74,33 @@ int main() {
     all_teams.emplace_back(current_team_id++, "St. Louis", "Archer Aim", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
     all_teams.emplace_back(current_team_id++, "Kansas City", "Monarch Reign", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
 
-    // v3.9.0: Populate teams with players, including placeholder performance scores
+    // Populate teams with players
     int current_player_id = 1;
     for (auto& team : all_teams) {
         team.players.emplace_back(current_player_id++, "PlayerA_" + team.city, 85.0, 5000000, 10000000, false);
         team.players.emplace_back(current_player_id++, "PlayerB_" + team.city, 80.0, 3000000, 5000000, false);
         team.players.emplace_back(current_player_id++, "PlayerC_" + team.city, 75.0, 2000000, 3000000, false);
-        // Add a star player to a few teams with a high performance score
         if (team.city == "Los Angeles" || team.city == "New York" || team.city == "Austin" || team.city == "Seattle") {
             team.players.emplace_back(current_player_id++, "StarPlayer_" + team.city, 95.0, 15000000, 25000000, true);
         } else {
             team.players.emplace_back(current_player_id++, "PlayerD_" + team.city, 70.0, 1000000, 2000000, false);
         }
     }
+
+    // --- v3.9.0: Simulate Regular Season Performance ---
+    std::cout << "\n--- Simulating Regular Season Performance ---" << std::endl;
+    std::mt19937 perf_rng(std::chrono::steady_clock::now().time_since_epoch().count());
+    std::normal_distribution<> distribution(0.0, 5.0); // Mean 0, standard deviation 5
+
+    for (auto& team : all_teams) {
+        for (auto& player : team.players) {
+            double season_variance = distribution(perf_rng);
+            player.performance_score = player.skill_rating + season_variance;
+            std::cout << "Player " << player.name << " performance score: " << std::fixed << std::setprecision(2) << player.performance_score << std::endl;
+        }
+    }
+    std::cout << "--- Performance Simulation Complete ---\n" << std::endl;
+
 
     LeagueScheduler2 scheduler;
     DateConverter date_converter;
