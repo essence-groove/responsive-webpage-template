@@ -41,6 +41,7 @@ struct Game {
     Team designated_home_team_for_batting; // Crucial for alternating first bat rule in neutral-site games.
     Team actual_host_stadium;              // The team whose city the game is played in.
     std::string date;
+    std::string time;
     GameType game_type;
 };
 
