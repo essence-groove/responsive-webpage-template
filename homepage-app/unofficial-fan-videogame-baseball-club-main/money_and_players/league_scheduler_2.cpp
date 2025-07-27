@@ -22,6 +22,8 @@
 #include <random>
 #include <map>
 #include <vector>
+#include "days.h" // 1. Add this line
+
 
 namespace LeagueSchedulerNS {
 
