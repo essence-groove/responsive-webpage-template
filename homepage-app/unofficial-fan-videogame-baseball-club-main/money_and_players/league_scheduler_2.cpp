@@ -63,9 +63,9 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             host = *host_it;
             available_teams.erase(host_it);
 
-            // --- v3.9.0: Prioritize Regional Matchups ---
+            // --- v3.9.0: Integrated Visitor Selection Logic ---
             std::vector<Team> visitors;
-            // Simple prioritization: try to find two visitors from the host's region first
+            // 1. Separate teams into regional and non-regional groups
             std::vector<Team*> regional_visitors;
             std::vector<Team*> other_visitors;
             for(auto* team : available_teams) {
@@ -75,9 +75,16 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
                     other_visitors.push_back(team);
                 }
             }
-            std::shuffle(regional_visitors.begin(), regional_visitors.end(), rng);
-            std::shuffle(other_visitors.begin(), other_visitors.end(), rng);
 
+            // 2. Shuffle regional visitors to get a random mix of local opponents
+            std::shuffle(regional_visitors.begin(), regional_visitors.end(), rng);
+
+            // 3. Sort non-regional visitors by distance (farthest first)
+            std::sort(other_visitors.begin(), other_visitors.end(), [&](Team* a, Team* b){
+                return GeographyData::calculateDistance(host->city, a->city) > GeographyData::calculateDistance(host->city, b->city);
+            });
+
+            // 4. Fill the visitor slots, prioritizing regional teams first
             for(auto* team : regional_visitors) { if(visitors.size() < 3) visitors.push_back(*team); }
             for(auto* team : other_visitors) { if(visitors.size() < 3) visitors.push_back(*team); }
             
