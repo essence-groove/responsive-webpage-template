@@ -163,10 +163,11 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
             block.games.insert(block.games.end(), series.begin(), series.end());
         }
     }
-    
+
+    DateConverter converter;
     std::sort(block.games.begin(), block.games.end(), [](const Game& a, const Game& b){
-        int day_a = getDayNumber(a.date);
-        int day_b = getDayNumber(b.date);
+        int day_a = converter.getDayNumber(a.date);
+        int day_b = converter.getDayNumber(b.date);
 
         return day_a < day_b;
     });
