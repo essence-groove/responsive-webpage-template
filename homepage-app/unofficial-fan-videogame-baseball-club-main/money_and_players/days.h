@@ -5,9 +5,6 @@
 #include <string>  // <-- ADD THIS LINE
 #include <vector> // Required for std::vector
 
-// Forward-declarations of the types used in the class interface
-struct Game_4; // Changed from Game
-
 namespace LeagueSchedulerNS {
 
     class DateConverter {
@@ -24,6 +21,9 @@ namespace LeagueSchedulerNS {
 } // namespace LeagueSchedulerNS
 
 namespace LeagueScheduler_4_NS {
+    // Forward-declarations of the types used in the class interface
+    struct Game_4; // Changed from Game
+
     class DateConverter_4 {
     public:
         // New method designed for the future Game_4 struct
