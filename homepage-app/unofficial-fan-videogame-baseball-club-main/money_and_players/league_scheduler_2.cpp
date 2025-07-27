@@ -165,7 +165,7 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     }
 
     //DateConverter converter;
-    std::sort(block.games.begin(), block.games.end(), [](const Game& a, const Game& b, const DateConverter& converter){
+    std::sort(block.games.begin(), block.games.end(), [&converter](const Game& a, const Game& b){
         int day_a = converter.getDayNumber(a.date);
         int day_b = converter.getDayNumber(b.date);
 
