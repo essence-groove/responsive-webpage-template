@@ -10,6 +10,8 @@
 #include "game_sorter.h"
 #include <algorithm>
 #include <ranges>
+#include <stdexcept> // <-- ADD THIS LINE
+
 
 namespace LeagueSchedulerNS {
 
