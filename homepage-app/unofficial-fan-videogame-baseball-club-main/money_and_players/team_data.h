@@ -1,15 +1,12 @@
 /**
  * @file team_data.h
- * @brief Defines the data structure for a single team (v3.7.0).
+ * @brief Defines the data structure for a single team (v3.9.0).
  * @author  Eeshvar Das (Erik Douglas Ward)
- * @date 2025-Jul-25
+ * @date 2025-Jul-27
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
  * @license SPDX-License-Identifier: AGPL-3.0-or-later
- *
- * Note: The structure of a team is unchanged in v3.7.0, as the updates
- * focus on high-level league scheduling logic rather than team attributes.
  */
 
 #ifndef TEAM_DATA_H
@@ -17,18 +14,18 @@
 
 #include <string>
 #include <vector>
-#include "player_data.h" // Include the player data structure
+#include "player_data.h"
 
 namespace LeagueSchedulerNS {
 
-// Enum for Union types (e.g., Atlantic Union, Pacific Union)
+// Enum for Union types
 enum class UnionType {
     ATLANTIC,
     PACIFIC,
     UNKNOWN
 };
 
-// Enum for Region types within Unions, used for scheduling Regional Games in v3.7.0
+// Enum for Region types within Unions
 enum class RegionType {
     KEYSTONE,
     TIDEWATER,
@@ -47,24 +44,28 @@ enum class RegionType {
 struct Team {
     int id;
     std::string city;
-    std::string mascot_theme; // Placeholder for mascot or fan theme
+    std::string mascot_theme;
     UnionType union_type;
     RegionType region_type;
     int wins;
     int losses;
-    // A roster of Player objects for this team
+    
+    // v3.9.0: Add points for the "Capture the Flag" mechanic.
+    // These points are earned from Apex events and influence future schedules.
+    int apex_points = 0;
+
     std::vector<Player> players;
 
     // Default constructor
     Team() : id(0), city(""), mascot_theme(""), union_type(UnionType::UNKNOWN),
-             region_type(RegionType::UNKNOWN), wins(0), losses(0) {}
+             region_type(RegionType::UNKNOWN), wins(0), losses(0), apex_points(0) {}
 
-    // Parameterized constructor for easy initialization
+    // Parameterized constructor
     Team(int _id, const std::string& _city, const std::string& _mascot_theme,
          UnionType _union_type, RegionType _region_type)
         : id(_id), city(_city), mascot_theme(_mascot_theme),
           union_type(_union_type), region_type(_region_type),
-          wins(0), losses(0) {}
+          wins(0), losses(0), apex_points(0) {}
     
     // Overload the == operator for easy comparison
     bool operator==(const Team& other) const {
