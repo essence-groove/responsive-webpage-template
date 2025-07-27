@@ -16,6 +16,7 @@
 #include <random>
 #include <map>
 #include <vector>
+#include <set>
 #include "days.h"
 
 namespace LeagueSchedulerNS {
@@ -25,10 +26,6 @@ LeagueScheduler2::LeagueScheduler2() : rng(std::chrono::steady_clock::now().time
 
 /**
  * @brief Generates the full season schedule, now including a strategically timed Apex event.
- *
- * v3.9.0: This function is overhauled to schedule the regular season first, then
- * positions the Apex Residency as the final major event. It also includes logic
- * to prioritize regional matchups during visitor selection.
  */
 std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
     std::vector<ResidencyBlock> season_schedule;
@@ -38,9 +35,9 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
     }
 
     int current_day = 1;
-    const int APEX_EVENT_START_DAY = 150; // Target day to start the Apex event
+    const int APEX_EVENT_START_DAY = 150;
     const int MAX_REGULAR_SEASON_DAYS = 149;
-    const int MAX_HOST_BLOCKS = 5; // Approx 5-6 host blocks per team
+    const int MAX_HOST_BLOCKS = 5;
 
     // --- Phase 1: Schedule the Regular Season up to the Apex Event ---
     while (current_day < APEX_EVENT_START_DAY) {
@@ -63,9 +60,8 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             host = *host_it;
             available_teams.erase(host_it);
 
-            // --- v3.9.0: Integrated Visitor Selection Logic ---
+            // --- Integrated Visitor Selection Logic ---
             std::vector<Team> visitors;
-            // 1. Separate teams into regional and non-regional groups
             std::vector<Team*> regional_visitors;
             std::vector<Team*> other_visitors;
             for(auto* team : available_teams) {
@@ -75,20 +71,13 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
                     other_visitors.push_back(team);
                 }
             }
-
-            // 2. Shuffle regional visitors to get a random mix of local opponents
             std::shuffle(regional_visitors.begin(), regional_visitors.end(), rng);
-
-            // 3. Sort non-regional visitors by distance (farthest first)
             std::sort(other_visitors.begin(), other_visitors.end(), [&](Team* a, Team* b){
                 return GeographyData::calculateDistance(host->city, a->city) > GeographyData::calculateDistance(host->city, b->city);
             });
-
-            // 4. Fill the visitor slots, prioritizing regional teams first
             for(auto* team : regional_visitors) { if(visitors.size() < 3) visitors.push_back(*team); }
             for(auto* team : other_visitors) { if(visitors.size() < 3) visitors.push_back(*team); }
             
-            // Remove selected visitors from available pool
             for(const auto& v : visitors) {
                 available_teams.erase(std::remove_if(available_teams.begin(), available_teams.end(), 
                     [&](Team* t){ return t->id == v.id; }), available_teams.end());
@@ -124,9 +113,11 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
     // --- Phase 2: Schedule the Apex Residency Event ---
     if (!apex_event_scheduled) {
         std::vector<Team*> participants = selectApexParticipants(all_teams);
-        ResidencyBlock apex_block = createApexResidency(participants, APEX_EVENT_START_DAY);
-        season_schedule.push_back(apex_block);
-        apex_event_scheduled = true;
+        if (!participants.empty()) {
+            ResidencyBlock apex_block = createApexResidency(participants, APEX_EVENT_START_DAY);
+            season_schedule.push_back(apex_block);
+            apex_event_scheduled = true;
+        }
     }
 
     std::cout << "Generated " << season_schedule.size() << " total blocks, including Apex event." << std::endl;
@@ -134,7 +125,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
 }
 
 /**
- * @brief Creates a standard residency block. Logic is stable from v3.8.1.
+ * @brief Creates a standard residency block.
  */
 ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const std::vector<Team>& visitors, int start_day, int& out_duration_days) {
     ResidencyBlock block;
@@ -169,9 +160,7 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     }
     
     DateConverter converter;
-    std::sort(block.games.begin(), block.games.end(), [&converter](const Game& a, const Game& b){
-        return converter.getDayNumber(a.date) < converter.getDayNumber(b.date);
-    });
+    converter.sortGames(block.games);
 
     out_duration_days = day_offset + 1; 
     block.end_date = "Day " + std::to_string(start_day + out_duration_days - 1);
@@ -185,7 +174,7 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
     ResidencyBlock block;
     block.is_apex_residency = true;
     
-    // Placeholder: The first participant is the "host" city
+    // The first participant's city is chosen as the host location
     block.host_team = *participants[0]; 
     for(size_t i = 1; i < participants.size(); ++i) {
         block.visiting_residents.push_back(*participants[i]);
@@ -195,10 +184,10 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
     int day_offset = 1;
     const int APEX_DURATION_DAYS = 35; // Extended duration, ~5 weeks
 
-    // Placeholder logic: simple round-robin for Apex games
+    // Simple round-robin for Apex games
     for (size_t i = 0; i < participants.size(); ++i) {
         for (size_t j = i + 1; j < participants.size(); ++j) {
-             if (day_offset > APEX_DURATION_DAYS - 5) break; // Ensure we don't overrun
+             if (day_offset > APEX_DURATION_DAYS - 5) break;
             Game game;
             game.team1 = *participants[i];
             game.team2 = *participants[j];
@@ -207,7 +196,7 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
             game.date = "Day " + std::to_string(start_day + day_offset);
             game.game_type = GameType::APEX_RESIDENCY_GAME;
             block.games.push_back(game);
-            day_offset += 2; // Game day + rest day
+            day_offset += 2;
         }
     }
 
@@ -216,21 +205,40 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
 }
 
 /**
- * @brief v3.9.0: Selects teams for the Apex event. Placeholder logic.
+ * @brief v3.9.0: Selects teams for the Apex event based on individual player performance.
  */
 std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& all_teams) {
-    // Placeholder: For now, just select the first 4 teams for demonstration.
-    // A real implementation would use performance metrics.
-    std::vector<Team*> participants;
-    for(int i=0; i < 4 && i < all_teams.size(); ++i) {
-        participants.push_back(&all_teams[i]);
+    // 1. Create a flat list of all players, keeping a pointer to their team.
+    std::vector<std::pair<Player*, Team*>> all_players;
+    for (auto& team : all_teams) {
+        for (auto& player : team.players) {
+            all_players.push_back({&player, &team});
+        }
     }
+
+    // 2. Sort the list of players by performance score in descending order.
+    std::sort(all_players.begin(), all_players.end(), [](const auto& a, const auto& b) {
+        return a.first->performance_score > b.first->performance_score;
+    });
+
+    // 3. Select the top N players for the event.
+    const int NUM_APEX_PLAYERS = 16;
+    std::set<Team*> participating_teams_set;
+    for (int i = 0; i < NUM_APEX_PLAYERS && i < all_players.size(); ++i) {
+        participating_teams_set.insert(all_players[i].second);
+    }
+
+    // 4. Convert the set of unique teams to a vector.
+    std::vector<Team*> participants(participating_teams_set.begin(), participating_teams_set.end());
+    
+    std::cout << "Selected " << participants.size() << " teams for the Apex Residency based on the top " << NUM_APEX_PLAYERS << " players." << std::endl;
+    
     return participants;
 }
 
 
 /**
- * @brief Generates a series of neutral-site games. Logic is stable from v3.8.1.
+ * @brief Generates a series of neutral-site games.
  */
 std::vector<Game> LeagueScheduler2::generateNeutralSiteSeries(const Team& visitor1, const Team& visitor2, const Team& host_stadium, int num_games, GameType game_type, int start_day, int& day_offset) {
     std::vector<Game> series_games;
