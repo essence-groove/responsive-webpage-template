@@ -27,6 +27,7 @@ on:
   push:
     branches:
       - main
+      - cpp-apmw-3_9_0 # Or your current development branch
     paths:
       - '**'
 
@@ -651,4 +652,14 @@ jobs:
         shell: bash
 
       - name: Install jq
-        if: ${{ matrix.ap
+        if: ${{ matrix.app_data.deploy_app != false }}
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Deploy to Heroku
+        if: ${{ matrix.app_data.deploy_app != false }}
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_app_name: ${{ matrix.app_data.herokuAppName }}
+          appdir: ${{ matrix.app_data.app_dir }}
