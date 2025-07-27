@@ -20,6 +20,7 @@
 #include "money_and_players/geography_data.h"
 #include "money_and_players/environmental_agent.h" // v3.8.1: Include new agent
 
+
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
 
@@ -34,6 +35,7 @@ std::string getGameTypeString(GameType type) {
 }
 
 // Helper to extract the day number
+
 int getDayNumber(const std::string& day_str) {
     try {
         return std::stoi(day_str.substr(4));
@@ -45,6 +47,7 @@ int getDayNumber(const std::string& day_str) {
 
 int main() {
     std::cout << "Starting APMW League Schedule Generation (C++ 3.8.1 with Money & Players)" << std::endl;
+
 
     std::vector<Team> all_teams;
     int current_team_id = 1;
@@ -73,6 +76,7 @@ int main() {
 
     LeagueScheduler2 scheduler;
     int games_per_team = 98;
+
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, games_per_team);
 
     std::sort(season_schedule.begin(), season_schedule.end(), [](const ResidencyBlock& a, const ResidencyBlock& b){
@@ -85,10 +89,12 @@ int main() {
     std::cout << "\n--- Sample Season Schedule (v3.8.1) ---" << std::endl;
     for (const auto& block : season_schedule) {
         reportFile << "## Residency Block: " << block.host_team.city << " Host (" << block.start_date << " to " << block.end_date << ")\n\n";
+
         int last_printed_day = getDayNumber(block.start_date) - 1;
 
         for (const auto& game : block.games) {
             int current_game_day = getDayNumber(game.date);
+
             if (current_game_day > last_printed_day + 1) {
                 for (int day = last_printed_day + 1; day < current_game_day; ++day) {
                     std::string day_str = "Day " + std::to_string(day);
@@ -107,11 +113,13 @@ int main() {
             }
             last_printed_day = current_game_day;
         }
+
         int block_end_day = getDayNumber(block.end_date);
         if (block_end_day > last_printed_day) {
              for (int day = last_printed_day + 1; day <= block_end_day; ++day) {
                 std::string day_str = "Day " + std::to_string(day);
                 std::string note = "Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.";
+
                 reportFile << "- **" << day_str << ":** TRAVEL / REST DAY. **Environmental Adjustment Note:** " << note << "\n";
             }
         }
@@ -124,6 +132,7 @@ int main() {
     // v3.8.1: Run the new Environmental Impact Evaluation Agent
     EnvironmentalAgent env_agent;
     env_agent.generateReport(season_schedule);
+
 
     return 0;
 }
