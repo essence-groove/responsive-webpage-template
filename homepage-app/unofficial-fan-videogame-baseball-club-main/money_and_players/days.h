@@ -6,7 +6,7 @@
 
 // Forward-declarations of the types used in the class interface
 struct YourDateType;
-struct Game;
+struct Game_4; // Changed from Game
 
 class DateConverter {
 public:
