@@ -1,6 +1,8 @@
 #include "days.h"
 #include "game_data.h" // Use this instead of "game.h"
 #include <algorithm> // Required for std::sort
+#include <stdexcept> // <-- ADDED: Required for std::exception
+
 
 // IMPORTANT: Include the header that provides the full definition of the 'Game' struct
 // For example: #include "game.h"
