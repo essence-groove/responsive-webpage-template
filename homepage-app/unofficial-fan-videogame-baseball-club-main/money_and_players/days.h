@@ -6,6 +6,8 @@
 #include <vector> // Required for std::vector
 
 namespace LeagueSchedulerNS {
+    // Forward-declarations of the types used in the class interface
+    struct YourDateType;
 
     class DateConverter {
     public:
