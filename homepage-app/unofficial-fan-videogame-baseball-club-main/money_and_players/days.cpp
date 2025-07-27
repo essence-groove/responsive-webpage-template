@@ -1,4 +1,5 @@
 #include "days.h"
+#include "game.h" // <-- ADD THE HEADER THAT DEFINES 'Game' (use the correct filename)
 #include <algorithm> // Required for std::sort
 
 // IMPORTANT: Include the header that provides the full definition of the 'Game' struct
