@@ -21,7 +21,7 @@ public:
     void sortSchedule(std::vector<Game>& games) const override;
 
 private:
-    // This private method contains the actual sorting logic.
+    // ...so it can call this private method, which is also declared.
     void sort_impl(std::vector<Game>& games) const;
 
     static int parseDayFromDate(const Game& game);
