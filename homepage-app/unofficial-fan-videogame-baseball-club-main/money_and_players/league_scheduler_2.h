@@ -1,8 +1,8 @@
 /**
  * @file league_scheduler_2.h
- * @brief Header for the v3.8.0 league scheduling logic.
+ * @brief Header for the v3.9.0 league scheduling logic.
  * @author  Eeshvar Das (Erik Douglas Ward)
- * @date 2025-Jul-25
+ * @date 2025-Jul-27
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
@@ -17,7 +17,6 @@
 #include <random>
 #include <algorithm>
 #include <map>
-// v3.8.0 FIX: Use direct includes for the new flattened directory structure.
 #include "game_data.h" 
 #include "team_data.h" 
 #include "geography_data.h"
@@ -26,7 +25,10 @@ namespace LeagueSchedulerNS {
 
 /**
  * @class LeagueScheduler2
- * @brief Manages the generation of the APMW season schedule for v3.8.0.
+ * @brief Manages the generation of the APMW season schedule for v3.9.0.
+ *
+ * v3.9.0 introduces strategic scheduling, including a season-ending Apex event
+ * and prioritization of regional games.
  */
 class LeagueScheduler2 {
 public:
@@ -44,8 +46,24 @@ private:
         int host_blocks_assigned = 0;
     };
 
+    // v3.9.0: New private functions for handling the Apex Residency event
     /**
-     * @brief Helper to create an extended residency block.
+     * @brief Creates the special, extended Apex Residency block.
+     */
+    ResidencyBlock createApexResidency(std::vector<Team*>& participants, int start_day);
+
+    /**
+     * @brief Selects teams for the Apex event based on performance (placeholder logic).
+     */
+    std::vector<Team*> selectApexParticipants(std::vector<Team>& all_teams);
+    
+    /**
+     * @brief Simulates the outcome of the Apex event and awards points to teams.
+     */
+    void simulateApexEventAndAwardPoints(const ResidencyBlock& apex_block, std::vector<Team>& all_teams);
+
+    /**
+     * @brief Helper to create a standard residency block.
      */
     ResidencyBlock createResidencyBlock(const Team& host, const std::vector<Team>& visitors, int start_day, int& out_duration_days);
 
@@ -56,6 +74,9 @@ private:
 
     // Random number generator for shuffling teams and determining batting order.
     std::mt19937 rng;
+    
+    // v3.9.0: Flag to ensure Apex event is scheduled only once.
+    bool apex_event_scheduled = false;
 };
 
 } // namespace LeagueSchedulerNS
