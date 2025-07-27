@@ -9,15 +9,19 @@
 struct YourDateType;
 struct Game_4; // Changed from Game
 
-class DateConverter {
-public:
-    // Overload 1: Handles a date object (as you already have)
-    int getDayNumber(const YourDateType& date) const;
+namespace LeagueSchedulerNS {
 
-    // Overload 2: Handles a date string
-    int getDayNumber(const std::string& date_str) const;
+    class DateConverter {
+    public:
+        // Overload 1: Handles a date object (as you already have)
+        int getDayNumber(const YourDateType& date) const;
+    
+        // Overload 2: Handles a date string
+        int getDayNumber(const std::string& date_str) const;
+    
+        void sortGames(std::vector<Game>& games) const;
+    };
 
-    void sortGames(std::vector<Game>& games) const;
-};
+} // namespace LeagueSchedulerNS
 
 #endif // DAYS_H
