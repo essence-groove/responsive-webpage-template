@@ -8,19 +8,22 @@
  * until v3.9.0.
  */
 #include "game_sorter.h"
-#include <algorithm> // For std::ranges::sort
-#include <ranges>    // Required for ranges library
-#include <stdexcept>
+#include <algorithm>
+#include <ranges>
 
 namespace LeagueSchedulerNS {
 
-void GameSorter::sort(std::vector<Game>& games) const {
-    // C++23 Feature: Use std::ranges::sort with a projection.
-    // The fourth argument, &GameSorter::parseDayFromDate, is the projection.
-    // It tells sort to compare games by applying this function to each one first.
+// The public interface method calls the private implementation.
+void GameSorter::sortSchedule(std::vector<Game>& games) const {
+    sort_impl(games);
+}
+
+// The private implementation contains the C++23 ranges sort logic.
+void GameSorter::sort_impl(std::vector<Game>& games) const {
     std::ranges::sort(games, {}, &GameSorter::parseDayFromDate);
 }
 
+// The static helper function for parsing remains the same.
 int GameSorter::parseDayFromDate(const Game& game) {
     const std::string& date_str = game.date;
     size_t space_pos = date_str.find(' ');
