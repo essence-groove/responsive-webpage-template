@@ -3,6 +3,7 @@
  * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.9.0).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
+
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
@@ -23,6 +24,7 @@
 #include "money_and_players/environmental_agent.h"
 #include "money_and_players/days.h"
 
+
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
 
@@ -37,6 +39,7 @@ std::string getGameTypeString(GameType type) {
 }
 
 // Helper to extract the day number
+
 int getDayNumber(const std::string& day_str) {
     try {
         return std::stoi(day_str.substr(4));
@@ -48,6 +51,7 @@ int getDayNumber(const std::string& day_str) {
 
 int main() {
     std::cout << "Starting APMW League Schedule Generation (C++ 3.9.0 with Money & Players)" << std::endl;
+
 
     std::vector<Team> all_teams;
     int current_team_id = 1;
@@ -102,6 +106,7 @@ int main() {
     std::cout << "--- Performance Simulation Complete ---\n" << std::endl;
 
 
+
     LeagueScheduler2 scheduler;
     DateConverter date_converter;
     int games_per_team = 98;
@@ -119,6 +124,7 @@ int main() {
         reportFile << "## Residency Block: " << block.host_team.city << " Host (" << block.start_date << " to " << block.end_date << ")" 
                    << (block.is_apex_residency ? " **(APEX RESIDENCY)**" : "") << "\n\n";
         int last_printed_day = date_converter.getDayNumber(block.start_date) - 1;
+
 
         for (const auto& game : block.games) {
             int current_game_day = date_converter.getDayNumber(game.date);
@@ -145,6 +151,7 @@ int main() {
              for (int day = last_printed_day + 1; day <= block_end_day; ++day) {
                 std::string day_str = "Day " + std::to_string(day);
                 std::string note = "Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.";
+
                 reportFile << "- **" << day_str << ":** TRAVEL / REST DAY. **Environmental Adjustment Note:** " << note << "\n";
             }
         }
@@ -156,6 +163,7 @@ int main() {
 
     EnvironmentalAgent env_agent;
     env_agent.generateReport(season_schedule);
+
 
     return 0;
 }

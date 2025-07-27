@@ -27,7 +27,6 @@ on:
   push:
     branches:
       - main
-      - apmw-3_8_x-3.9.0
     paths:
       - '**'
 

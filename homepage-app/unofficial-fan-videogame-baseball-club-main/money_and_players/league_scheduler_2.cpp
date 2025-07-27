@@ -3,10 +3,16 @@
  * @brief Implements the scheduling logic for the APMW baseball league (v3.9.0).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
+
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
  * @license SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * v3.8.1: This version represents a stabilization of the 3.8.0 concurrent
+ * scheduling engine. The logic has been reviewed to ensure flawless consistency
+ * in game counts and precise management of travel/rest days.
+
  */
 
 #include "league_scheduler_2.h"
@@ -19,6 +25,7 @@
 #include <set>
 #include "days.h"
 
+
 namespace LeagueSchedulerNS {
 
 // Constructor to initialize the random number generator
@@ -26,6 +33,7 @@ LeagueScheduler2::LeagueScheduler2() : rng(std::chrono::steady_clock::now().time
 
 /**
  * @brief Generates the full season schedule, including a strategically timed Apex event.
+
  */
 std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
     std::vector<ResidencyBlock> season_schedule;
@@ -41,6 +49,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
 
     // --- Phase 1: Schedule the Regular Season up to the Apex Event ---
     while (current_day < MAX_REGULAR_SEASON_DAYS) {
+
         std::vector<Team*> available_teams;
         for (auto& team : all_teams) {
             if (team_statuses[team.id].available_day <= current_day) {
@@ -53,6 +62,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
 
         while (available_teams.size() >= 4) {
             // --- v3.9.0: "Capture the Flag" Host Selection ---
+
             Team* host = nullptr;
             
             // 1. Get a list of eligible hosts
@@ -91,6 +101,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
 
 
             // --- Integrated Visitor Selection Logic ---
+
             std::vector<Team> visitors;
             std::vector<Team*> regional_visitors;
             std::vector<Team*> other_visitors;
@@ -114,14 +125,17 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             }
 
             if (visitors.size() < 3) {
+
                 available_teams.push_back(host);
                 break; 
             }
+
 
             int block_duration = 0;
             ResidencyBlock block = createResidencyBlock(*host, visitors, current_day, block_duration);
             season_schedule.push_back(block);
             
+
             int end_day = current_day + block_duration;
             team_statuses[host->id].available_day = end_day;
             team_statuses[host->id].host_blocks_assigned++;
@@ -132,6 +146,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
         }
 
         int next_free_day = MAX_REGULAR_SEASON_DAYS + 1;
+
         for(const auto& pair : team_statuses) {
             if (pair.second.available_day > current_day) {
                 next_free_day = std::min(next_free_day, pair.second.available_day);
@@ -151,6 +166,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
 
             apex_event_scheduled = true;
         }
+
     }
 
     std::cout << "Generated " << season_schedule.size() << " total blocks, including Apex event." << std::endl;
@@ -166,7 +182,9 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     block.visiting_residents = visitors;
     block.start_date = "Day " + std::to_string(start_day);
 
-    int day_offset = 1;
+    int day_offset = 1; // Start on day 1 of the block (day 0 is arrival)
+
+    // 2 games per visitor against the host (6 total)
 
     for (const auto& visitor : visitors) {
         Game g1, g2;
@@ -174,9 +192,10 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
         g2 = {.team1 = host, .team2 = visitor, .designated_home_team_for_batting = visitor, .actual_host_stadium = host, .date = "Day " + std::to_string(start_day + day_offset++), .game_type = GameType::REGULAR_SEASON};
         block.games.push_back(g1);
         block.games.push_back(g2);
-        day_offset++;
+        day_offset++; // Rest day
     }
     day_offset++;
+
 
     for (size_t i = 0; i < visitors.size(); ++i) {
         for (size_t j = i + 1; j < visitors.size(); ++j) {
@@ -194,6 +213,7 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     
     DateConverter converter;
     converter.sortGames(block.games);
+
 
     out_duration_days = day_offset + 1; 
     block.end_date = "Day " + std::to_string(start_day + out_duration_days - 1);
