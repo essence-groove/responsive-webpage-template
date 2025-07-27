@@ -1,8 +1,8 @@
 /**
  * @file main.cpp
- * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.8.1).
+ * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.9.0).
  * @author  Eeshvar Das (Erik Douglas Ward)
- * @date 2025-Jul-26
+ * @date 2025-Jul-27
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
@@ -18,8 +18,7 @@
 #include "money_and_players/league_scheduler_2.h"
 #include "money_and_players/game_data.h"
 #include "money_and_players/geography_data.h"
-#include "money_and_players/environmental_agent.h" // v3.8.1: Include new agent
-
+#include "money_and_players/environmental_agent.h"
 
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
@@ -35,7 +34,6 @@ std::string getGameTypeString(GameType type) {
 }
 
 // Helper to extract the day number
-
 int getDayNumber(const std::string& day_str) {
     try {
         return std::stoi(day_str.substr(4));
@@ -46,8 +44,7 @@ int getDayNumber(const std::string& day_str) {
 
 
 int main() {
-    std::cout << "Starting APMW League Schedule Generation (C++ 3.8.1 with Money & Players)" << std::endl;
-
+    std::cout << "Starting APMW League Schedule Generation (C++ 3.9.0 with Money & Players)" << std::endl;
 
     std::vector<Team> all_teams;
     int current_team_id = 1;
@@ -74,27 +71,31 @@ int main() {
     all_teams.emplace_back(current_team_id++, "St. Louis", "Archer Aim", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
     all_teams.emplace_back(current_team_id++, "Kansas City", "Monarch Reign", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
 
+    // Populate teams with some players
+    int current_player_id = 1;
+    for (auto& team : all_teams) {
+        team.players.emplace_back(current_player_id++, "PlayerA_" + team.city, 85.0, 5000000, 10000000, false);
+        team.players.emplace_back(current_player_id++, "PlayerB_" + team.city, 80.0, 3000000, 5000000, false);
+    }
+
     LeagueScheduler2 scheduler;
     int games_per_team = 98;
-
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, games_per_team);
 
     std::sort(season_schedule.begin(), season_schedule.end(), [](const ResidencyBlock& a, const ResidencyBlock& b){
         return getDayNumber(a.start_date) < getDayNumber(b.start_date);
     });
 
-    std::ofstream reportFile("schedule_report_v3.8.md");
-    reportFile << "# APMW Season Schedule Report (v3.8)\n\n";
+    std::ofstream reportFile("schedule_report_v3.9.md");
+    reportFile << "# APMW Season Schedule Report (v3.9)\n\n";
 
-    std::cout << "\n--- Sample Season Schedule (v3.8.1) ---" << std::endl;
+    std::cout << "\n--- Sample Season Schedule (v3.9.0) ---" << std::endl;
     for (const auto& block : season_schedule) {
         reportFile << "## Residency Block: " << block.host_team.city << " Host (" << block.start_date << " to " << block.end_date << ")\n\n";
-
         int last_printed_day = getDayNumber(block.start_date) - 1;
 
         for (const auto& game : block.games) {
             int current_game_day = getDayNumber(game.date);
-
             if (current_game_day > last_printed_day + 1) {
                 for (int day = last_printed_day + 1; day < current_game_day; ++day) {
                     std::string day_str = "Day " + std::to_string(day);
@@ -113,26 +114,22 @@ int main() {
             }
             last_printed_day = current_game_day;
         }
-
         int block_end_day = getDayNumber(block.end_date);
         if (block_end_day > last_printed_day) {
              for (int day = last_printed_day + 1; day <= block_end_day; ++day) {
                 std::string day_str = "Day " + std::to_string(day);
                 std::string note = "Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.";
-
                 reportFile << "- **" << day_str << ":** TRAVEL / REST DAY. **Environmental Adjustment Note:** " << note << "\n";
             }
         }
         reportFile << "\n";
     }
     
-    std::cout << "Schedule generation complete. Report written to schedule_report_v3.8.md" << std::endl;
+    std::cout << "Schedule generation complete. Report written to schedule_report_v3.9.md" << std::endl;
     reportFile.close();
 
-    // v3.8.1: Run the new Environmental Impact Evaluation Agent
     EnvironmentalAgent env_agent;
     env_agent.generateReport(season_schedule);
-
 
     return 0;
 }
