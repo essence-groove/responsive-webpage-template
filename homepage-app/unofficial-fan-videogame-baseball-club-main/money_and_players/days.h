@@ -20,6 +20,9 @@ namespace LeagueSchedulerNS {
         int getDayNumber(const std::string& date_str) const;
     
         void sortGames(std::vector<Game>& games) const;
+
+        // New method designed for the future Game_4 struct
+        void sortGames_4(std::vector<Game_4>& games) const;
     };
 
 } // namespace LeagueSchedulerNS
