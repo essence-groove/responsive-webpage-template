@@ -19,8 +19,8 @@
 #include "money_and_players/league_scheduler_2.h"
 #include "money_and_players/environmental_agent.h"
 #include "money_and_players/trade_agent.h"
-#include "money_and_players/report_logic.h" // v3.9.2: Include the new report generator
-#include "money_and_players/days.h"
+#include "money_and_players/report_logic.h"
+#include "money_and_players/game_sorter.h" // v3.9.2: Include for sorting blocks
 
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
@@ -82,6 +82,8 @@ int main() {
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, 98);
 
     // --- Sort and Print Schedule Report ---
+    // Note: Sorting ResidencyBlocks still requires a date parser.
+    // The new GameSorter is for sorting games within a block.
     DateConverter date_converter;
     std::sort(season_schedule.begin(), season_schedule.end(), [&](const ResidencyBlock& a, const ResidencyBlock& b){
         return date_converter.getDayNumber(a.start_date) < date_converter.getDayNumber(b.start_date);
@@ -94,9 +96,9 @@ int main() {
     EnvironmentalAgent env_agent;
     env_agent.generateReport(season_schedule);
 
-    // --- v3.9.2: Demonstrate Trade Agent with a veto ---
+    // --- Demonstrate Trade Agent ---
     TradeAgent trade_agent;
-    if (all_teams.size() >= 5) { // Ensure we have enough teams for a cross-region trade
+    if (all_teams.size() >= 5) {
         // Propose a trade that will be vetoed (Maine is Keystone, Atlanta is Tidewater)
         std::vector<Player*> players_from_maine = {&all_teams[0].players[0]};
         trade_agent.proposeTrade(all_teams[0], all_teams[4], players_from_maine);
