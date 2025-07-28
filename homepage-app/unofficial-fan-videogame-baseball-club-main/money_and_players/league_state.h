@@ -1,6 +1,6 @@
 /**
- * @file persistence_agent.h
- * @brief Defines the Persistence Agent for saving and loading league state (v3.9.2).
+ * @file league_state.h
+ * @brief Defines the main data structure for the league's persistent state (v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -9,38 +9,31 @@
  * @license SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-#ifndef PERSISTENCE_AGENT_H
-#define PERSISTENCE_AGENT_H
+#ifndef LEAGUE_STATE_H
+#define LEAGUE_STATE_H
 
+#include <vector>
 #include <string>
-#include "league_state.h"
+#include "team_data.h"
 
 namespace LeagueSchedulerNS {
 
 /**
- * @class PersistenceAgent
- * @brief Manages saving and loading the entire league state to/from a file.
+ * @struct LeagueState
+ * @brief Encapsulates the entire state of the baseball league.
  *
- * This enables multi-season play by persisting the league's progress.
+ * This structure is designed to be saved at the end of a season and loaded
+ * at the beginning of the next, enabling a true, persistent offseason and
+ * multi-season play.
  */
-class PersistenceAgent {
-public:
-    /**
-     * @brief Saves the current league state to a file.
-     * @param state The LeagueState object to save.
-     * @param filename The name of the file to save to.
-     * @return True if saving was successful, false otherwise.
-     */
-    bool saveState(const LeagueState& state, const std::string& filename);
-
-    /**
-     * @brief Loads the league state from a file.
-     * @param filename The name of the file to load from.
-     * @return A LeagueState object. If loading fails, it returns a default-initialized state.
-     */
-    LeagueState loadState(const std::string& filename);
+struct LeagueState {
+    int current_season_year = 2025;
+    std::vector<Team> teams;
+    // Future fields for offseason simulation can be added here, e.g.:
+    // std::vector<Player> free_agents;
+    // DraftOrder draft_order;
 };
 
 } // namespace LeagueSchedulerNS
 
-#endif // PERSISTENCE_AGENT_H
+#endif // LEAGUE_STATE_H
