@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.cpp
- * @brief Implements the scheduling logic for the APMW baseball league (v3.9.1).
+ * @brief Implements the scheduling logic for the APMW baseball league (v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -17,7 +17,7 @@
 #include <map>
 #include <vector>
 #include <set>
-#include "days.h"
+#include "game_sorter.h" // v3.9.2: Use the new GameSorter for sorting
 
 namespace LeagueSchedulerNS {
 
@@ -174,8 +174,9 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
         }
     }
     
-    DateConverter converter;
-    converter.sortGames(block.games);
+    // v3.9.2: Use the new GameSorter class to sort games chronologically.
+    GameSorter sorter;
+    sorter.sortSchedule(block.games);
 
     out_duration_days = day_offset + 1; 
     block.end_date = "Day " + std::to_string(start_day + out_duration_days - 1);
@@ -221,10 +222,9 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
 }
 
 /**
- * @brief v3.9.1: Selects teams for the Apex event and sets player ApexStatus.
+ * @brief Selects teams for the Apex event and sets player ApexStatus.
  */
 std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& all_teams) {
-    // 1. Create a flat list of all players, keeping a pointer to their team.
     std::vector<std::pair<Player*, Team*>> all_players;
     for (auto& team : all_teams) {
         for (auto& player : team.players) {
@@ -232,12 +232,10 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         }
     }
 
-    // 2. Sort players by performance score.
     std::sort(all_players.begin(), all_players.end(), [](const auto& a, const auto& b) {
         return a.first->performance_score > b.first->performance_score;
     });
 
-    // 3. Identify the top N players and the unique teams they represent.
     const int NUM_APEX_PLAYERS = 16;
     std::set<Team*> qualifying_teams_set;
     std::vector<Player*> top_players;
@@ -246,37 +244,22 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         top_players.push_back(all_players[i].first);
     }
 
-    // 4. Set the ApexStatus for the top players.
     std::cout << "\n--- Apex Player Selection (v3.9.1) ---" << std::endl;
     for (auto* player : top_players) {
-        bool team_qualified = false;
-        // Find the team this player belongs to
-        for (auto* team : qualifying_teams_set) {
-            for (const auto& p : team->players) {
-                if (p.id == player->id) {
-                    team_qualified = true;
-                    break;
-                }
-            }
-            if(team_qualified) break;
-        }
-
-        if (team_qualified) {
+        if (qualifying_teams_set.count(player->team)) {
             player->apex_status = ApexStatus::TeamParticipant;
         } else {
-            // This case is logically difficult to hit with current team selection,
-            // but the logic is here for future, more complex selection models.
             player->apex_status = ApexStatus::GreyUniform;
             std::cout << "Player " << player->name << " selected as a Grey Uniform participant." << std::endl;
         }
     }
-     // Also set status for all players on qualifying teams
     for (auto* team : qualifying_teams_set) {
         for (auto& player : team->players) {
-            player.apex_status = ApexStatus::TeamParticipant;
+            if (player.apex_status == ApexStatus::None) {
+                 player.apex_status = ApexStatus::TeamParticipant;
+            }
         }
     }
-
 
     std::vector<Team*> participants(qualifying_teams_set.begin(), qualifying_teams_set.end());
     
