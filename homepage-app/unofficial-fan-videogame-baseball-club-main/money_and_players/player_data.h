@@ -20,7 +20,7 @@ namespace LeagueSchedulerNS {
 
 /**
  * @enum ApexStatus
- * @brief v3.9.1: Defines a player's participation status in the Apex Residency.
+ * @brief Defines a player's participation status in the Apex Residency.
  */
 enum class ApexStatus {
     None,           // Not participating
@@ -42,9 +42,11 @@ struct Player {
     long long market_value;
     bool is_star_player;
     double performance_score = 0.0; 
-    
-    // v3.9.1: Add status for Apex "Earned Participation" and "grey uniform" logic.
     ApexStatus apex_status = ApexStatus::None;
+
+    // v3.9.0 Feature: Player Autonomy in Trades
+    bool will_accept_trade_to_new_region = true;
+    bool will_accept_trade_to_new_union = true;
 
     std::map<std::string, double> performance_metrics;
 
