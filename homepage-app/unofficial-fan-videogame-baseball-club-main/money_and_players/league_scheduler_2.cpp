@@ -17,7 +17,7 @@
 #include <map>
 #include <vector>
 #include <set>
-#include "game_sorter.h" // v3.9.2: Use the new GameSorter for sorting
+#include "days.h"
 
 namespace LeagueSchedulerNS {
 
@@ -174,7 +174,6 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
         }
     }
     
-    // v3.9.2: Use the new GameSorter class to sort games chronologically.
     GameSorter sorter;
     sorter.sortSchedule(block.games);
 
@@ -222,9 +221,10 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
 }
 
 /**
- * @brief Selects teams for the Apex event and sets player ApexStatus.
+ * @brief v3.9.2: Selects teams for the Apex event and sets player ApexStatus.
  */
 std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& all_teams) {
+    // 1. Create a flat list of all players, keeping a pointer to their team.
     std::vector<std::pair<Player*, Team*>> all_players;
     for (auto& team : all_teams) {
         for (auto& player : team.players) {
@@ -232,29 +232,41 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         }
     }
 
+    // 2. Sort players by performance score.
     std::sort(all_players.begin(), all_players.end(), [](const auto& a, const auto& b) {
         return a.first->performance_score > b.first->performance_score;
     });
 
+    // 3. Identify the top N players and the unique teams they represent.
     const int NUM_APEX_PLAYERS = 16;
     std::set<Team*> qualifying_teams_set;
-    std::vector<Player*> top_players;
+    std::vector<std::pair<Player*, Team*>> top_players_with_teams;
     for (int i = 0; i < NUM_APEX_PLAYERS && i < all_players.size(); ++i) {
         qualifying_teams_set.insert(all_players[i].second);
-        top_players.push_back(all_players[i].first);
+        top_players_with_teams.push_back(all_players[i]);
     }
 
-    std::cout << "\n--- Apex Player Selection (v3.9.1) ---" << std::endl;
-    for (auto* player : top_players) {
-        if (qualifying_teams_set.count(player->team)) {
+    // 4. Set the ApexStatus for the top players.
+    std::cout << "\n--- Apex Player Selection (v3.9.2) ---" << std::endl;
+    for (auto& player_team_pair : top_players_with_teams) {
+        Player* player = player_team_pair.first;
+        Team* team = player_team_pair.second;
+        
+        // FIX: Check if the player's team is in the set of qualifying teams.
+        if (qualifying_teams_set.count(team) > 0) {
             player->apex_status = ApexStatus::TeamParticipant;
         } else {
+            // This case is now reachable if a top player's team didn't qualify
+            // because other players from other teams pushed them out of the top team set.
             player->apex_status = ApexStatus::GreyUniform;
-            std::cout << "Player " << player->name << " selected as a Grey Uniform participant." << std::endl;
+            std::cout << "Player " << player->name << " (" << team->city 
+                      << ") selected as a Grey Uniform participant." << std::endl;
         }
     }
+     // Also set status for all players on qualifying teams
     for (auto* team : qualifying_teams_set) {
         for (auto& player : team->players) {
+            // Only set status if it hasn't been set already (top players are already handled)
             if (player.apex_status == ApexStatus::None) {
                  player.apex_status = ApexStatus::TeamParticipant;
             }
