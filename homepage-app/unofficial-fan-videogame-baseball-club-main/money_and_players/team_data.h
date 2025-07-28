@@ -1,6 +1,6 @@
 /**
  * @file team_data.h
- * @brief Defines the data structure for a single team (v3.9.0).
+ * @brief Defines the data structure for a single team (v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -49,10 +49,13 @@ struct Team {
     RegionType region_type;
     int wins;
     int losses;
-    
-    // v3.9.0: Add points for the "Capture the Flag" mechanic.
-    // These points are earned from Apex events and influence future schedules.
     int apex_points = 0;
+
+    // v3.9.2: Expanded financial data model
+    long long total_revenue = 50000000; // Placeholder starting revenue
+    long long player_payroll = 0;
+    long long marketing_budget = 5000000;
+    long long stadium_expenses = 10000000;
 
     std::vector<Player> players;
 
