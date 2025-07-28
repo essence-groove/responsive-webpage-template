@@ -1,6 +1,6 @@
 # MyAPMWProject/money_and_players/CMakeLists.txt
 
-# v3.9.2: Add the new Financial Agent to the build.
+# v3.9.2: Add the new Persistence Agent to the build.
 add_library(money_and_players_lib
     league_scheduler_2.cpp
     money_and_players.cpp
@@ -10,6 +10,7 @@ add_library(money_and_players_lib
     report_logic.cpp
     game_sorter.cpp
     financial_agent.cpp
+    persistence_agent.cpp
 )
 
 # Expose the current directory so that any target linking against this library
