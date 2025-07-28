@@ -20,7 +20,8 @@
 #include "money_and_players/environmental_agent.h"
 #include "money_and_players/trade_agent.h"
 #include "money_and_players/report_logic.h"
-#include "money_and_players/game_sorter.h" // v3.9.2: Include for sorting blocks
+#include "money_and_players/game_sorter.h"
+#include "money_and_players/financial_agent.h" // v3.9.2: Include the new Financial Agent
 
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
@@ -67,6 +68,14 @@ int main() {
     all_teams[0].players[0].will_accept_trade_to_new_region = false;
     std::cout << "\nNOTE: Player " << all_teams[0].players[0].name << " will veto any trade to a new region." << std::endl;
 
+    // --- v3.9.2: Calculate Initial Payrolls ---
+    FinancialAgent financial_agent;
+    std::cout << "\n--- Initial Team Payrolls ---" << std::endl;
+    for (auto& team : all_teams) {
+        financial_agent.calculateTeamPayroll(team);
+    }
+    std::cout << "-----------------------------" << std::endl;
+
 
     // --- Simulate Regular Season Performance ---
     std::mt19937 perf_rng(std::chrono::steady_clock::now().time_since_epoch().count());
@@ -82,8 +91,6 @@ int main() {
     std::vector<ResidencyBlock> season_schedule = scheduler.generateSeasonSchedule(all_teams, 98);
 
     // --- Sort and Print Schedule Report ---
-    // Note: Sorting ResidencyBlocks still requires a date parser.
-    // The new GameSorter is for sorting games within a block.
     DateConverter date_converter;
     std::sort(season_schedule.begin(), season_schedule.end(), [&](const ResidencyBlock& a, const ResidencyBlock& b){
         return date_converter.getDayNumber(a.start_date) < date_converter.getDayNumber(b.start_date);
