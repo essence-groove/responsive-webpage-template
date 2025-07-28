@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.9.1).
+ * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -12,33 +12,21 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <fstream>
 #include <algorithm>
 #include <iomanip>
 #include <random>
 #include <chrono>
 #include "money_and_players/league_scheduler_2.h"
-#include "money_and_players/game_data.h"
-#include "money_and_players/geography_data.h"
 #include "money_and_players/environmental_agent.h"
+#include "money_and_players/trade_agent.h"
+#include "money_and_players/report_logic.h" // v3.9.2: Include the new report generator
 #include "money_and_players/days.h"
-#include "money_and_players/trade_agent.h" // v3.9.1: Include the new Trade Agent
 
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
 
-// Helper function to convert GameType enum to string
-std::string getGameTypeString(GameType type) {
-    switch (type) {
-        case GameType::REGIONAL_GAME: return "REGIONAL_GAME";
-        case GameType::CROSSROADS_GAME: return "CROSSROADS_GAME";
-        case GameType::APEX_RESIDENCY_GAME: return "APEX_RESIDENCY_GAME";
-        case GameType::REGULAR_SEASON: default: return "REGULAR_SEASON";
-    }
-}
-
 int main() {
-    std::cout << "Starting APMW League Schedule Generation (C++ 3.9.1 with Money & Players)" << std::endl;
+    std::cout << "Starting APMW League Schedule Generation (C++ 3.9.2 with Money & Players)" << std::endl;
 
     std::vector<Team> all_teams;
     int current_team_id = 1;
@@ -65,7 +53,7 @@ int main() {
     all_teams.emplace_back(current_team_id++, "St. Louis", "Archer Aim", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
     all_teams.emplace_back(current_team_id++, "Kansas City", "Monarch Reign", UnionType::PACIFIC, RegionType::THE_HEARTLAND_CORE);
 
-    // Populate teams with players
+    // Populate teams with players and set trade preferences
     int current_player_id = 1;
     for (auto& team : all_teams) {
         team.players.emplace_back(current_player_id++, "PlayerA_" + team.city, 85.0, 5000000, 10000000, false);
@@ -74,6 +62,11 @@ int main() {
             team.players.emplace_back(current_player_id++, "StarPlayer_" + team.city, 95.0, 15000000, 25000000, true);
         }
     }
+    
+    // v3.9.2: Set a specific player to veto trades to a new region
+    all_teams[0].players[0].will_accept_trade_to_new_region = false;
+    std::cout << "\nNOTE: Player " << all_teams[0].players[0].name << " will veto any trade to a new region." << std::endl;
+
 
     // --- Simulate Regular Season Performance ---
     std::mt19937 perf_rng(std::chrono::steady_clock::now().time_since_epoch().count());
@@ -93,20 +86,24 @@ int main() {
     std::sort(season_schedule.begin(), season_schedule.end(), [&](const ResidencyBlock& a, const ResidencyBlock& b){
         return date_converter.getDayNumber(a.start_date) < date_converter.getDayNumber(b.start_date);
     });
-    // (Report printing logic would go here, omitted for brevity)
-    std::cout << "\nSchedule generation complete." << std::endl;
+    
+    ReportGenerator report_generator;
+    report_generator.generate(season_schedule, "schedule_report_v3.9.md");
 
     // --- Run Environmental Report ---
     EnvironmentalAgent env_agent;
     env_agent.generateReport(season_schedule);
 
-    // --- v3.9.1: Demonstrate Trade Agent ---
+    // --- v3.9.2: Demonstrate Trade Agent with a veto ---
     TradeAgent trade_agent;
-    if (all_teams.size() >= 2) {
-        // Placeholder: Propose a trade of the first player from the first two teams
-        std::vector<Player*> players_from_team1 = {&all_teams[0].players[0]};
-        std::vector<Player*> players_from_team2 = {&all_teams[1].players[0]};
-        trade_agent.proposeTrade(all_teams[0], all_teams[1], players_from_team1, players_from_team2);
+    if (all_teams.size() >= 5) { // Ensure we have enough teams for a cross-region trade
+        // Propose a trade that will be vetoed (Maine is Keystone, Atlanta is Tidewater)
+        std::vector<Player*> players_from_maine = {&all_teams[0].players[0]};
+        trade_agent.proposeTrade(all_teams[0], all_teams[4], players_from_maine);
+
+        // Propose a trade that will succeed (Maine to New York is within the same region)
+        std::vector<Player*> another_player_from_maine = {&all_teams[0].players[1]};
+        trade_agent.proposeTrade(all_teams[0], all_teams[1], another_player_from_maine);
     }
 
     return 0;
