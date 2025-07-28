@@ -22,8 +22,9 @@
 #include "money_and_players/report_logic.h"
 #include "money_and_players/game_sorter.h"
 #include "money_and_players/financial_agent.h"
-#include "money_and_players/persistence_agent.h" // v3.9.2: Include the new Persistence Agent
-#include "money_and_players/league_state.h"      // v3.9.2: Include the LeagueState struct
+#include "money_and_players/persistence_agent.h"
+#include "money_and_players/league_state.h"
+#include "money_and_players/days.h" // FIX: Include the header for DateConverter
 
 // Using the new namespace explicitly
 using namespace LeagueSchedulerNS;
