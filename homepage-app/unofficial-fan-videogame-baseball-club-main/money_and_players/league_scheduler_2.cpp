@@ -18,6 +18,7 @@
 #include <vector>
 #include <set>
 #include "days.h"
+#include "game_sorter.h" // FIX: Include the header for the GameSorter class
 
 namespace LeagueSchedulerNS {
 
@@ -252,12 +253,9 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         Player* player = player_team_pair.first;
         Team* team = player_team_pair.second;
         
-        // FIX: Check if the player's team is in the set of qualifying teams.
         if (qualifying_teams_set.count(team) > 0) {
             player->apex_status = ApexStatus::TeamParticipant;
         } else {
-            // This case is now reachable if a top player's team didn't qualify
-            // because other players from other teams pushed them out of the top team set.
             player->apex_status = ApexStatus::GreyUniform;
             std::cout << "Player " << player->name << " (" << team->city 
                       << ") selected as a Grey Uniform participant." << std::endl;
@@ -266,7 +264,6 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
      // Also set status for all players on qualifying teams
     for (auto* team : qualifying_teams_set) {
         for (auto& player : team->players) {
-            // Only set status if it hasn't been set already (top players are already handled)
             if (player.apex_status == ApexStatus::None) {
                  player.apex_status = ApexStatus::TeamParticipant;
             }
