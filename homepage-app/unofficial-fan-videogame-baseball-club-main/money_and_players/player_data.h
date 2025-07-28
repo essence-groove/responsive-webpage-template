@@ -1,6 +1,6 @@
 /**
  * @file player_data.h
- * @brief Defines the data structure for a single player (v3.9.0).
+ * @brief Defines the data structure for a single player (v3.9.1).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -19,6 +19,16 @@
 namespace LeagueSchedulerNS {
 
 /**
+ * @enum ApexStatus
+ * @brief v3.9.1: Defines a player's participation status in the Apex Residency.
+ */
+enum class ApexStatus {
+    None,           // Not participating
+    TeamParticipant, // Participating with their qualifying team
+    GreyUniform      // A top player selected from a non-qualifying team
+};
+
+/**
  * @struct Player
  * @brief Represents a single player in the league.
  */
@@ -31,21 +41,21 @@ struct Player {
     long long salary;
     long long market_value;
     bool is_star_player;
-    
-    // v3.9.0: Add performance score for Apex selection
     double performance_score = 0.0; 
+    
+    // v3.9.1: Add status for Apex "Earned Participation" and "grey uniform" logic.
+    ApexStatus apex_status = ApexStatus::None;
 
     std::map<std::string, double> performance_metrics;
 
     // Default constructor
     Player() : id(0), name(""), skill_rating(0.0), games_played_season(0), fatigue_level(0.0),
-               salary(0), market_value(0), is_star_player(false), performance_score(0.0) {}
+               salary(0), market_value(0), is_star_player(false), performance_score(0.0), apex_status(ApexStatus::None) {}
 
     // Parameterized constructor for easy initialization
     Player(int _id, const std::string& _name, double _skill_rating, long long _salary, long long _market_value, bool _is_star_player)
         : id(_id), name(_name), skill_rating(_skill_rating), games_played_season(0), fatigue_level(0.0),
           salary(_salary), market_value(_market_value), is_star_player(_is_star_player) {
-        // For now, base performance score on skill rating for demonstration
         performance_score = _skill_rating;
     }
 };
