@@ -28,6 +28,7 @@ on:
     branches:
       - main
       - apmw-3_9_x
+      - apmw-3.9.2
     paths:
       - '**'
 
