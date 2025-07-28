@@ -1,18 +1,12 @@
 /**
  * @file league_scheduler_2.cpp
- * @brief Implements the scheduling logic for the APMW baseball league (v3.9.0).
+ * @brief Implements the scheduling logic for the APMW baseball league (v3.9.1).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
-
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
  * @license SPDX-License-Identifier: AGPL-3.0-or-later
- *
- * v3.8.1: This version represents a stabilization of the 3.8.0 concurrent
- * scheduling engine. The logic has been reviewed to ensure flawless consistency
- * in game counts and precise management of travel/rest days.
-
  */
 
 #include "league_scheduler_2.h"
@@ -25,7 +19,6 @@
 #include <set>
 #include "days.h"
 
-
 namespace LeagueSchedulerNS {
 
 // Constructor to initialize the random number generator
@@ -33,7 +26,6 @@ LeagueScheduler2::LeagueScheduler2() : rng(std::chrono::steady_clock::now().time
 
 /**
  * @brief Generates the full season schedule, including a strategically timed Apex event.
-
  */
 std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team) {
     std::vector<ResidencyBlock> season_schedule;
@@ -49,7 +41,6 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
 
     // --- Phase 1: Schedule the Regular Season up to the Apex Event ---
     while (current_day < MAX_REGULAR_SEASON_DAYS) {
-
         std::vector<Team*> available_teams;
         for (auto& team : all_teams) {
             if (team_statuses[team.id].available_day <= current_day) {
@@ -57,15 +48,8 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             }
         }
         
-        // No need to shuffle here, as selection is now weighted
-        // std::shuffle(available_teams.begin(), available_teams.end(), rng);
-
         while (available_teams.size() >= 4) {
-            // --- v3.9.0: "Capture the Flag" Host Selection ---
-
             Team* host = nullptr;
-            
-            // 1. Get a list of eligible hosts
             std::vector<Team*> eligible_hosts;
             for(auto* team : available_teams) {
                 if (team_statuses[team->id].host_blocks_assigned < MAX_HOST_BLOCKS) {
@@ -73,15 +57,13 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
                 }
             }
 
-            if (eligible_hosts.empty()) break; // No eligible hosts left
+            if (eligible_hosts.empty()) break;
 
-            // 2. Calculate total weight for the lottery (1 base point + apex_points)
             int total_weight = 0;
             for(auto* team : eligible_hosts) {
                 total_weight += (1 + team->apex_points);
             }
 
-            // 3. Run the lottery
             std::uniform_int_distribution<> distrib(1, total_weight);
             int winning_ticket = distrib(rng);
 
@@ -93,24 +75,16 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
                     break;
                 }
             }
-            if (!host) host = eligible_hosts.back(); // Fallback
+            if (!host) host = eligible_hosts.back();
 
-            // 4. Remove the selected host from the available pool
             available_teams.erase(std::remove_if(available_teams.begin(), available_teams.end(), 
                 [&](Team* t){ return t->id == host->id; }), available_teams.end());
 
-
-            // --- Integrated Visitor Selection Logic ---
-
             std::vector<Team> visitors;
-            std::vector<Team*> regional_visitors;
-            std::vector<Team*> other_visitors;
+            std::vector<Team*> regional_visitors, other_visitors;
             for(auto* team : available_teams) {
-                if (team->region_type == host->region_type) {
-                    regional_visitors.push_back(team);
-                } else {
-                    other_visitors.push_back(team);
-                }
+                if (team->region_type == host->region_type) regional_visitors.push_back(team);
+                else other_visitors.push_back(team);
             }
             std::shuffle(regional_visitors.begin(), regional_visitors.end(), rng);
             std::sort(other_visitors.begin(), other_visitors.end(), [&](Team* a, Team* b){
@@ -125,17 +99,14 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
             }
 
             if (visitors.size() < 3) {
-
                 available_teams.push_back(host);
                 break; 
             }
-
 
             int block_duration = 0;
             ResidencyBlock block = createResidencyBlock(*host, visitors, current_day, block_duration);
             season_schedule.push_back(block);
             
-
             int end_day = current_day + block_duration;
             team_statuses[host->id].available_day = end_day;
             team_statuses[host->id].host_blocks_assigned++;
@@ -146,7 +117,6 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
         }
 
         int next_free_day = MAX_REGULAR_SEASON_DAYS + 1;
-
         for(const auto& pair : team_statuses) {
             if (pair.second.available_day > current_day) {
                 next_free_day = std::min(next_free_day, pair.second.available_day);
@@ -161,12 +131,9 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
         if (!participants.empty()) {
             ResidencyBlock apex_block = createApexResidency(participants, APEX_EVENT_START_DAY);
             season_schedule.push_back(apex_block);
-            
             simulateApexEventAndAwardPoints(apex_block, all_teams);
-
             apex_event_scheduled = true;
         }
-
     }
 
     std::cout << "Generated " << season_schedule.size() << " total blocks, including Apex event." << std::endl;
@@ -181,10 +148,7 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     block.host_team = host;
     block.visiting_residents = visitors;
     block.start_date = "Day " + std::to_string(start_day);
-
-    int day_offset = 1; // Start on day 1 of the block (day 0 is arrival)
-
-    // 2 games per visitor against the host (6 total)
+    int day_offset = 1;
 
     for (const auto& visitor : visitors) {
         Game g1, g2;
@@ -192,10 +156,9 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
         g2 = {.team1 = host, .team2 = visitor, .designated_home_team_for_batting = visitor, .actual_host_stadium = host, .date = "Day " + std::to_string(start_day + day_offset++), .game_type = GameType::REGULAR_SEASON};
         block.games.push_back(g1);
         block.games.push_back(g2);
-        day_offset++; // Rest day
+        day_offset++;
     }
     day_offset++;
-
 
     for (size_t i = 0; i < visitors.size(); ++i) {
         for (size_t j = i + 1; j < visitors.size(); ++j) {
@@ -214,7 +177,6 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     DateConverter converter;
     converter.sortGames(block.games);
 
-
     out_duration_days = day_offset + 1; 
     block.end_date = "Day " + std::to_string(start_day + out_duration_days - 1);
     return block;
@@ -226,18 +188,13 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
 ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& participants, int start_day) {
     ResidencyBlock block;
     block.is_apex_residency = true;
-    
     if (participants.empty()) return block;
-
     block.host_team = *participants[0]; 
     for(size_t i = 0; i < participants.size(); ++i) {
         block.visiting_residents.push_back(*participants[i]);
     }
-
     block.start_date = "Day " + std::to_string(start_day);
     int day_offset = 1;
-    
-    // Double Round-Robin Tournament
     for (size_t i = 0; i < participants.size(); ++i) {
         for (size_t j = i + 1; j < participants.size(); ++j) {
             Game game1;
@@ -248,7 +205,6 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
             game1.game_type = GameType::APEX_RESIDENCY_GAME;
             block.games.push_back(game1);
             day_offset += 2;
-
             Game game2;
             game2.team1 = *participants[j]; game2.team2 = *participants[i];
             game2.designated_home_team_for_batting = *participants[i];
@@ -259,16 +215,16 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
             day_offset += 2;
         }
     }
-
     const int APEX_DURATION_DAYS = day_offset + 5;
     block.end_date = "Day " + std::to_string(start_day + APEX_DURATION_DAYS);
     return block;
 }
 
 /**
- * @brief Selects teams for the Apex event based on individual player performance.
+ * @brief v3.9.1: Selects teams for the Apex event and sets player ApexStatus.
  */
 std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& all_teams) {
+    // 1. Create a flat list of all players, keeping a pointer to their team.
     std::vector<std::pair<Player*, Team*>> all_players;
     for (auto& team : all_teams) {
         for (auto& player : team.players) {
@@ -276,29 +232,66 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         }
     }
 
+    // 2. Sort players by performance score.
     std::sort(all_players.begin(), all_players.end(), [](const auto& a, const auto& b) {
         return a.first->performance_score > b.first->performance_score;
     });
 
+    // 3. Identify the top N players and the unique teams they represent.
     const int NUM_APEX_PLAYERS = 16;
-    std::set<Team*> participating_teams_set;
+    std::set<Team*> qualifying_teams_set;
+    std::vector<Player*> top_players;
     for (int i = 0; i < NUM_APEX_PLAYERS && i < all_players.size(); ++i) {
-        participating_teams_set.insert(all_players[i].second);
+        qualifying_teams_set.insert(all_players[i].second);
+        top_players.push_back(all_players[i].first);
     }
 
-    std::vector<Team*> participants(participating_teams_set.begin(), participating_teams_set.end());
+    // 4. Set the ApexStatus for the top players.
+    std::cout << "\n--- Apex Player Selection (v3.9.1) ---" << std::endl;
+    for (auto* player : top_players) {
+        bool team_qualified = false;
+        // Find the team this player belongs to
+        for (auto* team : qualifying_teams_set) {
+            for (const auto& p : team->players) {
+                if (p.id == player->id) {
+                    team_qualified = true;
+                    break;
+                }
+            }
+            if(team_qualified) break;
+        }
+
+        if (team_qualified) {
+            player->apex_status = ApexStatus::TeamParticipant;
+        } else {
+            // This case is logically difficult to hit with current team selection,
+            // but the logic is here for future, more complex selection models.
+            player->apex_status = ApexStatus::GreyUniform;
+            std::cout << "Player " << player->name << " selected as a Grey Uniform participant." << std::endl;
+        }
+    }
+     // Also set status for all players on qualifying teams
+    for (auto* team : qualifying_teams_set) {
+        for (auto& player : team->players) {
+            player.apex_status = ApexStatus::TeamParticipant;
+        }
+    }
+
+
+    std::vector<Team*> participants(qualifying_teams_set.begin(), qualifying_teams_set.end());
     
     std::cout << "Selected " << participants.size() << " teams for the Apex Residency based on the top " << NUM_APEX_PLAYERS << " players." << std::endl;
+    std::cout << "------------------------------------" << std::endl;
     
     return participants;
 }
+
 
 /**
  * @brief Simulates the outcome of the Apex event and awards points to teams.
  */
 void LeagueScheduler2::simulateApexEventAndAwardPoints(const ResidencyBlock& apex_block, std::vector<Team>& all_teams) {
     std::map<int, int> apex_wins;
-
     std::uniform_int_distribution<> distrib(0, 1);
     for (const auto& game : apex_block.games) {
         int winner_id = (distrib(rng) == 0) ? game.team1.id : game.team2.id;
@@ -321,13 +314,9 @@ void LeagueScheduler2::simulateApexEventAndAwardPoints(const ResidencyBlock& ape
     for (size_t i = 0; i < sorted_teams.size(); ++i) {
         int team_id = sorted_teams[i].first;
         int points_to_award = 0;
-        if (i == 0) {
-            points_to_award = WINNER_POINTS;
-        } else if (i == 1) {
-            points_to_award = RUNNER_UP_POINTS;
-        } else {
-            points_to_award = PARTICIPATION_POINTS;
-        }
+        if (i == 0) points_to_award = WINNER_POINTS;
+        else if (i == 1) points_to_award = RUNNER_UP_POINTS;
+        else points_to_award = PARTICIPATION_POINTS;
 
         auto it = std::find_if(all_teams.begin(), all_teams.end(), [team_id](const Team& t){
             return t.id == team_id;

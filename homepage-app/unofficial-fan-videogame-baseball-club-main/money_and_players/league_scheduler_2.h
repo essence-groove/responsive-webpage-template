@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.h
- * @brief Header for the v3.9.0 league scheduling logic.
+ * @brief Header for the v3.9.1 league scheduling logic.
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -25,10 +25,7 @@ namespace LeagueSchedulerNS {
 
 /**
  * @class LeagueScheduler2
- * @brief Manages the generation of the APMW season schedule for v3.9.0.
- *
- * v3.9.0 introduces strategic scheduling, including a season-ending Apex event
- * and prioritization of regional games.
+ * @brief Manages the generation of the APMW season schedule for v3.9.1.
  */
 class LeagueScheduler2 {
 public:
@@ -46,14 +43,14 @@ private:
         int host_blocks_assigned = 0;
     };
 
-    // v3.9.0: New private functions for handling the Apex Residency event
     /**
      * @brief Creates the special, extended Apex Residency block.
      */
     ResidencyBlock createApexResidency(std::vector<Team*>& participants, int start_day);
 
     /**
-     * @brief Selects teams for the Apex event based on performance (placeholder logic).
+     * @brief Selects teams for the Apex event and sets player ApexStatus.
+     * v3.9.1: Signature updated to pass all_teams by non-const reference to modify player status.
      */
     std::vector<Team*> selectApexParticipants(std::vector<Team>& all_teams);
     
@@ -75,7 +72,7 @@ private:
     // Random number generator for shuffling teams and determining batting order.
     std::mt19937 rng;
     
-    // v3.9.0: Flag to ensure Apex event is scheduled only once.
+    // Flag to ensure Apex event is scheduled only once.
     bool apex_event_scheduled = false;
 };
 
