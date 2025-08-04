@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.cpp
- * @brief Implements the scheduling logic for the APMW baseball league (v3.9.1).
+ * @brief Implements the scheduling logic for the APMW baseball league (v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -253,7 +253,7 @@ std::vector<Game> LeagueScheduler2::createApexTournamentGames(std::vector<Team*>
 
 
 /**
- * @brief Selects teams for the Apex event and sets player ApexStatus.
+ * @brief v3.9.2: Selects teams for the Apex event and sets player ApexStatus.
  */
 std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& all_teams) {
     std::vector<std::pair<Player*, Team*>> all_players;
@@ -275,7 +275,8 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         top_players_with_teams.push_back(all_players[i]);
     }
 
-    std::cout << "\n--- Apex Player Selection (v3.9.1) ---" << std::endl;
+    // 4. Set the ApexStatus for the top players.
+    std::cout << "\n--- Apex Player Selection (v3.9.2) ---" << std::endl;
     for (auto& player_team_pair : top_players_with_teams) {
         Player* player = player_team_pair.first;
         Team* team = player_team_pair.second;
