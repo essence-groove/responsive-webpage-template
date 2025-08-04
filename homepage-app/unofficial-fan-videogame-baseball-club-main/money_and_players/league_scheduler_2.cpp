@@ -1,6 +1,6 @@
 /**
  * @file league_scheduler_2.cpp
- * @brief Implements the scheduling logic for the APMW baseball league (v3.9.2).
+ * @brief Implements the scheduling logic for the APMW baseball league (v3.9.1).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Jul-27
  *
@@ -18,7 +18,7 @@
 #include <vector>
 #include <set>
 #include "days.h"
-#include "game_sorter.h" // FIX: Include the header for the GameSorter class
+#include "game_sorter.h"
 
 namespace LeagueSchedulerNS {
 
@@ -36,8 +36,10 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
     }
 
     int current_day = 1;
-    const int APEX_EVENT_START_DAY = 160;
-    const int MAX_REGULAR_SEASON_DAYS = 159;
+    // v3.9.1: Reduce max season days to align with lore and ensure a proper offseason.
+    const int MAX_SEASON_DAYS = 180; 
+    const int APEX_EVENT_START_DAY = MAX_SEASON_DAYS - 45; // Start Apex ~45 days before season end
+    const int MAX_REGULAR_SEASON_DAYS = APEX_EVENT_START_DAY - 1;
     const int MAX_HOST_BLOCKS = 5;
 
     // --- Phase 1: Schedule the Regular Season up to the Apex Event ---
@@ -65,7 +67,7 @@ std::vector<ResidencyBlock> LeagueScheduler2::generateSeasonSchedule(std::vector
                 total_weight += (1 + team->apex_points);
             }
 
-            std::uniform_int_distribution<> distrib(1, total_weight);
+            std::uniform_int_distribution<> distrib(1, total_weight > 0 ? total_weight : 1);
             int winning_ticket = distrib(rng);
 
             int current_weight = 0;
@@ -222,10 +224,9 @@ ResidencyBlock LeagueScheduler2::createApexResidency(std::vector<Team*>& partici
 }
 
 /**
- * @brief v3.9.2: Selects teams for the Apex event and sets player ApexStatus.
+ * @brief Selects teams for the Apex event and sets player ApexStatus.
  */
 std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& all_teams) {
-    // 1. Create a flat list of all players, keeping a pointer to their team.
     std::vector<std::pair<Player*, Team*>> all_players;
     for (auto& team : all_teams) {
         for (auto& player : team.players) {
@@ -233,12 +234,10 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         }
     }
 
-    // 2. Sort players by performance score.
     std::sort(all_players.begin(), all_players.end(), [](const auto& a, const auto& b) {
         return a.first->performance_score > b.first->performance_score;
     });
 
-    // 3. Identify the top N players and the unique teams they represent.
     const int NUM_APEX_PLAYERS = 16;
     std::set<Team*> qualifying_teams_set;
     std::vector<std::pair<Player*, Team*>> top_players_with_teams;
@@ -247,8 +246,7 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
         top_players_with_teams.push_back(all_players[i]);
     }
 
-    // 4. Set the ApexStatus for the top players.
-    std::cout << "\n--- Apex Player Selection (v3.9.2) ---" << std::endl;
+    std::cout << "\n--- Apex Player Selection (v3.9.1) ---" << std::endl;
     for (auto& player_team_pair : top_players_with_teams) {
         Player* player = player_team_pair.first;
         Team* team = player_team_pair.second;
@@ -261,7 +259,6 @@ std::vector<Team*> LeagueScheduler2::selectApexParticipants(std::vector<Team>& a
                       << ") selected as a Grey Uniform participant." << std::endl;
         }
     }
-     // Also set status for all players on qualifying teams
     for (auto* team : qualifying_teams_set) {
         for (auto& player : team->players) {
             if (player.apex_status == ApexStatus::None) {
