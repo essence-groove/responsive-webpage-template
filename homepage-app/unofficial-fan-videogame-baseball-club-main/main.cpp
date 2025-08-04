@@ -43,7 +43,7 @@ void initializeNewLeague(LeagueState& state) {
     state.teams.emplace_back(current_team_id++, "Atlanta", "Peach Blossom", UnionType::ATLANTIC, RegionType::TIDEWATER);
     state.teams.emplace_back(current_team_id++, "Miami", "Manatee Calm", UnionType::ATLANTIC, RegionType::TIDEWATER);
     state.teams.emplace_back(current_team_id++, "Charlotte", "Aviator Grit", UnionType::ATLANTIC, RegionType::TIDEWATER);
-    state.teams.emplace_back(current_team_id++, "Cleveland", "Guardian Resolve", UnionType::ATLANTIC, RegionType::THE_CONFLUENCE);
+    state.teams.emplace_back(current_team_id++, "Cleveland", "Sentinel Resolve", UnionType::ATLANTIC, RegionType::THE_CONFLUENCE);
     state.teams.emplace_back(current_team_id++, "Detroit", "Automaker Drive", UnionType::ATLANTIC, RegionType::THE_CONFLUENCE);
 
     // Pacific Union
