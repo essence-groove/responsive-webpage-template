@@ -17,7 +17,7 @@
 #include <random>
 #include <chrono>
 #include "money_and_players/league_scheduler_2.h"
-#include "money_and_players/environmental_agent.hh"
+#include "money_and_players/environmental_agent.h"
 #include "money_and_players/trade_agent.h"
 #include "money_and_players/report_logic.h"
 #include "money_and_players/game_sorter.h"
