@@ -1,35 +1,31 @@
 # APMW Season Schedule Report (v3.9)
 
-## Residency Block: Maine Host (Day 1 to Day 24)
+## Residency Block: Seattle Host (Day 1 to Day 24)
 
 - **Day 1:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 2:** New York (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** REGULAR_SEASON
-- **Day 3:** Maine (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** REGULAR_SEASON
+- **Day 2:** Miami (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 3:** Seattle (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
 - **Day 4:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 5:** Philadelphia (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** REGULAR_SEASON
-- **Day 6:** Maine (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** REGULAR_SEASON
+- **Day 5:** Charlotte (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 6:** Seattle (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
 - **Day 7:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 8:** Pittsburgh (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** REGULAR_SEASON
-- **Day 9:** Maine (First Bat) vs. Pittsburgh (Second Bat) at Maine Stadium. **Type:** REGULAR_SEASON
+- **Day 8:** Cleveland (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 9:** Seattle (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
 - **Day 10:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 11:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 12:** New York (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 12:** Miami (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 13:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 14:** Philadelphia (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 14:** Charlotte (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 15:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 16:** Pittsburgh (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 16:** Cleveland (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 17:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 18:** New York (First Bat) vs. Pittsburgh (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 18:** Miami (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 19:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 20:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 20:** Charlotte (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 21:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 22:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 22:** Cleveland (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 23:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 24:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
@@ -42,81 +38,85 @@
 - **Day 5:** Dallas (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
 - **Day 6:** Denver (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
 - **Day 7:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 8:** Cleveland (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
-- **Day 9:** Denver (First Bat) vs. Cleveland (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 8:** Detroit (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 9:** Denver (First Bat) vs. Detroit (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
 - **Day 10:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 11:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 12:** Dallas (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
+- **Day 12:** Austin (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 13:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 14:** Austin (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
+- **Day 14:** Dallas (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 15:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 16:** Cleveland (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 16:** Detroit (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 17:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 18:** Austin (First Bat) vs. Cleveland (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 18:** Austin (First Bat) vs. Detroit (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 19:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 20:** Cleveland (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 20:** Dallas (First Bat) vs. Detroit (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 21:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 22:** Dallas (First Bat) vs. Cleveland (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 22:** Detroit (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 23:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 24:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Los Angeles Host (Day 1 to Day 24)
+## Residency Block: St. Louis Host (Day 1 to Day 24)
 
 - **Day 1:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 2:** San Diego (First Bat) vs. Los Angeles (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
-- **Day 3:** Los Angeles (First Bat) vs. San Diego (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
+- **Day 2:** Kansas City (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 3:** St. Louis (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 4:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 5:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
-- **Day 6:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
+- **Day 5:** San Francisco (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 6:** St. Louis (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 7:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 8:** Detroit (First Bat) vs. Los Angeles (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
-- **Day 9:** Los Angeles (First Bat) vs. Detroit (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
+- **Day 8:** Los Angeles (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 9:** St. Louis (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 10:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 11:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 12:** San Francisco (First Bat) vs. San Diego (Second Bat) at Los Angeles Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 12:** San Francisco (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 13:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 14:** San Diego (First Bat) vs. San Francisco (Second Bat) at Los Angeles Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 14:** Kansas City (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 15:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 16:** San Diego (First Bat) vs. Detroit (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 16:** Los Angeles (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 17:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 18:** Detroit (First Bat) vs. San Diego (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 18:** Kansas City (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 19:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 20:** San Francisco (First Bat) vs. Detroit (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 20:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 21:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 22:** Detroit (First Bat) vs. San Francisco (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 22:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 23:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 24:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Charlotte Host (Day 1 to Day 24)
+## Residency Block: New York Host (Day 1 to Day 24)
 
 - **Day 1:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 2:** Miami (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 3:** Charlotte (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 2:** Philadelphia (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
+- **Day 3:** New York (First Bat) vs. Philadelphia (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
 - **Day 4:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 5:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 6:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 5:** Maine (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
+- **Day 6:** New York (First Bat) vs. Maine (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
 - **Day 7:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 8:** Seattle (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 9:** Charlotte (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 8:** Pittsburgh (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
+- **Day 9:** New York (First Bat) vs. Pittsburgh (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
 - **Day 10:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 11:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 12:** Atlanta (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
+- **Day 12:** Philadelphia (First Bat) vs. Maine (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 13:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 14:** Miami (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
+- **Day 14:** Maine (First Bat) vs. Philadelphia (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 15:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 16:** Seattle (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 16:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 17:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 18:** Miami (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 18:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 19:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 20:** Atlanta (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 20:** Pittsburgh (First Bat) vs. Maine (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 21:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 22:** Seattle (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 22:** Maine (First Bat) vs. Pittsburgh (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 23:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 24:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
@@ -133,10 +133,10 @@
 - **Day 33:** Maine (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** REGULAR_SEASON
 - **Day 34:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 35:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 36:** Pittsburgh (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
+- **Day 36:** New York (First Bat) vs. Pittsburgh (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 37:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 38:** New York (First Bat) vs. Pittsburgh (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
+- **Day 38:** Pittsburgh (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 39:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 40:** New York (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
@@ -145,656 +145,932 @@
 - **Day 42:** Philadelphia (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 43:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 44:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
+- **Day 44:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 45:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 46:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
+- **Day 46:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Maine Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 47:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 48:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Denver Host (Day 25 to Day 48)
+## Residency Block: Seattle Host (Day 25 to Day 48)
 
 - **Day 25:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 26:** Austin (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
-- **Day 27:** Denver (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 26:** Miami (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 27:** Seattle (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
 - **Day 28:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 29:** Dallas (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
-- **Day 30:** Denver (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 29:** Charlotte (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 30:** Seattle (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
 - **Day 31:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 32:** Miami (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
-- **Day 33:** Denver (First Bat) vs. Miami (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 32:** Cleveland (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 33:** Seattle (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
 - **Day 34:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 35:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 36:** Dallas (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 36:** Miami (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 37:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 38:** Austin (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 38:** Charlotte (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 39:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 40:** Miami (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 40:** Miami (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 41:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 42:** Austin (First Bat) vs. Miami (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 42:** Cleveland (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 43:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 44:** Dallas (First Bat) vs. Miami (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 44:** Charlotte (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 45:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 46:** Miami (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 46:** Cleveland (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
 - **Day 47:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 48:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: San Francisco Host (Day 25 to Day 48)
+## Residency Block: Dallas Host (Day 25 to Day 48)
 
 - **Day 25:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 26:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
-- **Day 27:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 26:** Denver (First Bat) vs. Dallas (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
+- **Day 27:** Dallas (First Bat) vs. Denver (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
 - **Day 28:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 29:** San Diego (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
-- **Day 30:** San Francisco (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 29:** Austin (First Bat) vs. Dallas (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
+- **Day 30:** Dallas (First Bat) vs. Austin (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
 - **Day 31:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 32:** Charlotte (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
-- **Day 33:** San Francisco (First Bat) vs. Charlotte (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 32:** San Francisco (First Bat) vs. Dallas (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
+- **Day 33:** Dallas (First Bat) vs. San Francisco (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
 - **Day 34:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 35:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 36:** San Diego (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 36:** Denver (First Bat) vs. Austin (Second Bat) at Dallas Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 37:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 38:** Los Angeles (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 38:** Austin (First Bat) vs. Denver (Second Bat) at Dallas Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 39:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 40:** Los Angeles (First Bat) vs. Charlotte (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 40:** Denver (First Bat) vs. San Francisco (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 41:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 42:** Charlotte (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 42:** San Francisco (First Bat) vs. Denver (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 43:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 44:** San Diego (First Bat) vs. Charlotte (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 44:** Austin (First Bat) vs. San Francisco (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 45:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 46:** Charlotte (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 46:** San Francisco (First Bat) vs. Austin (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 47:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 48:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Kansas City Host (Day 25 to Day 48)
+## Residency Block: San Diego Host (Day 25 to Day 48)
 
 - **Day 25:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 26:** St. Louis (First Bat) vs. Kansas City (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
-- **Day 27:** Kansas City (First Bat) vs. St. Louis (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
+- **Day 26:** Los Angeles (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 27:** San Diego (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 28:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 29:** Seattle (First Bat) vs. Kansas City (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
-- **Day 30:** Kansas City (First Bat) vs. Seattle (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
+- **Day 29:** Detroit (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 30:** San Diego (First Bat) vs. Detroit (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 31:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 32:** Cleveland (First Bat) vs. Kansas City (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
-- **Day 33:** Kansas City (First Bat) vs. Cleveland (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
+- **Day 32:** Atlanta (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 33:** San Diego (First Bat) vs. Atlanta (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 34:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 35:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 36:** Seattle (First Bat) vs. St. Louis (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
+- **Day 36:** Detroit (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 37:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 38:** St. Louis (First Bat) vs. Seattle (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
+- **Day 38:** Los Angeles (First Bat) vs. Detroit (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 39:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 40:** St. Louis (First Bat) vs. Cleveland (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
+- **Day 40:** Atlanta (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 41:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 42:** Cleveland (First Bat) vs. St. Louis (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
+- **Day 42:** Los Angeles (First Bat) vs. Atlanta (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 43:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 44:** Cleveland (First Bat) vs. Seattle (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
+- **Day 44:** Atlanta (First Bat) vs. Detroit (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 45:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 46:** Seattle (First Bat) vs. Cleveland (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
+- **Day 46:** Detroit (First Bat) vs. Atlanta (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 47:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 48:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Philadelphia Host (Day 49 to Day 72)
+## Residency Block: San Francisco Host (Day 49 to Day 72)
 
 - **Day 49:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 50:** Maine (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 51:** Philadelphia (First Bat) vs. Maine (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
+- **Day 50:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 51:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
 - **Day 52:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 53:** New York (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 54:** Philadelphia (First Bat) vs. New York (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
+- **Day 53:** San Diego (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 54:** San Francisco (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
 - **Day 55:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 56:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 57:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
+- **Day 56:** Maine (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 57:** San Francisco (First Bat) vs. Maine (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
 - **Day 58:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 59:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 60:** New York (First Bat) vs. Maine (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
+- **Day 60:** San Diego (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 61:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 62:** Maine (First Bat) vs. New York (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
+- **Day 62:** Los Angeles (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 63:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 64:** Maine (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 64:** Los Angeles (First Bat) vs. Maine (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
 - **Day 65:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 66:** Pittsburgh (First Bat) vs. Maine (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 66:** Maine (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
 - **Day 67:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 68:** New York (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 68:** Maine (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
 - **Day 69:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 70:** Pittsburgh (First Bat) vs. New York (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 70:** San Diego (First Bat) vs. Maine (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
 - **Day 71:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 72:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Seattle Host (Day 49 to Day 72)
+## Residency Block: Charlotte Host (Day 49 to Day 72)
 
 - **Day 49:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 50:** Miami (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
-- **Day 51:** Seattle (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 50:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 51:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
 - **Day 52:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 53:** Charlotte (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
-- **Day 54:** Seattle (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 53:** Miami (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 54:** Charlotte (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
 - **Day 55:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 56:** Cleveland (First Bat) vs. Seattle (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
-- **Day 57:** Seattle (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** REGULAR_SEASON
+- **Day 56:** Seattle (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 57:** Charlotte (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
 - **Day 58:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 59:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 60:** Miami (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** REGIONAL_GAME
+- **Day 60:** Miami (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 61:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 62:** Charlotte (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** REGIONAL_GAME
+- **Day 62:** Atlanta (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 63:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 64:** Miami (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
+- **Day 64:** Seattle (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
 - **Day 65:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 66:** Cleveland (First Bat) vs. Miami (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
+- **Day 66:** Atlanta (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
 - **Day 67:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 68:** Cleveland (First Bat) vs. Charlotte (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
+- **Day 68:** Miami (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
 - **Day 69:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 70:** Charlotte (First Bat) vs. Cleveland (Second Bat) at Seattle Stadium. **Type:** CROSSROADS_GAME
+- **Day 70:** Seattle (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
 - **Day 71:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 72:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Los Angeles Host (Day 49 to Day 72)
+## Residency Block: St. Louis Host (Day 49 to Day 72)
 
 - **Day 49:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 50:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
-- **Day 51:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
+- **Day 50:** Kansas City (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 51:** St. Louis (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 52:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 53:** San Diego (First Bat) vs. Los Angeles (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
-- **Day 54:** Los Angeles (First Bat) vs. San Diego (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
+- **Day 53:** New York (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 54:** St. Louis (First Bat) vs. New York (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 55:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 56:** Detroit (First Bat) vs. Los Angeles (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
-- **Day 57:** Los Angeles (First Bat) vs. Detroit (Second Bat) at Los Angeles Stadium. **Type:** REGULAR_SEASON
+- **Day 56:** Philadelphia (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 57:** St. Louis (First Bat) vs. Philadelphia (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 58:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 59:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 60:** San Francisco (First Bat) vs. San Diego (Second Bat) at Los Angeles Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 60:** Kansas City (First Bat) vs. New York (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 61:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 62:** San Diego (First Bat) vs. San Francisco (Second Bat) at Los Angeles Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 62:** New York (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 63:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 64:** Detroit (First Bat) vs. San Francisco (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 64:** Philadelphia (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 65:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 66:** San Francisco (First Bat) vs. Detroit (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 66:** Kansas City (First Bat) vs. Philadelphia (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 67:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 68:** Detroit (First Bat) vs. San Diego (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 68:** Philadelphia (First Bat) vs. New York (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 69:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 70:** San Diego (First Bat) vs. Detroit (Second Bat) at Los Angeles Stadium. **Type:** CROSSROADS_GAME
+- **Day 70:** New York (First Bat) vs. Philadelphia (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 71:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 72:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Austin Host (Day 49 to Day 72)
+## Residency Block: Dallas Host (Day 49 to Day 72)
 
 - **Day 49:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 50:** Denver (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
-- **Day 51:** Austin (First Bat) vs. Denver (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 50:** Austin (First Bat) vs. Dallas (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
+- **Day 51:** Dallas (First Bat) vs. Austin (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
 - **Day 52:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 53:** Dallas (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
-- **Day 54:** Austin (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 53:** Denver (First Bat) vs. Dallas (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
+- **Day 54:** Dallas (First Bat) vs. Denver (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
 - **Day 55:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 56:** Atlanta (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
-- **Day 57:** Austin (First Bat) vs. Atlanta (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 56:** Pittsburgh (First Bat) vs. Dallas (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
+- **Day 57:** Dallas (First Bat) vs. Pittsburgh (Second Bat) at Dallas Stadium. **Type:** REGULAR_SEASON
 - **Day 58:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 59:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 60:** Denver (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** REGIONAL_GAME
+- **Day 60:** Denver (First Bat) vs. Austin (Second Bat) at Dallas Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 61:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 62:** Dallas (First Bat) vs. Denver (Second Bat) at Austin Stadium. **Type:** REGIONAL_GAME
+- **Day 62:** Austin (First Bat) vs. Denver (Second Bat) at Dallas Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 63:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 64:** Denver (First Bat) vs. Atlanta (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 64:** Pittsburgh (First Bat) vs. Austin (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 65:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 66:** Atlanta (First Bat) vs. Denver (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 66:** Austin (First Bat) vs. Pittsburgh (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 67:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 68:** Dallas (First Bat) vs. Atlanta (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 68:** Denver (First Bat) vs. Pittsburgh (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 69:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 70:** Atlanta (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 70:** Pittsburgh (First Bat) vs. Denver (Second Bat) at Dallas Stadium. **Type:** CROSSROADS_GAME
 - **Day 71:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 72:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Charlotte Host (Day 73 to Day 96)
+## Residency Block: San Diego Host (Day 73 to Day 96)
 
 - **Day 73:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 74:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 75:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 74:** Los Angeles (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 75:** San Diego (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 76:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 77:** Miami (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 78:** Charlotte (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 77:** San Francisco (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 78:** San Diego (First Bat) vs. San Francisco (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 79:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 80:** Seattle (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 81:** Charlotte (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 80:** Maine (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 81:** San Diego (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 82:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 83:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 84:** Miami (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
+- **Day 84:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 85:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 86:** Atlanta (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
+- **Day 86:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at San Diego Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 87:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 88:** Atlanta (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 88:** Maine (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 89:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 90:** Seattle (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 90:** Los Angeles (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 91:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 92:** Miami (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 92:** Maine (First Bat) vs. San Francisco (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 93:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 94:** Seattle (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 94:** San Francisco (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 95:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 96:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: New York Host (Day 73 to Day 96)
+## Residency Block: Austin Host (Day 73 to Day 96)
 
 - **Day 73:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 74:** Philadelphia (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
-- **Day 75:** New York (First Bat) vs. Philadelphia (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
+- **Day 74:** Dallas (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 75:** Austin (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
 - **Day 76:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 77:** Pittsburgh (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
-- **Day 78:** New York (First Bat) vs. Pittsburgh (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
+- **Day 77:** Cleveland (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 78:** Austin (First Bat) vs. Cleveland (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
 - **Day 79:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 80:** San Diego (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
-- **Day 81:** New York (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** REGULAR_SEASON
+- **Day 80:** Detroit (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 81:** Austin (First Bat) vs. Detroit (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
 - **Day 82:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 83:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 84:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 84:** Cleveland (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
 - **Day 85:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 86:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at New York Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 86:** Dallas (First Bat) vs. Cleveland (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
 - **Day 87:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 88:** San Diego (First Bat) vs. Philadelphia (Second Bat) at New York Stadium. **Type:** CROSSROADS_GAME
+- **Day 88:** Detroit (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
 - **Day 89:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 90:** Philadelphia (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** CROSSROADS_GAME
+- **Day 90:** Dallas (First Bat) vs. Detroit (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
 - **Day 91:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 92:** San Diego (First Bat) vs. Pittsburgh (Second Bat) at New York Stadium. **Type:** CROSSROADS_GAME
+- **Day 92:** Detroit (First Bat) vs. Cleveland (Second Bat) at Austin Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 93:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 94:** Pittsburgh (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** CROSSROADS_GAME
+- **Day 94:** Cleveland (First Bat) vs. Detroit (Second Bat) at Austin Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 95:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 96:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Denver Host (Day 73 to Day 96)
+## Residency Block: Miami Host (Day 73 to Day 96)
 
 - **Day 73:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 74:** Dallas (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
-- **Day 75:** Denver (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 74:** Atlanta (First Bat) vs. Miami (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
+- **Day 75:** Miami (First Bat) vs. Atlanta (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
 - **Day 76:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 77:** Austin (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
-- **Day 78:** Denver (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 77:** Charlotte (First Bat) vs. Miami (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
+- **Day 78:** Miami (First Bat) vs. Charlotte (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
 - **Day 79:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 80:** Maine (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
-- **Day 81:** Denver (First Bat) vs. Maine (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 80:** Denver (First Bat) vs. Miami (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
+- **Day 81:** Miami (First Bat) vs. Denver (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
 - **Day 82:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 83:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 84:** Austin (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
+- **Day 84:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Miami Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 85:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 86:** Dallas (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
+- **Day 86:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Miami Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 87:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 88:** Maine (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 88:** Atlanta (First Bat) vs. Denver (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 89:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 90:** Dallas (First Bat) vs. Maine (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 90:** Denver (First Bat) vs. Atlanta (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 91:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 92:** Austin (First Bat) vs. Maine (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 92:** Charlotte (First Bat) vs. Denver (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 93:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 94:** Maine (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
+- **Day 94:** Denver (First Bat) vs. Charlotte (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 95:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 96:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: St. Louis Host (Day 73 to Day 96)
+## Residency Block: Philadelphia Host (Day 73 to Day 96)
 
 - **Day 73:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 74:** Kansas City (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 75:** St. Louis (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 74:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
+- **Day 75:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
 - **Day 76:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 77:** San Francisco (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 78:** St. Louis (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 77:** New York (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
+- **Day 78:** Philadelphia (First Bat) vs. New York (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
 - **Day 79:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 80:** Los Angeles (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 81:** St. Louis (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 80:** Seattle (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
+- **Day 81:** Philadelphia (First Bat) vs. Seattle (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
 - **Day 82:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 83:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 84:** Kansas City (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
+- **Day 84:** Pittsburgh (First Bat) vs. New York (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 85:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 86:** San Francisco (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
+- **Day 86:** New York (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 87:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 88:** Los Angeles (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
+- **Day 88:** Pittsburgh (First Bat) vs. Seattle (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
 - **Day 89:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 90:** Kansas City (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
+- **Day 90:** Seattle (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
 - **Day 91:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 92:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 92:** Seattle (First Bat) vs. New York (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
 - **Day 93:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 94:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 94:** New York (First Bat) vs. Seattle (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
 - **Day 95:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 96:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Austin Host (Day 97 to Day 120)
+## Residency Block: San Diego Host (Day 97 to Day 120)
 
 - **Day 97:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 98:** Denver (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
-- **Day 99:** Austin (First Bat) vs. Denver (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 98:** San Francisco (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 99:** San Diego (First Bat) vs. San Francisco (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 100:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 101:** Dallas (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
-- **Day 102:** Austin (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 101:** Los Angeles (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 102:** San Diego (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 103:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 104:** Maine (First Bat) vs. Austin (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
-- **Day 105:** Austin (First Bat) vs. Maine (Second Bat) at Austin Stadium. **Type:** REGULAR_SEASON
+- **Day 104:** Maine (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 105:** San Diego (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
 - **Day 106:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 107:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 108:** Denver (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** REGIONAL_GAME
+- **Day 108:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 109:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 110:** Dallas (First Bat) vs. Denver (Second Bat) at Austin Stadium. **Type:** REGIONAL_GAME
+- **Day 110:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at San Diego Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 111:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 112:** Maine (First Bat) vs. Denver (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 112:** San Francisco (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 113:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 114:** Denver (First Bat) vs. Maine (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 114:** Maine (First Bat) vs. San Francisco (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 115:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 116:** Maine (First Bat) vs. Dallas (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 116:** Los Angeles (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 117:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 118:** Dallas (First Bat) vs. Maine (Second Bat) at Austin Stadium. **Type:** CROSSROADS_GAME
+- **Day 118:** Maine (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
 - **Day 119:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 120:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: San Francisco Host (Day 97 to Day 120)
+## Residency Block: Kansas City Host (Day 97 to Day 120)
 
 - **Day 97:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 98:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
-- **Day 99:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 98:** St. Louis (First Bat) vs. Kansas City (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
+- **Day 99:** Kansas City (First Bat) vs. St. Louis (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
 - **Day 100:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 101:** San Diego (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
-- **Day 102:** San Francisco (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 101:** Seattle (First Bat) vs. Kansas City (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
+- **Day 102:** Kansas City (First Bat) vs. Seattle (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
 - **Day 103:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 104:** New York (First Bat) vs. San Francisco (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
-- **Day 105:** San Francisco (First Bat) vs. New York (Second Bat) at San Francisco Stadium. **Type:** REGULAR_SEASON
+- **Day 104:** New York (First Bat) vs. Kansas City (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
+- **Day 105:** Kansas City (First Bat) vs. New York (Second Bat) at Kansas City Stadium. **Type:** REGULAR_SEASON
 - **Day 106:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 107:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 108:** Los Angeles (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 108:** Seattle (First Bat) vs. St. Louis (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
 - **Day 109:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 110:** San Diego (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 110:** St. Louis (First Bat) vs. Seattle (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
 - **Day 111:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 112:** New York (First Bat) vs. Los Angeles (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 112:** New York (First Bat) vs. St. Louis (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
 - **Day 113:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 114:** Los Angeles (First Bat) vs. New York (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 114:** St. Louis (First Bat) vs. New York (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
 - **Day 115:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 116:** New York (First Bat) vs. San Diego (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 116:** New York (First Bat) vs. Seattle (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
 - **Day 117:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 118:** San Diego (First Bat) vs. New York (Second Bat) at San Francisco Stadium. **Type:** CROSSROADS_GAME
+- **Day 118:** Seattle (First Bat) vs. New York (Second Bat) at Kansas City Stadium. **Type:** CROSSROADS_GAME
 - **Day 119:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 120:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Charlotte Host (Day 97 to Day 120)
+## Residency Block: Pittsburgh Host (Day 97 to Day 120)
 
 - **Day 97:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 98:** Miami (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 99:** Charlotte (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 98:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 99:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
 - **Day 100:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 101:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 102:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 101:** Denver (First Bat) vs. Pittsburgh (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 102:** Pittsburgh (First Bat) vs. Denver (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
 - **Day 103:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 104:** Seattle (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 105:** Charlotte (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 104:** Austin (First Bat) vs. Pittsburgh (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 105:** Pittsburgh (First Bat) vs. Austin (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
 - **Day 106:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 107:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 108:** Miami (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
+- **Day 108:** Philadelphia (First Bat) vs. Denver (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 109:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 110:** Denver (First Bat) vs. Philadelphia (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 111:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 112:** Austin (First Bat) vs. Philadelphia (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 113:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 114:** Philadelphia (First Bat) vs. Austin (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 115:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 116:** Denver (First Bat) vs. Austin (Second Bat) at Pittsburgh Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 117:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 118:** Austin (First Bat) vs. Denver (Second Bat) at Pittsburgh Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 119:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 120:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+
+## Residency Block: Atlanta Host (Day 97 to Day 120)
+
+- **Day 97:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 98:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Atlanta Stadium. **Type:** REGULAR_SEASON
+- **Day 99:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Atlanta Stadium. **Type:** REGULAR_SEASON
+- **Day 100:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 101:** Miami (First Bat) vs. Atlanta (Second Bat) at Atlanta Stadium. **Type:** REGULAR_SEASON
+- **Day 102:** Atlanta (First Bat) vs. Miami (Second Bat) at Atlanta Stadium. **Type:** REGULAR_SEASON
+- **Day 103:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 104:** Dallas (First Bat) vs. Atlanta (Second Bat) at Atlanta Stadium. **Type:** REGULAR_SEASON
+- **Day 105:** Atlanta (First Bat) vs. Dallas (Second Bat) at Atlanta Stadium. **Type:** REGULAR_SEASON
+- **Day 106:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 107:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 108:** Charlotte (First Bat) vs. Miami (Second Bat) at Atlanta Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 109:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 110:** Atlanta (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
+- **Day 110:** Miami (First Bat) vs. Charlotte (Second Bat) at Atlanta Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 111:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 112:** Seattle (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 112:** Dallas (First Bat) vs. Charlotte (Second Bat) at Atlanta Stadium. **Type:** CROSSROADS_GAME
 - **Day 113:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 114:** Miami (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 114:** Charlotte (First Bat) vs. Dallas (Second Bat) at Atlanta Stadium. **Type:** CROSSROADS_GAME
 - **Day 115:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 116:** Seattle (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 116:** Dallas (First Bat) vs. Miami (Second Bat) at Atlanta Stadium. **Type:** CROSSROADS_GAME
 - **Day 117:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 118:** Atlanta (First Bat) vs. Seattle (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 118:** Miami (First Bat) vs. Dallas (Second Bat) at Atlanta Stadium. **Type:** CROSSROADS_GAME
 - **Day 119:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 120:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: St. Louis Host (Day 97 to Day 120)
-
-- **Day 97:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 98:** Kansas City (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 99:** St. Louis (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 100:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 101:** Philadelphia (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 102:** St. Louis (First Bat) vs. Philadelphia (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 103:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 104:** Pittsburgh (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 105:** St. Louis (First Bat) vs. Pittsburgh (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
-- **Day 106:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 107:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 108:** Philadelphia (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
-- **Day 109:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 110:** Kansas City (First Bat) vs. Philadelphia (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
-- **Day 111:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 112:** Kansas City (First Bat) vs. Pittsburgh (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
-- **Day 113:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 114:** Pittsburgh (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
-- **Day 115:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 116:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
-- **Day 117:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 118:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
-- **Day 119:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 120:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-
-## Residency Block: Cleveland Host (Day 121 to Day 144)
+## Residency Block: Miami Host (Day 121 to Day 144)
 
 - **Day 121:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 122:** Detroit (First Bat) vs. Cleveland (Second Bat) at Cleveland Stadium. **Type:** REGULAR_SEASON
-- **Day 123:** Cleveland (First Bat) vs. Detroit (Second Bat) at Cleveland Stadium. **Type:** REGULAR_SEASON
+- **Day 122:** Atlanta (First Bat) vs. Miami (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
+- **Day 123:** Miami (First Bat) vs. Atlanta (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
 - **Day 124:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 125:** Seattle (First Bat) vs. Cleveland (Second Bat) at Cleveland Stadium. **Type:** REGULAR_SEASON
-- **Day 126:** Cleveland (First Bat) vs. Seattle (Second Bat) at Cleveland Stadium. **Type:** REGULAR_SEASON
+- **Day 125:** Charlotte (First Bat) vs. Miami (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
+- **Day 126:** Miami (First Bat) vs. Charlotte (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
 - **Day 127:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 128:** San Francisco (First Bat) vs. Cleveland (Second Bat) at Cleveland Stadium. **Type:** REGULAR_SEASON
-- **Day 129:** Cleveland (First Bat) vs. San Francisco (Second Bat) at Cleveland Stadium. **Type:** REGULAR_SEASON
+- **Day 128:** Seattle (First Bat) vs. Miami (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
+- **Day 129:** Miami (First Bat) vs. Seattle (Second Bat) at Miami Stadium. **Type:** REGULAR_SEASON
 - **Day 130:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 131:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 132:** Seattle (First Bat) vs. Detroit (Second Bat) at Cleveland Stadium. **Type:** CROSSROADS_GAME
+- **Day 132:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Miami Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 133:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 134:** Detroit (First Bat) vs. Seattle (Second Bat) at Cleveland Stadium. **Type:** CROSSROADS_GAME
+- **Day 134:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Miami Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 135:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 136:** San Francisco (First Bat) vs. Detroit (Second Bat) at Cleveland Stadium. **Type:** CROSSROADS_GAME
+- **Day 136:** Seattle (First Bat) vs. Atlanta (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 137:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 138:** Detroit (First Bat) vs. San Francisco (Second Bat) at Cleveland Stadium. **Type:** CROSSROADS_GAME
+- **Day 138:** Atlanta (First Bat) vs. Seattle (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 139:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 140:** San Francisco (First Bat) vs. Seattle (Second Bat) at Cleveland Stadium. **Type:** CROSSROADS_GAME
+- **Day 140:** Seattle (First Bat) vs. Charlotte (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 141:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 142:** Seattle (First Bat) vs. San Francisco (Second Bat) at Cleveland Stadium. **Type:** CROSSROADS_GAME
+- **Day 142:** Charlotte (First Bat) vs. Seattle (Second Bat) at Miami Stadium. **Type:** CROSSROADS_GAME
 - **Day 143:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 144:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: San Diego Host (Day 121 to Day 144)
+## Residency Block: St. Louis Host (Day 121 to Day 144)
 
 - **Day 121:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 122:** Los Angeles (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
-- **Day 123:** San Diego (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 122:** Kansas City (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 123:** St. Louis (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 124:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 125:** Maine (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
-- **Day 126:** San Diego (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 125:** San Francisco (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 126:** St. Louis (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 127:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 128:** New York (First Bat) vs. San Diego (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
-- **Day 129:** San Diego (First Bat) vs. New York (Second Bat) at San Diego Stadium. **Type:** REGULAR_SEASON
+- **Day 128:** Los Angeles (First Bat) vs. St. Louis (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
+- **Day 129:** St. Louis (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** REGULAR_SEASON
 - **Day 130:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 131:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 132:** Los Angeles (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
+- **Day 132:** San Francisco (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 133:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 134:** Maine (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
+- **Day 134:** Kansas City (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 135:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 136:** New York (First Bat) vs. Los Angeles (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
+- **Day 136:** Los Angeles (First Bat) vs. Kansas City (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 137:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 138:** Los Angeles (First Bat) vs. New York (Second Bat) at San Diego Stadium. **Type:** CROSSROADS_GAME
+- **Day 138:** Kansas City (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** CROSSROADS_GAME
 - **Day 139:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 140:** Maine (First Bat) vs. New York (Second Bat) at San Diego Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
-- **Day 141:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 142:** New York (First Bat) vs. Maine (Second Bat) at San Diego Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
-- **Day 143:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 144:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-
-## Residency Block: Philadelphia Host (Day 121 to Day 144)
-
-- **Day 121:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 122:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 123:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 124:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 125:** Denver (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 126:** Philadelphia (First Bat) vs. Denver (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 127:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 128:** Austin (First Bat) vs. Philadelphia (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 129:** Philadelphia (First Bat) vs. Austin (Second Bat) at Philadelphia Stadium. **Type:** REGULAR_SEASON
-- **Day 130:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 131:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 132:** Denver (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
-- **Day 133:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 134:** Pittsburgh (First Bat) vs. Denver (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
-- **Day 135:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 136:** Pittsburgh (First Bat) vs. Austin (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
-- **Day 137:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 138:** Austin (First Bat) vs. Pittsburgh (Second Bat) at Philadelphia Stadium. **Type:** CROSSROADS_GAME
-- **Day 139:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 140:** Denver (First Bat) vs. Austin (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
+- **Day 140:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 141:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 142:** Austin (First Bat) vs. Denver (Second Bat) at Philadelphia Stadium. **Type:** REGIONAL_GAME
+- **Day 142:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at St. Louis Stadium. **Type:** REGIONAL_GAME
   - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
 - **Day 143:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 144:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: Charlotte Host (Day 121 to Day 144)
+## Residency Block: Denver Host (Day 121 to Day 144)
 
 - **Day 121:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 122:** Miami (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 123:** Charlotte (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 122:** Dallas (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 123:** Denver (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
 - **Day 124:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 125:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 126:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 125:** Austin (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 126:** Denver (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
 - **Day 127:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 128:** Dallas (First Bat) vs. Charlotte (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
-- **Day 129:** Charlotte (First Bat) vs. Dallas (Second Bat) at Charlotte Stadium. **Type:** REGULAR_SEASON
+- **Day 128:** Maine (First Bat) vs. Denver (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
+- **Day 129:** Denver (First Bat) vs. Maine (Second Bat) at Denver Stadium. **Type:** REGULAR_SEASON
 - **Day 130:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
 - **Day 131:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 132:** Miami (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 132:** Dallas (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 133:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 134:** Atlanta (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** REGIONAL_GAME
-  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This matchup allows for efficient regional fan travel by train, minimizing the carbon footprint compared to air travel.*
+- **Day 134:** Austin (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
 - **Day 135:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 136:** Miami (First Bat) vs. Dallas (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 136:** Maine (First Bat) vs. Dallas (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 137:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 138:** Dallas (First Bat) vs. Miami (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 138:** Dallas (First Bat) vs. Maine (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 139:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 140:** Atlanta (First Bat) vs. Dallas (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 140:** Maine (First Bat) vs. Austin (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 141:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 142:** Dallas (First Bat) vs. Atlanta (Second Bat) at Charlotte Stadium. **Type:** CROSSROADS_GAME
+- **Day 142:** Austin (First Bat) vs. Maine (Second Bat) at Denver Stadium. **Type:** CROSSROADS_GAME
 - **Day 143:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 - **Day 144:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
-## Residency Block: New York Host (Day 135 to Day 225) **(APEX RESIDENCY)**
+## Residency Block: Pittsburgh Host (Day 121 to Day 144)
+
+- **Day 121:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 122:** New York (First Bat) vs. Pittsburgh (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 123:** Pittsburgh (First Bat) vs. New York (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 124:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 125:** Philadelphia (First Bat) vs. Pittsburgh (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 126:** Pittsburgh (First Bat) vs. Philadelphia (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 127:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 128:** San Diego (First Bat) vs. Pittsburgh (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 129:** Pittsburgh (First Bat) vs. San Diego (Second Bat) at Pittsburgh Stadium. **Type:** REGULAR_SEASON
+- **Day 130:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 131:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 132:** New York (First Bat) vs. Philadelphia (Second Bat) at Pittsburgh Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 133:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 134:** Philadelphia (First Bat) vs. New York (Second Bat) at Pittsburgh Stadium. **Type:** REGIONAL_GAME
+  - *Note: This is a **Regional Game**. **Environmental Enhancement:** This is a local derby, facilitating low-emission fan travel by train for a short-distance journey.*
+- **Day 135:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 136:** San Diego (First Bat) vs. New York (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 137:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 138:** New York (First Bat) vs. San Diego (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 139:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 140:** San Diego (First Bat) vs. Philadelphia (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 141:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 142:** Philadelphia (First Bat) vs. San Diego (Second Bat) at Pittsburgh Stadium. **Type:** CROSSROADS_GAME
+- **Day 143:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 144:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+
+## Residency Block: Maine Host (Day 135 to Day 505) **(APEX RESIDENCY)**
 
 - **Day 135:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 136:** New York (First Bat) vs. Cleveland (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 136:** Maine (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 137:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 138:** Cleveland (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 138:** New York (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 139:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 140:** New York (First Bat) vs. Los Angeles (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 140:** Maine (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 141:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 142:** Los Angeles (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 142:** Philadelphia (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 143:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 144:** New York (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 144:** Maine (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 145:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 146:** San Diego (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 146:** Atlanta (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 147:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 148:** New York (First Bat) vs. San Francisco (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 148:** Maine (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 149:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 150:** San Francisco (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 150:** Miami (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 151:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 152:** New York (First Bat) vs. Seattle (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 152:** Maine (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 153:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 154:** Seattle (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 154:** Charlotte (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 155:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 156:** New York (First Bat) vs. Austin (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 156:** Maine (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 157:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 158:** Austin (First Bat) vs. New York (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 158:** Cleveland (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 159:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 160:** Cleveland (First Bat) vs. Los Angeles (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 160:** Maine (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 161:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 162:** Los Angeles (First Bat) vs. Cleveland (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 162:** Detroit (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 163:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 164:** Cleveland (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 164:** Maine (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 165:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 166:** San Diego (First Bat) vs. Cleveland (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 166:** Los Angeles (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 167:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 168:** Cleveland (First Bat) vs. San Francisco (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 168:** Maine (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 169:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 170:** San Francisco (First Bat) vs. Cleveland (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 170:** San Diego (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 171:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 172:** Cleveland (First Bat) vs. Seattle (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 172:** Maine (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 173:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 174:** Seattle (First Bat) vs. Cleveland (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 174:** Seattle (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 175:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 176:** Cleveland (First Bat) vs. Austin (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 176:** Maine (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 177:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 178:** Austin (First Bat) vs. Cleveland (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 178:** Austin (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 179:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 180:** Los Angeles (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 180:** Maine (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 181:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 182:** San Diego (First Bat) vs. Los Angeles (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 182:** St. Louis (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 183:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 184:** Los Angeles (First Bat) vs. San Francisco (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 184:** Maine (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 185:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 186:** San Francisco (First Bat) vs. Los Angeles (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 186:** Kansas City (First Bat) vs. Maine (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 187:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 188:** Los Angeles (First Bat) vs. Seattle (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 188:** New York (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 189:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 190:** Seattle (First Bat) vs. Los Angeles (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 190:** Philadelphia (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 191:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 192:** Los Angeles (First Bat) vs. Austin (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 192:** New York (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 193:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 194:** Austin (First Bat) vs. Los Angeles (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 194:** Atlanta (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 195:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 196:** San Diego (First Bat) vs. San Francisco (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 196:** New York (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 197:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 198:** San Francisco (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 198:** Miami (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 199:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 200:** San Diego (First Bat) vs. Seattle (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 200:** New York (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 201:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 202:** Seattle (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 202:** Charlotte (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 203:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 204:** San Diego (First Bat) vs. Austin (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 204:** New York (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 205:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 206:** Austin (First Bat) vs. San Diego (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 206:** Cleveland (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 207:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 208:** San Francisco (First Bat) vs. Seattle (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 208:** New York (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 209:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 210:** Seattle (First Bat) vs. San Francisco (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 210:** Detroit (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 211:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 212:** San Francisco (First Bat) vs. Austin (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 212:** New York (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 213:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 214:** Austin (First Bat) vs. San Francisco (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 214:** Los Angeles (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 215:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 216:** Seattle (First Bat) vs. Austin (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 216:** New York (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
 - **Day 217:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
-- **Day 218:** Austin (First Bat) vs. Seattle (Second Bat) at New York Stadium. **Type:** APEX_RESIDENCY_GAME
-- **Day 219:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 220:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 221:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 222:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 223:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 224:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
-- **Day 225:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 218:** San Diego (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 219:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 220:** New York (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 221:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 222:** Seattle (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 223:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 224:** New York (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 225:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 226:** Austin (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 227:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 228:** New York (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 229:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 230:** St. Louis (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 231:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 232:** New York (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 233:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 234:** Kansas City (First Bat) vs. New York (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 235:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 236:** Philadelphia (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 237:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 238:** Atlanta (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 239:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 240:** Philadelphia (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 241:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 242:** Miami (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 243:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 244:** Philadelphia (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 245:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 246:** Charlotte (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 247:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 248:** Philadelphia (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 249:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 250:** Cleveland (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 251:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 252:** Philadelphia (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 253:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 254:** Detroit (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 255:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 256:** Philadelphia (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 257:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 258:** Los Angeles (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 259:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 260:** Philadelphia (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 261:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 262:** San Diego (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 263:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 264:** Philadelphia (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 265:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 266:** Seattle (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 267:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 268:** Philadelphia (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 269:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 270:** Austin (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 271:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 272:** Philadelphia (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 273:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 274:** St. Louis (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 275:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 276:** Philadelphia (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 277:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 278:** Kansas City (First Bat) vs. Philadelphia (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 279:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 280:** Atlanta (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 281:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 282:** Miami (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 283:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 284:** Atlanta (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 285:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 286:** Charlotte (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 287:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 288:** Atlanta (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 289:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 290:** Cleveland (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 291:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 292:** Atlanta (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 293:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 294:** Detroit (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 295:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 296:** Atlanta (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 297:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 298:** Los Angeles (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 299:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 300:** Atlanta (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 301:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 302:** San Diego (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 303:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 304:** Atlanta (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 305:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 306:** Seattle (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 307:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 308:** Atlanta (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 309:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 310:** Austin (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 311:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 312:** Atlanta (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 313:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 314:** St. Louis (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 315:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 316:** Atlanta (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 317:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 318:** Kansas City (First Bat) vs. Atlanta (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 319:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 320:** Miami (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 321:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 322:** Charlotte (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 323:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 324:** Miami (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 325:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 326:** Cleveland (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 327:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 328:** Miami (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 329:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 330:** Detroit (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 331:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 332:** Miami (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 333:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 334:** Los Angeles (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 335:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 336:** Miami (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 337:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 338:** San Diego (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 339:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 340:** Miami (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 341:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 342:** Seattle (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 343:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 344:** Miami (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 345:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 346:** Austin (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 347:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 348:** Miami (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 349:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 350:** St. Louis (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 351:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 352:** Miami (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 353:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 354:** Kansas City (First Bat) vs. Miami (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 355:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 356:** Charlotte (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 357:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 358:** Cleveland (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 359:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 360:** Charlotte (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 361:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 362:** Detroit (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 363:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 364:** Charlotte (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 365:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 366:** Los Angeles (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 367:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 368:** Charlotte (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 369:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 370:** San Diego (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 371:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 372:** Charlotte (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 373:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 374:** Seattle (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 375:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 376:** Charlotte (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 377:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 378:** Austin (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 379:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 380:** Charlotte (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 381:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 382:** St. Louis (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 383:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 384:** Charlotte (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 385:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 386:** Kansas City (First Bat) vs. Charlotte (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 387:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 388:** Cleveland (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 389:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 390:** Detroit (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 391:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 392:** Cleveland (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 393:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 394:** Los Angeles (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 395:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 396:** Cleveland (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 397:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 398:** San Diego (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 399:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 400:** Cleveland (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 401:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 402:** Seattle (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 403:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 404:** Cleveland (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 405:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 406:** Austin (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 407:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 408:** Cleveland (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 409:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 410:** St. Louis (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 411:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 412:** Cleveland (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 413:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 414:** Kansas City (First Bat) vs. Cleveland (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 415:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 416:** Detroit (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 417:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 418:** Los Angeles (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 419:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 420:** Detroit (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 421:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 422:** San Diego (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 423:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 424:** Detroit (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 425:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 426:** Seattle (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 427:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 428:** Detroit (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 429:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 430:** Austin (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 431:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 432:** Detroit (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 433:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 434:** St. Louis (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 435:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 436:** Detroit (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 437:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 438:** Kansas City (First Bat) vs. Detroit (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 439:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 440:** Los Angeles (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 441:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 442:** San Diego (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 443:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 444:** Los Angeles (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 445:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 446:** Seattle (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 447:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 448:** Los Angeles (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 449:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 450:** Austin (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 451:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 452:** Los Angeles (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 453:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 454:** St. Louis (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 455:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 456:** Los Angeles (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 457:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 458:** Kansas City (First Bat) vs. Los Angeles (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 459:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 460:** San Diego (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 461:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 462:** Seattle (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 463:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 464:** San Diego (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 465:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 466:** Austin (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 467:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 468:** San Diego (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 469:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 470:** St. Louis (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 471:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 472:** San Diego (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 473:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 474:** Kansas City (First Bat) vs. San Diego (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 475:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 476:** Seattle (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 477:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 478:** Austin (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 479:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 480:** Seattle (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 481:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 482:** St. Louis (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 483:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 484:** Seattle (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 485:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 486:** Kansas City (First Bat) vs. Seattle (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 487:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 488:** Austin (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 489:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 490:** St. Louis (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 491:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 492:** Austin (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 493:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 494:** Kansas City (First Bat) vs. Austin (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 495:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 496:** St. Louis (First Bat) vs. Kansas City (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 497:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Travel / Rest Day. Environmental Adjustment: Reduces frequent travel and carbon emissions within the extended residency model.
+- **Day 498:** Kansas City (First Bat) vs. St. Louis (Second Bat) at Maine Stadium. **Type:** APEX_RESIDENCY_GAME
+- **Day 499:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 500:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 501:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 502:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 503:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 504:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
+- **Day 505:** TRAVEL / REST DAY. **Environmental Adjustment Note:** Departure / Rest Day. Environmental Adjustment: Optimizes team travel logistics, reducing overall carbon footprint.
 
