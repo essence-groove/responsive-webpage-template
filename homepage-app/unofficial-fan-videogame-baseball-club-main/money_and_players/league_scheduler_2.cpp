@@ -1,8 +1,8 @@
 /**
  * @file league_scheduler_2.cpp
- * @brief Implements the scheduling logic for the APMW baseball league (v3.9.1).
+ * @brief Implements the scheduling logic for the Ayurveda Project Management World baseball league (v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
- * @date 2025-Jul-27
+ * @date 2025-Aug-07
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
@@ -139,14 +139,12 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     int day_offset = 1;
 
     // --- v3.9.1 Dormancy Fix: Cluster games for visitors ---
-    // All Host vs Visitor games are played first
     for (const auto& visitor : visitors) {
         Game g1 = {.team1 = visitor, .team2 = host, .designated_home_team_for_batting = host, .actual_host_stadium = host, .date = "Day " + std::to_string(start_day + day_offset++), .game_type = GameType::REGULAR_SEASON};
         block.games.push_back(g1);
     }
     day_offset++; // Rest day
 
-    // Then, all neutral site games are played
     for (size_t i = 0; i < visitors.size(); ++i) {
         for (size_t j = i + 1; j < visitors.size(); ++j) {
             const auto& visitor1 = visitors[i];
@@ -162,7 +160,6 @@ ResidencyBlock LeagueScheduler2::createResidencyBlock(const Team& host, const st
     }
     day_offset++; // Rest day
 
-    // Finally, the second round of Host vs Visitor games
     for (const auto& visitor : visitors) {
         Game g2 = {.team1 = host, .team2 = visitor, .designated_home_team_for_batting = visitor, .actual_host_stadium = host, .date = "Day " + std::to_string(start_day + day_offset++), .game_type = GameType::REGULAR_SEASON};
         block.games.push_back(g2);
@@ -216,7 +213,6 @@ std::vector<Game> LeagueScheduler2::createApexTournamentGames(std::vector<Team*>
             games.push_back(game);
             day_offset += 2; // Game + Rest Day
 
-            // Simulate winner for seeding
             int winner_id = (rng() % 2 == 0) ? game.team1.id : game.team2.id;
             seeding_wins[winner_id]++;
         }
@@ -235,14 +231,12 @@ std::vector<Game> LeagueScheduler2::createApexTournamentGames(std::vector<Team*>
 
         day_offset += 2; // Rest days before playoffs
 
-        // Semi-Finals
         Game semi1 = {.team1 = *seed1, .team2 = *seed4, .designated_home_team_for_batting = *seed1, .actual_host_stadium = host_team, .date = "Day " + std::to_string(start_day + day_offset), .game_type = GameType::APEX_RESIDENCY_GAME};
         Game semi2 = {.team1 = *seed2, .team2 = *seed3, .designated_home_team_for_batting = *seed2, .actual_host_stadium = host_team, .date = "Day " + std::to_string(start_day + day_offset), .game_type = GameType::APEX_RESIDENCY_GAME};
         games.push_back(semi1);
         games.push_back(semi2);
         day_offset += 3; // Game day + rest days
 
-        // Final (simulated winners of semis)
         Game final_game = {.team1 = *seed1, .team2 = *seed2, .designated_home_team_for_batting = *seed1, .actual_host_stadium = host_team, .date = "Day " + std::to_string(start_day + day_offset), .game_type = GameType::APEX_RESIDENCY_GAME};
         games.push_back(final_game);
         day_offset += 2;
