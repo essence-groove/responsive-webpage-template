@@ -2,7 +2,7 @@
  * @file report_logic.cpp
  * @brief Implements the ReportGenerator class (v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
- * @date 2025-Jul-27
+ * @date 2025-Aug-07
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
@@ -25,7 +25,7 @@ void ReportGenerator::generate(const std::vector<ResidencyBlock>& schedule, cons
         return;
     }
 
-    reportFile << "# APMW Season Schedule Report (v3.9)\n\n";
+    reportFile << "# Ayurveda Project Management World Season Schedule Report (v3.9)\n\n";
 
     DateConverter date_converter;
 
