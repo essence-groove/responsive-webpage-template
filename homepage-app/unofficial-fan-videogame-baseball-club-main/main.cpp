@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.9.2).
+ * @brief Main entry point for the unofficial-fan-videogame-baseball-club game (v3.9.1).
  * @author  Eeshvar Das (Erik Douglas Ward)
  * @date 2025-Aug-07
  *
@@ -43,6 +43,7 @@ void initializeNewLeague(LeagueState& state) {
     state.teams.emplace_back(current_team_id++, "Atlanta", "Peach Blossom", UnionType::ATLANTIC, RegionType::TIDEWATER);
     state.teams.emplace_back(current_team_id++, "Miami", "Manatee Calm", UnionType::ATLANTIC, RegionType::TIDEWATER);
     state.teams.emplace_back(current_team_id++, "Charlotte", "Aviator Grit", UnionType::ATLANTIC, RegionType::TIDEWATER);
+    // v3.9.1: Team Identity Refinement (Risk Management)
     state.teams.emplace_back(current_team_id++, "Cleveland", "Sentinel Resolve", UnionType::ATLANTIC, RegionType::THE_CONFLUENCE);
     state.teams.emplace_back(current_team_id++, "Detroit", "Automaker Drive", UnionType::ATLANTIC, RegionType::THE_CONFLUENCE);
 
@@ -71,6 +72,7 @@ void initializeNewLeague(LeagueState& state) {
 
 int main() {
     std::cout << "Starting Ayurveda Project Management World League Simulation (C++ 3.9.2)" << std::endl;
+
 
     PersistenceAgent persistence_agent;
     const std::string save_filename = "apm_world_save.dat";
