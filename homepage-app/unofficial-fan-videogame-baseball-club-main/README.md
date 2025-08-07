@@ -1,6 +1,6 @@
-# APMW Baseball Simulator (unofficial-fan-videogame-baseball-club)
+# Ayurveda Project Management World Baseball Simulator
 
-This is an unofficial fan-made baseball video game, serving as the **C++ 3.9.2 core** for the Ayurveda Project Management World (APMW) project. It is a text-based simulation of a baseball league, built with a focus on modularity, agent-driven-logic, and deep lore integration.
+This is an unofficial fan-made baseball video game, serving as the **C++ 3.9.2 core** for the Ayurveda Project Management World project. It is a text-based simulation of a baseball league, built with a focus on modularity, agent-driven-logic, and deep lore integration.
 
 ## Generated Schedule
 
@@ -44,7 +44,7 @@ This project uses CMake. You will need a C++ compiler (like G++, Clang, or MSVC)
 4.  **Run the executable:**
     ```bash
     # The executable will be inside the 'build' directory.
-    ./build/apmw_baseball_simulator
+    ./build/apm_world_simulator
     ```
 
 ## License

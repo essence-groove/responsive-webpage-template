@@ -23,56 +23,28 @@
 
 namespace LeagueSchedulerNS { 
 
-/**
- * @class LeagueScheduler2
- * @brief Manages the generation of the APMW season schedule for v3.9.1.
- */
 class LeagueScheduler2 {
 public:
-    // Constructor
     LeagueScheduler2();
-
-    // Main function to generate the season schedule
     std::vector<ResidencyBlock> generateSeasonSchedule(std::vector<Team>& all_teams, int games_per_team);
 
 private:
-    // Private helper struct to track team status during scheduling.
     struct TeamScheduleStatus {
         int available_day = 1;
         int games_scheduled = 0;
         int host_blocks_assigned = 0;
     };
 
-    /**
-     * @brief Creates the special, extended Apex Residency block.
-     */
     ResidencyBlock createApexResidency(std::vector<Team*>& participants, int start_day);
-
-    /**
-     * @brief Selects teams for the Apex event and sets player ApexStatus.
-     * v3.9.1: Signature updated to pass all_teams by non-const reference to modify player status.
-     */
     std::vector<Team*> selectApexParticipants(std::vector<Team>& all_teams);
-    
-    /**
-     * @brief Simulates the outcome of the Apex event and awards points to teams.
-     */
     void simulateApexEventAndAwardPoints(const ResidencyBlock& apex_block, std::vector<Team>& all_teams);
-
-    /**
-     * @brief Helper to create a standard residency block.
-     */
     ResidencyBlock createResidencyBlock(const Team& host, const std::vector<Team>& visitors, int start_day, int& out_duration_days);
-
-    /**
-     * @brief Generates a series of neutral-site games (Crossroads or Regional).
-     */
     std::vector<Game> generateNeutralSiteSeries(const Team& visitor1, const Team& visitor2, const Team& host_stadium, int num_games, GameType game_type, int start_day, int& day_offset);
-
-    // Random number generator for shuffling teams and determining batting order.
-    std::mt19937 rng;
     
-    // Flag to ensure Apex event is scheduled only once.
+    // v3.9.1: New helper for creating the Apex tournament games.
+    std::vector<Game> createApexTournamentGames(std::vector<Team*>& participants, const Team& host_team, int start_day, int& day_offset);
+
+    std::mt19937 rng;
     bool apex_event_scheduled = false;
 };
 
