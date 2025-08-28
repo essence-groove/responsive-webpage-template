@@ -18,15 +18,12 @@
  */
 
 import 'package:flutter/material.dart';
-import './adaptive_agenda_screen.dart'; // Import the agenda screen
+import './adaptive_agenda_screen.dart';
 
-// Main function to run the app
 void main() {
-  // No API key initialization is needed for the mock service.
   runApp(const AdvocacyOSApp());
 }
 
-// Root widget of the application
 class AdvocacyOSApp extends StatelessWidget {
   const AdvocacyOSApp({super.key});
 
@@ -35,6 +32,7 @@ class AdvocacyOSApp extends StatelessWidget {
     return MaterialApp(
       title: 'Capability Engine',
       theme: ThemeData(
+        // Theme choices are intentionally high-contrast for accessibility.
         primarySwatch: Colors.indigo,
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFFF5F5F7),
@@ -64,7 +62,6 @@ class AdvocacyOSApp extends StatelessWidget {
   }
 }
 
-// The main screen for the "Compassionate Check-In" flow
 class CompassionateCheckInScreen extends StatefulWidget {
   const CompassionateCheckInScreen({super.key});
 
@@ -75,6 +72,7 @@ class CompassionateCheckInScreen extends StatefulWidget {
 
 class _CompassionateCheckInScreenState
     extends State<CompassionateCheckInScreen> {
+  // ... (state variables remain the same) ...
   CheckInStep _currentStep = CheckInStep.energyLevel;
   double _energyLevel = 3.0;
   final List<String> _selectedLimitations = [];
@@ -88,6 +86,7 @@ class _CompassionateCheckInScreenState
   final TextEditingController _customLimitationController =
       TextEditingController();
 
+  // ... (functions like _nextStep, _finishCheckIn, etc. remain the same) ...
   void _nextStep() {
     setState(() {
       if (_currentStep == CheckInStep.energyLevel) {
@@ -143,6 +142,7 @@ class _CompassionateCheckInScreenState
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,32 +174,42 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('energyStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ... (Text widgets)
         const Text('Good morning.', style: TextStyle(fontSize: 20)),
         const SizedBox(height: 8),
         Text('Let\'s check in. How is your energy level right now?',
             style: Theme.of(context).textTheme.headlineSmall),
         const Spacer(),
-        Center(
-          child: Text(
-            _energyLevel.round().toString(),
-            style: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+        // ACCESSIBILITY: Added semantics for the slider.
+        Semantics(
+          label: "Energy level slider",
+          value: "Current level is ${_energyLevel.round()} out of 5",
+          child: Column(
+            children: [
+              Center(
+                child: Text(
+                  _energyLevel.round().toString(),
+                  style: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Slider(
+                value: _energyLevel,
+                min: 1,
+                max: 5,
+                divisions: 4,
+                label: _energyLevel.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    _energyLevel = value;
+                  });
+                },
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [Text('Very Low'), Text('Very High')],
+              ),
+            ],
           ),
-        ),
-        Slider(
-          value: _energyLevel,
-          min: 1,
-          max: 5,
-          divisions: 4,
-          label: _energyLevel.round().toString(),
-          onChanged: (double value) {
-            setState(() {
-              _energyLevel = value;
-            });
-          },
-        ),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [Text('Very Low'), Text('Very High')],
         ),
         const Spacer(),
         Center(
@@ -217,6 +227,7 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('limitationsStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ... (Text widgets)
         Text('Got it.', style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(height: 8),
         Text('Are you noticing any other limitations or feelings right now?',
@@ -224,35 +235,39 @@ class _CompassionateCheckInScreenState
         const SizedBox(height: 8),
         const Text('(Select any that apply)'),
         const SizedBox(height: 24),
-        Wrap(
-          spacing: 12.0,
-          runSpacing: 12.0,
-          children: [
-            ..._predefinedLimitations.map((limitation) {
-              final isSelected = _selectedLimitations.contains(limitation);
-              return ChoiceChip(
-                label: Text(limitation),
-                selected: isSelected,
-                onSelected: (bool selected) {
-                  setState(() {
-                    if (selected) {
-                      _selectedLimitations.add(limitation);
-                    } else {
-                      _selectedLimitations.remove(limitation);
-                    }
-                  });
-                },
-                selectedColor: Colors.indigo[100],
-                labelStyle: TextStyle(
-                    color: isSelected ? Colors.indigo[900] : Colors.black),
-              );
-            }).toList(),
-            ActionChip(
-              avatar: const Icon(Icons.add),
-              label: const Text('Add Custom'),
-              onPressed: _showAddCustomLimitationDialog,
-            ),
-          ],
+        // ACCESSIBILITY: Added semantics for the group of chips.
+        Semantics(
+          label: "Select your current limitations",
+          child: Wrap(
+            spacing: 12.0,
+            runSpacing: 12.0,
+            children: [
+              ..._predefinedLimitations.map((limitation) {
+                final isSelected = _selectedLimitations.contains(limitation);
+                return ChoiceChip(
+                  label: Text(limitation),
+                  selected: isSelected,
+                  onSelected: (bool selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedLimitations.add(limitation);
+                      } else {
+                        _selectedLimitations.remove(limitation);
+                      }
+                    });
+                  },
+                  selectedColor: Colors.indigo[100],
+                  labelStyle: TextStyle(
+                      color: isSelected ? Colors.indigo[900] : Colors.black),
+                );
+              }).toList(),
+              ActionChip(
+                avatar: const Icon(Icons.add),
+                label: const Text('Add Custom'),
+                onPressed: _showAddCustomLimitationDialog,
+              ),
+            ],
+          ),
         ),
         const Spacer(),
         Center(
@@ -270,6 +285,7 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('needsStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ... (Text widgets)
         Text('Thank you for sharing.',
             style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(height: 8),
@@ -278,13 +294,17 @@ class _CompassionateCheckInScreenState
         const SizedBox(height: 8),
         const Text('(Optional)'),
         const SizedBox(height: 24),
-        TextField(
-          controller: _notesController,
-          maxLines: 5,
-          decoration: InputDecoration(
-            hintText: 'e.g., "A moment of quiet," "Some gentle stretching"...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+        // ACCESSIBILITY: Added semantics for the text field.
+        Semantics(
+          label: "Optional notes about your current needs.",
+          child: TextField(
+            controller: _notesController,
+            maxLines: 5,
+            decoration: InputDecoration(
+              hintText: 'e.g., "A moment of quiet," "Some gentle stretching"...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ),
