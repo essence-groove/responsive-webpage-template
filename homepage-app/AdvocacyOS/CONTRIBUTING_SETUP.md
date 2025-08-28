@@ -11,7 +11,7 @@ First, you need to clone the project's repository from GitHub to your local mach
 ```
 git clone https://github.com/your-username/advocacyos.git
 ```
-
+This will download the entire homepage-app repository. Navigate into the AdvocacyOS project directory:
 ```
 cd homepage-app/AdvocacyOS
 ```
