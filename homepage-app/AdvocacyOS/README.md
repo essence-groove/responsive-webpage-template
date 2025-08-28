@@ -86,39 +86,39 @@ This powerful feedback loop enables AdvocacyOS to stand apart by:
 *   **Providing a transparent record** of the AI's performance.
 This ensures the AI is not just intelligent, but also **wise, safe, and genuinely helpful** for the disability community it serves, directly addressing the "Trust Gap".
 
-### Relevance to The Capability Engine [2, 4, 61, 62]
-The "Stax-like" feedback workflow is also critical for the upcoming **Capability Engine** module [2, 4, 61, 62]. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment [2, 4, 61, 62].
+### Relevance to The Capability Engine
+The "Stax-like" feedback workflow is also critical for the upcoming **Capability Engine** module. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment.
 
 ### Phased Integration of the "Stax-like" Feedback System
-To strategically manage complexity and ensure a rapid deployment of a valuable tool, AdvocacyOS adopts a phased approach for integrating its feedback system. This approach prioritizes immediate functionality while setting the stage for future enhancements [63-66].
+To strategically manage complexity and ensure a rapid deployment of a valuable tool, AdvocacyOS adopts a phased approach for integrating its feedback system. This approach prioritizes immediate functionality while setting the stage for future enhancements.
 
 #### Phase 1: Initial Launch (Internal "Stax-like" System)
-For the initial release, the core feedback mechanism is built directly into the AdvocacyOS infrastructure using its existing tech stack (Flutter and Firebase) [64-67].
-*   **Functionality:** After the AI provides a task breakdown (e.g., in "The Adaptive Now Agenda"), a simple, non-intrusive rating widget appears. This widget captures the four key metrics of the "Stax-like" workflow: **Accuracy, Safety, Tone, and Actionability** [67-70].
-*   **Data Storage:** This valuable feedback, along with the user's query and the AI's response, is securely saved to AdvocacyOS's own **Firestore database** [67-70].
-*   **Benefits:** This approach allows AdvocacyOS to capture the *essential function* of the "Stax-like" workflow—collecting structured user feedback—without the technical overhead or complexity of integrating a new, unknown third-party API. It ensures that invaluable safety and quality data can be gathered from day one [67-70].
+For the initial release, the core feedback mechanism is built directly into the AdvocacyOS infrastructure using its existing tech stack (Flutter and Firebase).
+*   **Functionality:** After the AI provides a task breakdown (e.g., in "The Adaptive Now Agenda"), a simple, non-intrusive rating widget appears. This widget captures the four key metrics of the "Stax-like" workflow: **Accuracy, Safety, Tone, and Actionability**.
+*   **Data Storage:** This valuable feedback, along with the user's query and the AI's response, is securely saved to AdvocacyOS's own **Firestore database**.
+*   **Benefits:** This approach allows AdvocacyOS to capture the *essential function* of the "Stax-like" workflow—collecting structured user feedback—without the technical overhead or complexity of integrating a new, unknown third-party API. It ensures that invaluable safety and quality data can be gathered from day one.
 
 #### Phase 2: Post-Launch (Evaluating a Formal API)
-Once AdvocacyOS is actively in use and has a steady stream of feedback data, the project will be in a much stronger position to evaluate a formal API integration [71-74].
-*   **Informed Decision:** With real-world usage, AdvocacyOS will have a deep understanding of its specific needs, the volume of feedback, and the exact features required from an external API (like Stax, if it exists) [71-74].
-*   **Data Migration:** The valuable data already collected in Firestore can be used to benchmark, test, or even migrate to a new system if a formal API or more advanced internal system is adopted [71-74].
-*   **Reduced Risk:** This strategy avoids committing to an unknown system early on, allowing for a more informed choice or build based on concrete usage and evidence [71, 74-76].
+Once AdvocacyOS is actively in use and has a steady stream of feedback data, the project will be in a much stronger position to evaluate a formal API integration.
+*   **Informed Decision:** With real-world usage, AdvocacyOS will have a deep understanding of its specific needs, the volume of feedback, and the exact features required from an external API (like Stax, if it exists).
+*   **Data Migration:** The valuable data already collected in Firestore can be used to benchmark, test, or even migrate to a new system if a formal API or more advanced internal system is adopted.
+*   **Reduced Risk:** This strategy avoids committing to an unknown system early on, allowing for a more informed choice or build based on concrete usage and evidence.
 
-This built-in feedback loop is considered the most effective and user-centric path, prioritizing immediate value delivery to the community while strategically planning for future enhancements [75-78].
+This built-in feedback loop is considered the most effective and user-centric path, prioritizing immediate value delivery to the community while strategically planning for future enhancements.
 
 ### Creator's Personal Commitment and Vision
-AdvocacyOS is a direct embodiment of the creator's personal experiences, technical skills, and strategic thinking, designed to address a critical, underserved need [49, 75-77]. The application is an ultimate expression of the "Ayurveda Tycoon" model, which uses technology and systematic thinking (the Tycoon) to foster balance, justice, and well-being (the Ayurveda) [50, 75-77].
+AdvocacyOS is a direct embodiment of the creator's personal experiences, technical skills, and strategic thinking, designed to address a critical, underserved need. The application is an ultimate expression of the "Ayurveda Tycoon" model, which uses technology and systematic thinking (the Tycoon) to foster balance, justice, and well-being (the Ayurveda).
 
-The comprehensive framework for the "Ayurveda Project Management World" (APM-WORLD) was designed by Eeshvar Das [51, 79-81]. The creator, Eeshvar Das, is actively building and utilizing AdvocacyOS daily, with the intent for it to eventually integrate with Ayurveda Project Management IO [79-81]. This commitment underscores the deep personal connection and foundational philosophy behind the project [79-81].
+The comprehensive framework for the "Ayurveda Project Management World" (APM-WORLD) was designed by Eeshvar Das. The creator, Eeshvar Das, is actively building and utilizing AdvocacyOS daily, with the intent for it to eventually integrate with Ayurveda Project Management IO. This commitment underscores the deep personal connection and foundational philosophy behind the project.
 
 #### AdvocacyOS: Contribution and Development Update
 #### How to Contribute & Current Status
-AdvocacyOS is an open-source project built with and for the disability community [79-81]. Your insights, feedback, and contributions are welcome and deeply valued [79-81]. Please feel free to open an issue or submit a pull request on our GitHub repository [79-81].
+AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository.
 
 ##### Project Status: Emergency Action Focus:
-The core mission of AdvocacyOS is to provide a tool for survival and self-advocacy when traditional support systems fail [82-85]. The reality for many with physical disabilities is that a broken promise or a missed connection isn't an inconvenience—it can be a life-threatening emergency [82-85].
-To that end, the development of the Capability Engine is being immediately refocused to address this urgent reality [82-85]. The initial MVP will be centered on an emergency action plan: guiding a user through the critical first steps when essential support suddenly becomes unavailable [82-85].
+The core mission of AdvocacyOS is to provide a tool for survival and self-advocacy when traditional support systems fail. The reality for many with physical disabilities is that a broken promise or a missed connection isn't an inconvenience—it can be a life-threatening emergency.
+To that end, the development of the Capability Engine is being immediately refocused to address this urgent reality. The initial MVP will be centered on an emergency action plan: guiding a user through the critical first steps when essential support suddenly becomes unavailable.
 
 ##### Current Development Status (As of August 2025):
-The project is in a brief, planned pause while the creator, Eeshvar Das, establishes the secure Google Cloud perimeter and backend environment [86-89]. This is a non-negotiable step to ensure the absolute privacy and security required for handling the sensitive situations this app is designed for [86-89].
-Development on the live AI integration—focused on this new emergency protocol—will resume the moment this secure foundation is in place [86-89].
+The project is in a brief, planned pause while the creator, Eeshvar Das, establishes the secure Google Cloud perimeter and backend environment. This is a non-negotiable step to ensure the absolute privacy and security required for handling the sensitive situations this app is designed for.
+Development on the live AI integration—focused on this new emergency protocol—will resume the moment this secure foundation is in place.
