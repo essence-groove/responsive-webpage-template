@@ -99,3 +99,24 @@ This ensures the AI is not just intelligent, but also **wise, safe, and genuinel
 
 The "Stax-like" feedback workflow is also critical for the upcoming **Capability Engine** module [17, 18]. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment [17, 18].
 
+### Phased Integration of the "Stax-like" Feedback System
+
+To strategically manage complexity and ensure a rapid deployment of a valuable tool, AdvocacyOS adopts a phased approach for integrating its feedback system. This approach prioritizes immediate functionality while setting the stage for future enhancements.
+
+#### Phase 1: Initial Launch (Internal "Stax-like" System)
+
+For the initial release, the core feedback mechanism is built directly into the AdvocacyOS infrastructure using its existing tech stack (Flutter and Firebase).
+
+*   **Functionality:** After the AI provides a task breakdown (e.g., in "The Adaptive Now Agenda"), a simple, non-intrusive rating widget appears. This widget captures the four key metrics of the "Stax-like" workflow: **Accuracy, Safety, Tone, and Actionability**.
+*   **Data Storage:** This valuable feedback, along with the user's query and the AI's response, is securely saved to AdvocacyOS's own **Firestore database**.
+*   **Benefits:** This approach allows AdvocacyOS to capture the *essential function* of the "Stax-like" workflow—collecting structured user feedback—without the technical overhead or complexity of integrating a new, unknown third-party API. It ensures that invaluable safety and quality data can be gathered from day one.
+
+#### Phase 2: Post-Launch (Evaluating a Formal API)
+
+Once AdvocacyOS is actively in use and has a steady stream of feedback data, the project will be in a much stronger position to evaluate a formal API integration.
+
+*   **Informed Decision:** With real-world usage, AdvocacyOS will have a deep understanding of its specific needs, the volume of feedback, and the exact features required from an external API.
+*   **Data Migration:** The valuable data already collected in Firestore can be used to benchmark, test, or even migrate to a new system if a formal API or more advanced internal system is adopted.
+*   **Reduced Risk:** This strategy avoids committing to an unknown system early on, allowing for a more informed choice or build based on concrete usage and evidence.
+
+This built-in feedback loop is considered the most effective and user-centric path, prioritizing immediate value delivery to the community while strategically planning for future enhancements.
