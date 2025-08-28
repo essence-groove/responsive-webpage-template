@@ -120,3 +120,9 @@ Once AdvocacyOS is actively in use and has a steady stream of feedback data, the
 *   **Reduced Risk:** This strategy avoids committing to an unknown system early on, allowing for a more informed choice or build based on concrete usage and evidence.
 
 This built-in feedback loop is considered the most effective and user-centric path, prioritizing immediate value delivery to the community while strategically planning for future enhancements.
+
+### Creator's Personal Commitment and Vision
+
+AdvocacyOS is a direct embodiment of the creator's personal experiences, technical skills, and strategic thinking, designed to address a critical, underserved need [1]. The application is an ultimate expression of the "Ayurveda Tycoon" model, which uses technology and systematic thinking (the Tycoon) to foster balance, justice, and well-being (the Ayurveda) [2].
+
+The comprehensive framework for the "Ayurveda Project Management World" (APMW) was designed by Eeshvar Das [3]. The creator, Eeshvar Das, is actively building and utilizing AdvocacyOS daily, with the intent for it to eventually integrate with Ayurveda Project Management IO. This commitment underscores the deep personal connection and foundational philosophy behind the project.
