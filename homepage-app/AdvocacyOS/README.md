@@ -127,9 +127,9 @@ AdvocacyOS is a direct embodiment of the creator's personal experiences, technic
 
 The comprehensive framework for the "Ayurveda Project Management World" (APM-WORLD) was designed by Eeshvar Das [3]. The creator, Eeshvar Das, is actively building and utilizing AdvocacyOS daily, with the intent for it to eventually integrate with Ayurveda Project Management IO. This commitment underscores the deep personal connection and foundational philosophy behind the project.
 
-#### AdvocacyOS: Contribution and Development Update [1]
-#### How to Contribute & Current Status [1]
-AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository. [1]
+#### AdvocacyOS: Contribution and Development Update 
+#### How to Contribute & Current Status 
+AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository.
 
 ##### Project Status: Emergency Action Focus:
 
