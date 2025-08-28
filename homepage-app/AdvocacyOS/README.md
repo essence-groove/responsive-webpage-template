@@ -1,13 +1,13 @@
 ### AdvocacyOS: A Personal Operating System for Justice
-AdvocacyOS is a powerful and innovative digital tool designed to empower individuals with physical disabilities in their self-advocacy efforts [16, 21]. It provides a secure and private system for documenting discrimination, managing advocacy, and building a robust body of evidence [16, 21]. Think of it as a personal, private, and secure "operating system" for justice [16, 21].
+AdvocacyOS is a powerful and innovative digital tool designed to empower individuals with physical disabilities in their self-advocacy efforts. It provides a secure and private system for documenting discrimination, managing advocacy, and building a robust body of evidence. Think of it as a personal, private, and secure "operating system" for justice.
 
-➡️ **Explore the full knowledge base on** [NotebookLM](https://notebooklm.google.com/notebook/5e1d9b50-ea51-4767-a62b-fdaa26c9cf29) (request access if needed) [6, 8, 9]
+➡️ **Explore the full knowledge base on** [NotebookLM](https://notebooklm.google.com/notebook/5e1d9b50-ea51-4767-a62b-fdaa26c9cf29) (request access if needed)
 
 #### The Core Problem
-Individuals with disabilities frequently encounter systemic discrimination [8, 9, 22]. Their claims are often dismissed because they lack a simple, secure, and organized system to track patterns of events and evidence over time [8, 9, 22]. The burden of proof is high, and existing tools are often inadequate, leading to a cycle of vulnerability and injustice [8, 9, 22].
+Individuals with disabilities frequently encounter systemic discrimination. Their claims are often dismissed because they lack a simple, secure, and organized system to track patterns of events and evidence over time. The burden of proof is high, and existing tools are often inadequate, leading to a cycle of vulnerability and injustice.
 
 #### The Solution: A Personal Fortress for Evidence
-AdvocacyOS empowers users by transforming their lived experiences into a structured, chronologically-ordered, and easily shareable case file [22-24]. It is not a social platform but a **personal fortress for evidence** [22-24].
+AdvocacyOS empowers users by transforming their lived experiences into a structured, chronologically-ordered, and easily shareable case file. It is not a social platform but a **personal fortress for evidence**.
 
 #### Key Features
 *   **Incident Ledger**: A simple, time-stamped journal to log every interaction or incident of discrimination as it occurs [23-25].
