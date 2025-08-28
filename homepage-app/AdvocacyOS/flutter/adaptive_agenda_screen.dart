@@ -104,8 +104,8 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
     if (widget.energyOutlook <= 2) {
       outlookText = "and I hear that you're feeling wary about using it.";
     } else {
-      // This line has been changed to be more neutral.
-      outlookText = "and I understand you're feeling more confident about it.";
+      // This line has been changed to be safer and more neutral.
+      outlookText = "and I've noted your outlook on using it.";
     }
 
     return Column(
