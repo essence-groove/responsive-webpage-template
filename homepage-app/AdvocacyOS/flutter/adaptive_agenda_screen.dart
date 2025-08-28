@@ -90,7 +90,7 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
     );
   }
 
-  // **UPDATED UI**
+  // **UPDATED UI TEXT**
   Widget _buildGoalInputView() {
     String limitationsText = widget.limitations.join(' and ');
     if (limitationsText.isEmpty) {
@@ -113,8 +113,8 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
         TextField(
           controller: _goalController,
           decoration: InputDecoration(
-            // **UPDATED HINT TEXT**
-            hintText: 'e.g., "My support person is missing"',
+            // **UPDATED HINT TEXT for Escalated Emergency**
+            hintText: 'e.g., "My essential support plan has failed"',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -133,12 +133,14 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
 
   Widget _buildLiveAgendaView() {
     if (_tasks.isEmpty) {
-      return const Center(child: Text("No tasks were generated. Please try again."));
+      return const Center(
+          child: Text("No tasks were generated. Please try again."));
     }
 
     final String aiSuggestion = "Let's start with one small, grounding step.";
-    final MicroTask currentTask =
-        _tasks.firstWhere((task) => !task.isCompleted, orElse: () => _tasks.first);
+    final MicroTask currentTask = _tasks.firstWhere(
+        (task) => !task.isCompleted,
+        orElse: () => _tasks.first);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
