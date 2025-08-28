@@ -31,8 +31,7 @@ Screen Reader Compatibility:
 *   Ensuring all elements are properly labeled and navigable for users of assistive technologies.
 *   Clear & High-Contrast UI: Using a clean design with readable fonts and sufficient color contrast to reduce cognitive load and aid visibility.
 *   Large Touch Targets: Making all interactive elements, like buttons and sliders, large and easy to tap, especially during high-stress situations.
-*   Core Principles -> ##### Designed for Accessibility section, add the following bullet point:
-    *   Nuanced Energy Assessment: Moving beyond a simple energy level, the app includes a unique "Energy Outlook" assessment. This helps capture a user's confidence in using their energy, allowing for a more empathetic and safer action plan.
+*   Nuanced Energy Assessment: Moving beyond a simple energy level, the app includes a unique "Energy Outlook" assessment. This helps capture a user's confidence in using their energy, allowing for a more empathetic and safer action plan.
 
 
 
