@@ -113,7 +113,7 @@ The comprehensive framework for the "Ayurveda Project Management World" (APM-WOR
 
 #### AdvocacyOS: Contribution and Development Update
 #### How to Contribute & Current Status
-AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository.
+AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository. For detailed instructions on setting up your development environment, please see our [**Contributor Setup Guide**](CONTRIBUTING_SETUP.md).
 
 ##### Project Status: Emergency Action Focus:
 The core mission of AdvocacyOS is to provide a tool for survival and self-advocacy when traditional support systems fail. The reality for many with physical disabilities is that a broken promise or a missed connection isn't an inconvenience—it can be a life-threatening emergency.
