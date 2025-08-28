@@ -13,7 +13,7 @@ git clone https://github.com/your-username/advocacyos.git
 ```
 
 ```
-
+cd homepage-app/AdvocacyOS
 ```
 
 Navigate into the newly created project directory:
