@@ -128,7 +128,7 @@ AdvocacyOS is an open-source project built with and for the disability community
 
 ##### Project Status: Emergency Action Focus:
 The core mission of AdvocacyOS is to provide a tool for survival and self-advocacy when traditional support systems fail. The reality for many with physical disabilities is that a broken promise or a missed connection isn't an inconvenience—it can be a life-threatening emergency.
-To that end, the development of the Capability Engine is being immediately refocused to address this urgent reality. The initial MVP will be centered on an emergency action plan: guiding a user through the critical first steps when essential support suddenly becomes unavailable.
+To that end, the development of the Capability Engine is being immediately refocused to address this urgent reality. The initial MVP will be centered on an emergency action plan: guiding a user through the critical, calm, and grounding first steps when essential support suddenly becomes unavailable.
 
 ##### Current Development Status (As of August 2025):
 The project is in a brief, planned pause while the creator, Eeshvar Das, establishes the secure Google Cloud perimeter and backend environment. This is a non-negotiable step to ensure the absolute privacy and security required for handling the sensitive situations this app is designed for.
