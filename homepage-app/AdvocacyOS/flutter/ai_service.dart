@@ -20,7 +20,7 @@
 import './adaptive_agenda_screen.dart'; // We need the MicroTask class
 
 class AiService {
-  // This is a MOCK function. It simulates a call to the AI for the emergency scenario.
+  // This is a MOCK function. It simulates a call to the AI for the escalated emergency.
   static Future<List<MicroTask>> getAdaptivePlan({
     required String goal,
     required double energyLevel,
@@ -29,14 +29,23 @@ class AiService {
     // Simulate a network delay
     await Future.delayed(const Duration(seconds: 2));
 
-    // **UPDATED MOCK RESPONSE**
-    // This is a pre-written, sample plan for the emergency scenario.
-    // It focuses on calm, grounding, and actionable first steps.
+    // **UPDATED MOCK RESPONSE for Escalated Emergency**
+    // This plan is more strategic, focusing on information gathering and
+    // finding alternative support networks.
     return [
-      MicroTask(description: 'Take one deep breath in and out.'),
-      MicroTask(description: 'Confirm their phone is still unresponsive.'),
-      MicroTask(description: 'Write down the name of one person to call for help.'),
-      MicroTask(description: 'Sit down with a glass of water before calling.'),
+      MicroTask(description: 'Sit down. Take three slow, deep breaths.'),
+      MicroTask(
+          description:
+              'Write down the exact support you need and the deadline.'),
+      MicroTask(
+          description:
+              'Try to contact both family members one last time via text message.'),
+      MicroTask(
+          description:
+              'Open your contacts. Find one other person or local service to call.'),
+      MicroTask(
+          description:
+              'Draft a short, clear message explaining your need before you call.'),
     ];
   }
 }
