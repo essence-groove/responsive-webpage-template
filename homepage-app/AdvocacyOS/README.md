@@ -40,8 +40,8 @@ AdvocacyOS uses a specialized interface for Google's Gemini AI backend, featurin
 
 ##### The "Stax-like" Feedback & Evaluation Workflow
 This innovative approach to transparency is central to the AI-powered AdvocacyOS [16, 17]:
-1.  **User Query**: A user asks Gemini a question (e.g., "Help me draft an email to my landlord about a reasonable accommodation request") [16, 17].
-2.  **AI Response**: The user receives a generated response [16, 17].
+1.  -----
+2.  -----
 3.  **"Stax-like" Rating**: The user rates the response on multiple facets:
     *   **Accuracy**: Was the information factually correct? [16, 17]
     *   **Safety**: Was the advice safe and responsible? [16, 17]
