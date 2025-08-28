@@ -131,7 +131,7 @@ The comprehensive framework for the "Ayurveda Project Management World" (APM-WOR
 ##### How to Contribute & Current Status [1]
 AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository. [1]
 
-**Current Development Status (As of August 2025):** [1]
+**Current Development Status (As of August 2025):**
 
 The initial user interface for the **Capability Engine** has been coded. The project is currently in a brief, planned pause while the creator, Eeshvar Das, handles other necessary matters and establishes the secure backend environment on Google Cloud. This is a critical step to ensure the privacy and integrity of the upcoming AI features. [1]
 
