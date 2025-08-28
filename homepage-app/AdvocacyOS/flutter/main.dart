@@ -105,8 +105,7 @@ class _CompassionateCheckInScreenState
       MaterialPageRoute(
         builder: (context) => AdaptiveAgendaScreen(
           energyLevel: _energyLevel,
-          // We will update the AdaptiveAgendaScreen to accept this new parameter next
-          // energyOutlook: _energyOutlook, 
+          energyOutlook: _energyOutlook, // UNCOMMENTED
           limitations: _selectedLimitations,
         ),
       ),
