@@ -26,36 +26,36 @@ A fundamental principle integrated into AdvocacyOS is **strategic disengagement*
 Strategic disengagement is a conscious act of power [3, 32-34]. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS**. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
 
 #### The Evolution: AdvocacyOS with Gemini AI 🤖
-AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model [35-37].
+AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model.
 
 ##### The Challenge: Need vs. Trust
-1.  **Immediate Need**: Individuals with disabilities require urgent, intelligent assistance for complex bureaucratic and legal challenges [3, 36-38].
-2.  **The Trust Gap**: Generic AI models are not trained on the nuances of disability advocacy and may provide unsafe or inaccurate information [3, 36-38].
+1.  **Immediate Need**: Individuals with disabilities require urgent, intelligent assistance for complex bureaucratic and legal challenges.
+2.  **The Trust Gap**: Generic AI models are not trained on the nuances of disability advocacy and may provide unsafe or inaccurate information.
 
 ##### The Solution: Community-Validated AI
-AdvocacyOS uses a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system [38-41]. This system allows users to not only receive answers but also to participate in validating the quality and safety of those answers for the entire community [38-41].
+AdvocacyOS uses a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system. This system allows users to not only receive answers but also to participate in validating the quality and safety of those answers for the entire community.
 
 ##### The "Stax-like" Feedback & Evaluation Workflow
-This innovative approach to transparency is central to the AI-powered AdvocacyOS [2, 39-41]:
-1.  **User Query**: A user asks Gemini a question (e.g., "Help me draft an email to my landlord about a reasonable accommodation request") [2, 39-41].
-2.  **AI Response**: The user receives a generated response [2, 39-41].
+This innovative approach to transparency is central to the AI-powered AdvocacyOS:
+1.  **User Query**: A user asks Gemini a question (e.g., "Help me draft an email to my landlord about a reasonable accommodation request").
+2.  **AI Response**: The user receives a generated response.
 3.  **"Stax-like" Rating**: The user rates the response on multiple facets:
-    *   **Accuracy**: Was the information factually correct? [2, 39, 42, 43]
-    *   **Safety**: Was the advice safe and responsible? [2, 39, 42, 43]
-    *   **Tone**: Was the language empowering and respectful? [2, 39, 42, 43]
-    *   **Actionability**: Did the response offer a practical solution? [2, 39, 42, 43]
+    *   **Accuracy**: Was the information factually correct?
+    *   **Safety**: Was the advice safe and responsible?
+    *   **Tone**: Was the language empowering and respectful?
+    *   **Actionability**: Did the response offer a practical solution?
 4.  **Multi-Layered Evaluation**: The rated interaction is passed to a secure review console where:
-    *   **Peer Evaluation**: A trusted, vetted group of other users reviews the interaction [2, 39, 42, 43].
-    *   **Principal Evaluation**: The project lead performs a final review and synthesizes feedback to establish a final quality score [2, 39, 44, 45].
+    *   **Peer Evaluation**: A trusted, vetted group of other users reviews the interaction.
+    *   **Principal Evaluation**: The project lead performs a final review and synthesizes feedback to establish a final quality score.
 
-This powerful feedback loop uses evaluation results to fine-tune the AI, build a public knowledge base of best-in-class answers, and provide a transparent record of the AI's performance [4, 44-46]. This ensures the AI is not only intelligent but also **wise, safe, and genuinely helpful** for the disability community [4, 44-46].
+This powerful feedback loop uses evaluation results to fine-tune the AI, build a public knowledge base of best-in-class answers, and provide a transparent record of the AI's performance. This ensures the AI is not only intelligent but also **wise, safe, and genuinely helpful** for the disability community.
 
 #### Future Vision: Internal Empowerment
-The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives [4, 46-48].
-Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md) [14-16]
+The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives.
+Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md)
 
 ## AI Transparency and the "Stax-like" Feedback Workflow
-AdvocacyOS does not defer the use of "Stax"; rather, it explicitly incorporates a system referred to as the "'Stax-like' Feedback & Evaluation Workflow" as a foundational and integral part of its AI architecture [46-52]. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models [1, 21, 22, 25, 30, 31, 47, 48].
+AdvocacyOS does not defer the use of "Stax"; rather, it explicitly incorporates a system referred to as the "'Stax-like' Feedback & Evaluation Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models.
 
 ### The Core Problem: The Trust Gap [1, 21, 22, 25, 30, 53, 54]
 Individuals with disabilities require urgent and intelligent assistance for complex bureaucratic, legal, and social challenges [1, 21, 22, 25, 30, 53, 54]. However, generic AI models are often:
