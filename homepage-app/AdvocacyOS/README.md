@@ -56,3 +56,46 @@ This powerful feedback loop uses evaluation results to fine-tune the AI, build a
 #### Future Vision: Internal Empowerment
 The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives [5, 18].
 Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md)
+
+## AI Transparency and the "Stax-like" Feedback Workflow
+
+AdvocacyOS does not defer the use of "Stax"; rather, it explicitly incorporates a system referred to as the "'Stax-like' Feedback & Evaluation Workflow" as a foundational and integral part of its AI architecture [1-5]. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models [6-11].
+
+### The Core Problem: The Trust Gap [6-9, 11]
+
+Individuals with disabilities require urgent and intelligent assistance for complex bureaucratic, legal, and social challenges [6-9, 11]. However, generic AI models are often:
+*   Not specifically trained on the nuances of disability advocacy [6-9, 11].
+*   Prone to providing unsafe or inaccurate information [6-9, 11].
+*   Lacking a mechanism for responses to be vetted by people with lived experience [6-9, 11].
+
+### The AdvocacyOS Solution: Community-Validated AI [2-4, 6, 11]
+
+AdvocacyOS utilizes a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system [2-4, 6, 11]. This system allows users to not only receive AI-generated answers but also to actively participate in validating their quality and safety for the entire community [2-4, 6, 11].
+
+### The "'Stax-like' Feedback & Evaluation Workflow" [1-5]
+
+This workflow is the core of AdvocacyOS's innovative approach to AI transparency and continuous improvement:
+1.  **User Query:** A user asks Gemini a question related to their advocacy needs (e.g., "Help me draft an email to my landlord about a reasonable accommodation request") [1-5].
+2.  **AI Response:** The user receives a generated response from Gemini AI [1-5].
+3.  **"Stax-like" Rating:** The user rates the AI's response using a structured, multi-faceted rating widget that goes beyond a simple thumbs-up/down [1-5]. This includes ratings for:
+    *   **Accuracy:** Was the information factually correct? [1-5]
+    *   **Safety:** Was the advice safe and responsible? [1-5]
+    *   **Tone:** Was the language empowering and respectful? [1-5]
+    *   **Actionability:** Did the response offer a practical, usable solution? [1-5]
+4.  **Multi-Layered Evaluation:** The user's rated interaction is then passed to a secure review console where [1-5]:
+    *   **Peer Evaluation:** A trusted, vetted group of other users (peers) can review the interaction and provide their own ratings and comments [1-5].
+    *   **Principal Evaluation:** The project lead performs a final review, synthesizing the user and peer feedback to establish a final quality score [1-5].
+
+### How This System Differentiates AdvocacyOS [6-10, 12-16]
+
+This powerful feedback loop enables AdvocacyOS to stand apart by:
+*   **Fine-tuning AI instructions** based on real-world feedback [12-16].
+*   **Building a public knowledge base** of best-in-class answers [12-16].
+*   **Providing a transparent record** of the AI's performance [12-16].
+
+This ensures the AI is not just intelligent, but also **wise, safe, and genuinely helpful** for the disability community it serves, directly addressing the "Trust Gap" [12-16].
+
+### Relevance to The Capability Engine [17, 18]
+
+The "Stax-like" feedback workflow is also critical for the upcoming **Capability Engine** module [17, 18]. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment [17, 18].
+
