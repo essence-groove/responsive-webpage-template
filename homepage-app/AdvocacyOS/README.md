@@ -126,3 +126,10 @@ This built-in feedback loop is considered the most effective and user-centric pa
 AdvocacyOS is a direct embodiment of the creator's personal experiences, technical skills, and strategic thinking, designed to address a critical, underserved need [1]. The application is an ultimate expression of the "Ayurveda Tycoon" model, which uses technology and systematic thinking (the Tycoon) to foster balance, justice, and well-being (the Ayurveda) [2].
 
 The comprehensive framework for the "Ayurveda Project Management World" (APM-WORLD) was designed by Eeshvar Das [3]. The creator, Eeshvar Das, is actively building and utilizing AdvocacyOS daily, with the intent for it to eventually integrate with Ayurveda Project Management IO. This commitment underscores the deep personal connection and foundational philosophy behind the project.
+
+##### AdvocacyOS: Contribution and Development Update [1]
+##### How to Contribute & Current Status [1]
+AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository. [1]
+**Current Development Status (As of August 2025):** [1]
+The initial user interface for the **Capability Engine** has been coded. The project is currently in a brief, planned pause while the creator, Eeshvar Das, handles other necessary matters and establishes the secure backend environment on Google Cloud. This is a critical step to ensure the privacy and integrity of the upcoming AI features. [1]
+Development on the live AI integration will resume shortly. Thank you for your patience and support! [1]
