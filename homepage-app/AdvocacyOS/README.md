@@ -25,6 +25,13 @@ AdvocacyOS is designed to empower, not prescribe. It provides a powerful tool to
 A fundamental principle integrated into AdvocacyOS is **strategic disengagement**. Ableist attacks are designed to drain an individual's energy. Arguing is a trap.
 Strategic disengagement is a conscious act of power. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS**. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
 
+##### Designed for Accessibility
+AdvocacyOS is being built from the ground up with accessibility as a core design principle. Adhering to standards like the Web Content Accessibility Guidelines (WCAG), the app prioritizes:
+Screen Reader Compatibility:
+*   Ensuring all elements are properly labeled and navigable for users of assistive technologies.
+*   Clear & High-Contrast UI: Using a clean design with readable fonts and sufficient color contrast to reduce cognitive load and aid visibility.
+*   Large Touch Targets: Making all interactive elements, like buttons and sliders, large and easy to tap, especially during high-stress situations.
+
 #### The Evolution: AdvocacyOS with Gemini AI 🤖
 AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model.
 
