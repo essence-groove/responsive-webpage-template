@@ -23,14 +23,14 @@ AdvocacyOS is designed to empower, not prescribe. It provides a powerful tool to
 
 ##### Strategic Disengagement
 A fundamental principle integrated into AdvocacyOS is **strategic disengagement**. Ableist attacks are designed to drain an individual's energy. Arguing is a trap.
-Strategic disengagement is a conscious act of power [3, 32-34]. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS**. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
+Strategic disengagement is a conscious act of power. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS**. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
 
 #### The Evolution: AdvocacyOS with Gemini AI 🤖
-AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model [35-37].
+AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model.
 
 ##### The Challenge: Need vs. Trust
-1.  **Immediate Need**: Individuals with disabilities require urgent, intelligent assistance for complex bureaucratic and legal challenges [3, 36-38].
-2.  **The Trust Gap**: Generic AI models are not trained on the nuances of disability advocacy and may provide unsafe or inaccurate information [3, 36-38].
+1.  **Immediate Need**: Individuals with disabilities require urgent, intelligent assistance for complex bureaucratic and legal challenges.
+2.  **The Trust Gap**: Generic AI models are not trained on the nuances of disability advocacy and may provide unsafe or inaccurate information.
 
 ##### The Solution: Community-Validated AI
 AdvocacyOS uses a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system [38-41]. This system allows users to not only receive answers but also to participate in validating the quality and safety of those answers for the entire community [38-41].
