@@ -72,9 +72,12 @@ class CompassionateCheckInScreen extends StatefulWidget {
 
 class _CompassionateCheckInScreenState
     extends State<CompassionateCheckInScreen> {
-  // ... (state variables remain the same) ...
   CheckInStep _currentStep = CheckInStep.energyLevel;
+  
+  // State for the two sliders
   double _energyLevel = 3.0;
+  double _energyOutlook = 3.0; // NEW: Tracks perception of spent energy
+
   final List<String> _selectedLimitations = [];
   final List<String> _predefinedLimitations = [
     'Fatigue',
@@ -86,7 +89,6 @@ class _CompassionateCheckInScreenState
   final TextEditingController _customLimitationController =
       TextEditingController();
 
-  // ... (functions like _nextStep, _finishCheckIn, etc. remain the same) ...
   void _nextStep() {
     setState(() {
       if (_currentStep == CheckInStep.energyLevel) {
@@ -97,11 +99,14 @@ class _CompassionateCheckInScreenState
     });
   }
 
+  // UPDATED: Now passes the energyOutlook value to the next screen
   void _finishCheckIn() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AdaptiveAgendaScreen(
           energyLevel: _energyLevel,
+          // We will update the AdaptiveAgendaScreen to accept this new parameter next
+          // energyOutlook: _energyOutlook, 
           limitations: _selectedLimitations,
         ),
       ),
@@ -169,27 +174,29 @@ class _CompassionateCheckInScreenState
     }
   }
 
+  // UPDATED: This widget now contains both sliders
   Widget _buildEnergyLevelStep() {
     return Column(
       key: const ValueKey('energyStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ... (Text widgets)
         const Text('Good morning.', style: TextStyle(fontSize: 20)),
         const SizedBox(height: 8),
-        Text('Let\'s check in. How is your energy level right now?',
+        Text('Let\'s check in.',
             style: Theme.of(context).textTheme.headlineSmall),
         const Spacer(),
-        // ACCESSIBILITY: Added semantics for the slider.
+        
+        // Current Energy Level Slider
         Semantics(
-          label: "Energy level slider",
+          label: "Current energy level slider",
           value: "Current level is ${_energyLevel.round()} out of 5",
           child: Column(
             children: [
+              const Text("How is your energy right now?", style: TextStyle(fontSize: 16)),
               Center(
                 child: Text(
                   _energyLevel.round().toString(),
-                  style: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
                 ),
               ),
               Slider(
@@ -211,6 +218,41 @@ class _CompassionateCheckInScreenState
             ],
           ),
         ),
+        const SizedBox(height: 32),
+
+        // NEW: Energy Outlook / Recovery Slider
+        Semantics(
+          label: "Energy outlook slider",
+          value: "Current outlook is ${_energyOutlook.round()} out of 5",
+          child: Column(
+            children: [
+              const Text("How do you feel about using energy?", style: TextStyle(fontSize: 16)),
+              Center(
+                child: Text(
+                  _energyOutlook.round().toString(),
+                  style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Slider(
+                value: _energyOutlook,
+                min: 1,
+                max: 5,
+                divisions: 4,
+                label: _energyOutlook.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    _energyOutlook = value;
+                  });
+                },
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [Text('Wary / Need to Recover'), Text('Confident / Ready to Act')],
+              ),
+            ],
+          ),
+        ),
+
         const Spacer(),
         Center(
           child: ElevatedButton(
@@ -227,7 +269,6 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('limitationsStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ... (Text widgets)
         Text('Got it.', style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(height: 8),
         Text('Are you noticing any other limitations or feelings right now?',
@@ -235,7 +276,6 @@ class _CompassionateCheckInScreenState
         const SizedBox(height: 8),
         const Text('(Select any that apply)'),
         const SizedBox(height: 24),
-        // ACCESSIBILITY: Added semantics for the group of chips.
         Semantics(
           label: "Select your current limitations",
           child: Wrap(
@@ -285,7 +325,6 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('needsStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ... (Text widgets)
         Text('Thank you for sharing.',
             style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(height: 8),
@@ -294,7 +333,6 @@ class _CompassionateCheckInScreenState
         const SizedBox(height: 8),
         const Text('(Optional)'),
         const SizedBox(height: 24),
-        // ACCESSIBILITY: Added semantics for the text field.
         Semantics(
           label: "Optional notes about your current needs.",
           child: TextField(
