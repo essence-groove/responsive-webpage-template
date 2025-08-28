@@ -286,7 +286,7 @@ class _CompassionateCheckInScreenState
           controller: _notesController,
           maxLines: 5,
           decoration: InputDecoration(
-            hintText: 'e.g., "A moment of quiet," "Some gentle stretching"...',
+            hintText: 'e.g., "A moment of quiet," "Some gentle stretching and breathing"...',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
