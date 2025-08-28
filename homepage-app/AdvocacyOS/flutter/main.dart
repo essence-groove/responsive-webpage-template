@@ -1,0 +1,316 @@
+import 'package:flutter/material.dart';
+
+// Main function to run the app
+void main() {
+  runApp(const AdvocacyOSApp());
+}
+
+// Root widget of the application
+class AdvocacyOSApp extends StatelessWidget {
+  const AdvocacyOSApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Capability Engine',
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        fontFamily: 'Inter',
+        // A gentle, supportive theme
+        scaffoldBackgroundColor: const Color(0xFFF5F5F7),
+        textTheme: const TextTheme(
+          headlineSmall: TextStyle(
+              fontSize: 28.0,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1D1D1F)),
+          bodyLarge: TextStyle(
+              fontSize: 18.0, color: Color(0xFF4A4A4A), height: 1.5),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            textStyle:
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+      home: const CompassionateCheckInScreen(),
+    );
+  }
+}
+
+// The main screen for the "Compassionate Check-In" flow
+class CompassionateCheckInScreen extends StatefulWidget {
+  const CompassionateCheckInScreen({super.key});
+
+  @override
+  State<CompassionateCheckInScreen> createState() =>
+      _CompassionateCheckInScreenState();
+}
+
+class _CompassionateCheckInScreenState
+    extends State<CompassionateCheckInScreen> {
+  // Using an enum to manage the flow of the check-in process
+  // This makes the code cleaner and easier to follow
+  CheckInStep _currentStep = CheckInStep.energyLevel;
+
+  // State variables to hold the user's selections
+  double _energyLevel = 3.0;
+  final List<String> _selectedLimitations = [];
+  final List<String> _predefinedLimitations = [
+    'Fatigue',
+    'Joint Pain',
+    'Brain Fog',
+    'Stiffness'
+  ];
+  final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _customLimitationController =
+      TextEditingController();
+
+  // Function to move to the next step in the check-in flow
+  void _nextStep() {
+    setState(() {
+      if (_currentStep == CheckInStep.energyLevel) {
+        _currentStep = CheckInStep.limitations;
+      } else if (_currentStep == CheckInStep.limitations) {
+        _currentStep = CheckInStep.needs;
+      }
+    });
+  }
+
+  // Function to handle the final submission
+  void _finishCheckIn() {
+    // In a real app, this is where you would save the data to Firestore
+    // and then navigate to the "Adaptive Now Agenda" screen.
+    print('Check-in complete!');
+    print('Energy Level: $_energyLevel');
+    print('Limitations: $_selectedLimitations');
+    print('Notes: ${_notesController.text}');
+
+    // For now, we'll just show a confirmation dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Check-In Complete'),
+        content: const Text(
+            "Thank you for sharing. We'll now build your adaptive agenda."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Function to show a dialog for adding a custom limitation
+  void _showAddCustomLimitationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add a Custom Limitation'),
+          content: TextField(
+            controller: _customLimitationController,
+            autofocus: true,
+            decoration: const InputDecoration(hintText: "e.g., 'Headache'"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_customLimitationController.text.isNotEmpty) {
+                  setState(() {
+                    _selectedLimitations.add(_customLimitationController.text);
+                  });
+                  _customLimitationController.clear();
+                }
+                Navigator.of(context).pop();
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Build the UI for the current step
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _buildStepWidget(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper function to return the widget for the current step
+  Widget _buildStepWidget() {
+    switch (_currentStep) {
+      case CheckInStep.energyLevel:
+        return _buildEnergyLevelStep();
+      case CheckInStep.limitations:
+        return _buildLimitationsStep();
+      case CheckInStep.needs:
+        return _buildNeedsStep();
+    }
+  }
+
+  // Widget for the Energy Level selection step
+  Widget _buildEnergyLevelStep() {
+    return Column(
+      key: const ValueKey('energyStep'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Good morning.', style: TextStyle(fontSize: 20)),
+        const SizedBox(height: 8),
+        Text('Let\'s check in. How is your energy level right now?',
+            style: Theme.of(context).textTheme.headlineSmall),
+        const Spacer(),
+        Center(
+          child: Text(
+            _energyLevel.round().toString(),
+            style: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Slider(
+          value: _energyLevel,
+          min: 1,
+          max: 5,
+          divisions: 4,
+          label: _energyLevel.round().toString(),
+          onChanged: (double value) {
+            setState(() {
+              _energyLevel = value;
+            });
+          },
+        ),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [Text('Very Low'), Text('Very High')],
+        ),
+        const Spacer(),
+        Center(
+          child: ElevatedButton(
+            onPressed: _nextStep,
+            child: const Text('Next'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Widget for the Limitations selection step
+  Widget _buildLimitationsStep() {
+    return Column(
+      key: const ValueKey('limitationsStep'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Got it.', style: Theme.of(context).textTheme.bodyLarge),
+        const SizedBox(height: 8),
+        Text('Are you noticing any specific physical limitations or pain today?',
+            style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: 8),
+        const Text('(Select any that apply)'),
+        const SizedBox(height: 24),
+        Wrap(
+          spacing: 12.0,
+          runSpacing: 12.0,
+          children: [
+            ..._predefinedLimitations.map((limitation) {
+              final isSelected = _selectedLimitations.contains(limitation);
+              return ChoiceChip(
+                label: Text(limitation),
+                selected: isSelected,
+                onSelected: (bool selected) {
+                  setState(() {
+                    if (selected) {
+                      _selectedLimitations.add(limitation);
+                    } else {
+                      _selectedLimitations.remove(limitation);
+                    }
+                  });
+                },
+                selectedColor: Colors.indigo[100],
+                labelStyle: TextStyle(
+                    color: isSelected ? Colors.indigo[900] : Colors.black),
+              );
+            }).toList(),
+            ActionChip(
+              avatar: const Icon(Icons.add),
+              label: const Text('Add Custom'),
+              onPressed: _showAddCustomLimitationDialog,
+            ),
+          ],
+        ),
+        const Spacer(),
+        Center(
+          child: ElevatedButton(
+            onPressed: _nextStep,
+            child: const Text('Next'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Widget for the final "Needs" step
+  Widget _buildNeedsStep() {
+    return Column(
+      key: const ValueKey('needsStep'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Thank you for sharing.',
+            style: Theme.of(context).textTheme.bodyLarge),
+        const SizedBox(height: 8),
+        Text('What does your body feel like it needs at this moment?',
+            style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: 8),
+        const Text('(Optional)'),
+        const SizedBox(height: 24),
+        TextField(
+          controller: _notesController,
+          maxLines: 5,
+          decoration: InputDecoration(
+            hintText: 'e.g., "A quiet space," "Some gentle stretching"...',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        const Spacer(),
+        Center(
+          child: ElevatedButton(
+            onPressed: _finishCheckIn,
+            child: const Text('Finish Check-In'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Enum to represent the different steps in the check-in process
+enum CheckInStep {
+  energyLevel,
+  limitations,
+  needs,
+}
