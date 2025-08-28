@@ -115,7 +115,7 @@ For the initial release, the core feedback mechanism is built directly into the 
 
 Once AdvocacyOS is actively in use and has a steady stream of feedback data, the project will be in a much stronger position to evaluate a formal API integration.
 
-*   **Informed Decision:** With real-world usage, AdvocacyOS will have a deep understanding of its specific needs, the volume of feedback, and the exact features required from an external API.
+*   **Informed Decision:** With real-world usage, AdvocacyOS will have a deep understanding of its specific needs, the volume of feedback, and the exact features required from an external API (like Stax, if it exists).
 *   **Data Migration:** The valuable data already collected in Firestore can be used to benchmark, test, or even migrate to a new system if a formal API or more advanced internal system is adopted.
 *   **Reduced Risk:** This strategy avoids committing to an unknown system early on, allowing for a more informed choice or build based on concrete usage and evidence.
 
