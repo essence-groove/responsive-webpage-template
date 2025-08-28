@@ -8,7 +8,14 @@ Before you begin, please make sure you have **Git** installed on your system. Yo
 ##### Step 1: Get the Project Code
 First, you need to clone the project's repository from GitHub to your local machine. Open your terminal or command prompt and run the following command:
 
+```
 git clone https://github.com/your-username/advocacyos.git
+```
+
+```
+
+```
+
 Navigate into the newly created project directory:
 cd advocacyos
 [2]
