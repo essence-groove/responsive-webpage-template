@@ -309,38 +309,3 @@ enum CheckInStep {
   limitations,
   needs,
 }
-
-
-// ==================================================================
-// FILE: ai_service.dart
-// This file now contains a mock response for the emergency scenario.
-// ==================================================================
-
-/*
- * AdvocacyOS: The Capability Engine
- * ... (rest of license header) ...
- */
-
-import './adaptive_agenda_screen.dart'; // We need the MicroTask class
-
-class AiService {
-  // This is a MOCK function. It simulates a call to the AI for the emergency scenario.
-  static Future<List<MicroTask>> getAdaptivePlan({
-    required String goal,
-    required double energyLevel,
-    required List<String> limitations,
-  }) async {
-    // Simulate a network delay
-    await Future.delayed(const Duration(seconds: 2));
-
-    // **UPDATED MOCK RESPONSE**
-    // This is a pre-written, sample plan for the emergency scenario.
-    // It focuses on calm, grounding, and actionable first steps.
-    return [
-      MicroTask(description: 'Take one deep breath in and out.'),
-      MicroTask(description: 'Confirm their phone is still unresponsive.'),
-      MicroTask(description: 'Write down the name of one person to call for help.'),
-      MicroTask(description: 'Sit down with a glass of water before calling.'),
-    ];
-  }
-}
