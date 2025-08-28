@@ -20,18 +20,19 @@
 import './adaptive_agenda_screen.dart'; // We need the MicroTask class
 
 class AiService {
-  // This is a MOCK function. It simulates a call to the AI for the escalated emergency.
+  // UPDATED: Now accepts energyOutlook
   static Future<List<MicroTask>> getAdaptivePlan({
     required String goal,
     required double energyLevel,
+    required double energyOutlook, // NEW: Parameter added
     required List<String> limitations,
   }) async {
     // Simulate a network delay
     await Future.delayed(const Duration(seconds: 2));
 
-    // **UPDATED MOCK RESPONSE for Escalated Emergency**
-    // This plan is more strategic, focusing on information gathering and
-    // finding alternative support networks.
+    // In a real scenario, the energyOutlook value would be used to
+    // craft a more nuanced prompt for the Gemini AI.
+    // For now, the mock response remains the same.
     return [
       MicroTask(description: 'Sit down. Take three slow, deep breaths.'),
       MicroTask(
