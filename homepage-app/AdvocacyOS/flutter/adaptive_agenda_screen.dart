@@ -99,19 +99,20 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
       limitationsText = 'no specific limitations';
     }
 
+    // UPDATED: This text is now more neutral and acknowledging.
     String outlookText;
     if (widget.energyOutlook <= 2) {
-      outlookText = "and you're feeling wary about using it.";
+      outlookText = "and I hear that you're feeling wary about using it.";
     } else {
-      outlookText = "and you've noted your outlook on using it.";
+      // This line has been changed to be safer and more neutral.
+      outlookText = "and I've noted your outlook on using it.";
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // UPDATED: This line now acknowledges the user's input rather than stating it as fact.
         Text(
-          "Okay, you've shared that your energy level is around a ${widget.energyLevel.round()}, $outlookText Let's create a clear path forward.",
+          "Okay, your energy is at a ${widget.energyLevel.round()} $outlookText Let's create a clear path forward.",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 24),
