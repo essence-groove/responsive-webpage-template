@@ -1,7 +1,3 @@
-// FILE: main.dart
-// This file remains the same as the previous version. It handles app startup
-// and the initial check-in screen.
-
 /*
  * AdvocacyOS: The Capability Engine
  * A Flutter module for self-empowerment and building physical capability.
@@ -286,7 +282,7 @@ class _CompassionateCheckInScreenState
           controller: _notesController,
           maxLines: 5,
           decoration: InputDecoration(
-            hintText: 'e.g., "A moment of quiet," "Some gentle stretching and breathing"...',
+            hintText: 'e.g., "A moment of quiet," "Some gentle stretching"...',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
