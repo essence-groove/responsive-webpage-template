@@ -23,7 +23,7 @@ cd advocacyos
 ##### Step 2: Install the Flutter SDK
 AdvocacyOS is built with Flutter [2]. To ensure compatibility, we are targeting **Flutter version 3.35** which uses **Dart 3.9** [2].
 The best way to install Flutter is by following the official documentation, as it provides the most up-to-date, step-by-step instructions for your specific operating system (Windows, macOS, or Linux) [2].
-➡️ **Follow the Official Flutter Installation Guide** [2]
+[➡️ **Follow the Official Flutter Installation Guide**](https://docs.flutter.dev/get-started/install) [2]
 
 After installation, you can ensure you are on the correct version by running `flutter --version` [3].
 
