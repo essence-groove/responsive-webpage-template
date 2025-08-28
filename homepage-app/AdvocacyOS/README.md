@@ -127,16 +127,17 @@ AdvocacyOS is a direct embodiment of the creator's personal experiences, technic
 
 The comprehensive framework for the "Ayurveda Project Management World" (APM-WORLD) was designed by Eeshvar Das [3]. The creator, Eeshvar Das, is actively building and utilizing AdvocacyOS daily, with the intent for it to eventually integrate with Ayurveda Project Management IO. This commitment underscores the deep personal connection and foundational philosophy behind the project.
 
-##### AdvocacyOS: Contribution and Development Update [1]
-##### How to Contribute & Current Status [1]
-AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository. [1]
+#### AdvocacyOS: Contribution and Development Update 
+#### How to Contribute & Current Status 
+AdvocacyOS is an open-source project built with and for the disability community. Your insights, feedback, and contributions are welcome and deeply valued. Please feel free to open an issue or submit a pull request on our GitHub repository.
 
-**Project Status: Emergency Action Focus:**
+##### Project Status: Emergency Action Focus:
+
 The core mission of AdvocacyOS is to provide a tool for survival and self-advocacy when traditional support systems fail. The reality for many with physical disabilities is that a broken promise or a missed connection isn't an inconvenience—it can be a life-threatening emergency.
 
 To that end, the development of the Capability Engine is being immediately refocused to address this urgent reality. The initial MVP will be centered on an emergency action plan: guiding a user through the critical first steps when essential support suddenly becomes unavailable.
 
-**Current Development Status (As of August 2025):**
+##### Current Development Status (As of August 2025):
 
 The project is in a brief, planned pause while the creator, Eeshvar Das, establishes the secure Google Cloud perimeter and backend environment. This is a non-negotiable step to ensure the absolute privacy and security required for handling the sensitive situations this app is designed for.
 
