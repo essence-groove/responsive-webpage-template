@@ -10,20 +10,20 @@ Individuals with disabilities frequently encounter systemic discrimination. Thei
 AdvocacyOS empowers users by transforming their lived experiences into a structured, chronologically-ordered, and easily shareable case file. It is not a social platform but a **personal fortress for evidence**.
 
 #### Key Features
-*   **Incident Ledger**: A simple, time-stamped journal to log every interaction or incident of discrimination as it occurs [23-25].
-*   **Evidence Vault**: A secure, encrypted space to upload and tag supporting files like screenshots, documents, photos, and audio recordings [23-25].
-*   **Case File Management**: The ability to create separate case files for different matters (e.g., "Housing Dispute," "SNAP Benefits Case") and tag evidence to the relevant case [25-27].
-*   **Automated Timeline Generator**: The "killer feature" that automatically generates a clean, chronological timeline of events from a case file, which can be exported as a PDF [25-27].
-*   **Secure Sharing Portal**: Generate a secure, time-limited, read-only link to a case file's timeline to share with trusted parties like an attorney or legal aid worker [25-27].
-*   **Advocacy Resource Hub**: A curated in-app library with links to national and local resources like the ADA network, legal aid societies, and tenant rights organizations [25, 28, 29].
+*   **Incident Ledger**: A simple, time-stamped journal to log every interaction or incident of discrimination as it occurs.
+*   **Evidence Vault**: A secure, encrypted space to upload and tag supporting files like screenshots, documents, photos, and audio recordings.
+*   **Case File Management**: The ability to create separate case files for different matters (e.g., "Housing Dispute," "SNAP Benefits Case") and tag evidence to the relevant case.
+*   **Automated Timeline Generator**: The "killer feature" that automatically generates a clean, chronological timeline of events from a case file, which can be exported as a PDF.
+*   **Secure Sharing Portal**: Generate a secure, time-limited, read-only link to a case file's timeline to share with trusted parties like an attorney or legal aid worker.
+*   **Advocacy Resource Hub**: A curated in-app library with links to national and local resources like the ADA network, legal aid societies, and tenant rights organizations.
 
 #### Core Principles
 ##### Empowerment Through Tools, Not Prescription
-AdvocacyOS is designed to empower, not prescribe [28-30]. It provides a powerful tool to help users navigate their *own* unique journey, acting as a **compass rather than a map** [28-30]. It embodies the "Ayurveda Tycoon" model: using technology and systematic thinking (the Tycoon) to achieve balance and justice (the Ayurveda) [28-30].
+AdvocacyOS is designed to empower, not prescribe. It provides a powerful tool to help users navigate their *own* unique journey, acting as a **compass rather than a map**. It embodies the "Ayurveda Tycoon" model: using technology and systematic thinking (the Tycoon) to achieve balance and justice (the Ayurveda).
 
 ##### Strategic Disengagement
-A fundamental principle integrated into AdvocacyOS is **strategic disengagement** [30-33]. Ableist attacks are designed to drain an individual's energy [1, 30, 32, 33]. Arguing is a trap [1, 30, 32, 33].
-Strategic disengagement is a conscious act of power [3, 32-34]. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS** [3, 32, 33, 35]. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty [3, 32, 33, 35].
+A fundamental principle integrated into AdvocacyOS is **strategic disengagement**. Ableist attacks are designed to drain an individual's energy. Arguing is a trap.
+Strategic disengagement is a conscious act of power [3, 32-34]. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS**. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
 
 #### The Evolution: AdvocacyOS with Gemini AI 🤖
 AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model [35-37].
