@@ -17,11 +17,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
- * AdvocacyOS: The Capability Engine
- * ... (license header) ...
- */
-
 import 'package:flutter/material.dart';
 import './ai_service.dart'; // Import the MOCK AI service
 
@@ -36,13 +31,13 @@ class MicroTask {
 // The "Adaptive Now Agenda" screen
 class AdaptiveAgendaScreen extends StatefulWidget {
   final double energyLevel;
-  final double energyOutlook; // NEW: Added energyOutlook
+  final double energyOutlook;
   final List<String> limitations;
 
   const AdaptiveAgendaScreen({
     super.key,
     required this.energyLevel,
-    required this.energyOutlook, // NEW: Required in constructor
+    required this.energyOutlook,
     required this.limitations,
   });
 
@@ -58,7 +53,6 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
 
   List<MicroTask> _tasks = [];
 
-  // UPDATED: Now passes energyOutlook to the AI service
   Future<void> _createPlan() async {
     if (_goalController.text.isNotEmpty) {
       setState(() {
@@ -69,7 +63,7 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
       final generatedTasks = await AiService.getAdaptivePlan(
         goal: _mainGoal,
         energyLevel: widget.energyLevel,
-        energyOutlook: widget.energyOutlook, // NEW: Pass to service
+        energyOutlook: widget.energyOutlook,
         limitations: widget.limitations,
       );
 
@@ -105,12 +99,13 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
       limitationsText = 'no specific limitations';
     }
 
-    // This text can also be updated to reflect the outlook
+    // UPDATED: This text is now more neutral and acknowledging.
     String outlookText;
     if (widget.energyOutlook <= 2) {
       outlookText = "and I hear that you're feeling wary about using it.";
     } else {
-      outlookText = "and it's good to know you're feeling confident.";
+      // This line has been changed to be more neutral.
+      outlookText = "and I understand you're feeling more confident about it.";
     }
 
     return Column(
