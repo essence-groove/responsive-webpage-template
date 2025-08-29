@@ -72,10 +72,9 @@ class CompassionateCheckInScreen extends StatefulWidget {
 
 class _CompassionateCheckInScreenState
     extends State<CompassionateCheckInScreen> {
-  // ... (state variables remain the same) ...
   CheckInStep _currentStep = CheckInStep.energyLevel;
   double _energyLevel = 3.0;
-  double _energyOutlook = 3.0; // NEW: Tracks perception of spent energy
+  double _energyOutlook = 3.0;
   final List<String> _selectedLimitations = [];
   final List<String> _predefinedLimitations = [
     'Fatigue',
@@ -87,7 +86,6 @@ class _CompassionateCheckInScreenState
   final TextEditingController _customLimitationController =
       TextEditingController();
 
-  // ... (functions like _nextStep, _finishCheckIn, etc. remain the same) ...
   void _nextStep() {
     setState(() {
       if (_currentStep == CheckInStep.energyLevel) {
@@ -103,7 +101,7 @@ class _CompassionateCheckInScreenState
       MaterialPageRoute(
         builder: (context) => AdaptiveAgendaScreen(
           energyLevel: _energyLevel,
-          energyOutlook: _energyOutlook, 
+          energyOutlook: _energyOutlook,
           limitations: _selectedLimitations,
         ),
       ),
@@ -176,7 +174,6 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('energyStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ... (Text widgets)
         const Text('Good morning.', style: TextStyle(fontSize: 20)),
         const SizedBox(height: 8),
         Text('Let\'s check in.',
@@ -217,7 +214,7 @@ class _CompassionateCheckInScreenState
         ),
         const SizedBox(height: 32),
 
-        // NEW: Energy Outlook / Recovery Slider
+        // Energy Outlook / Recovery Slider
         Semantics(
           label: "Energy outlook slider",
           value: "Current outlook is ${_energyOutlook.round()} out of 5",
@@ -266,7 +263,6 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('limitationsStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ... (Text widgets)
         Text('Got it.', style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(height: 8),
         Text('Are you noticing any other limitations or feelings right now?',
@@ -324,7 +320,6 @@ class _CompassionateCheckInScreenState
       key: const ValueKey('needsStep'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ... (Text widgets)
         Text('Thank you for sharing.',
             style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(height: 8),
@@ -364,3 +359,4 @@ enum CheckInStep {
   limitations,
   needs,
 }
+
