@@ -84,7 +84,7 @@ This built-in feedback loop is considered the most effective and user-centric pa
 #### Future Vision: Internal Empowerment
 The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives [9, 31].
 
-Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md) [31]
+Learn more about this new module: [**The Capability Engine**](CapabilityEngine.md) [31]
 
 ##### Creator's Personal Commitment and Vision
 AdvocacyOS is a direct embodiment of the creator's personal experiences, technical skills, and strategic thinking, designed to address a critical, underserved need [16, 40]. The application is an ultimate expression of the "Ayurveda Tycoon" model, which uses technology and systematic thinking (the Tycoon) to foster balance, justice, and well-being (the Ayurveda) [16, 40].
