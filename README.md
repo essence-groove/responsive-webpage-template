@@ -1,5 +1,9 @@
 # responsive-webpage-template
 
+## AdvocacyOS now in Development
+AdvocacyOS development paced along with the broad reaching goals of Ayurveda Project Mangement
+
+## Notes
 **Heroku no longer supported on GitHub**. Relevant issues will be addressed as they arrive.
 
 ✅**GitHub Actions** is not supported right now. Issue "No Worries #71" has more information. There is no need for GitHub Actions right now with the new designs as this project is agreed upon by 100% of the creators and participants to not need GitHub Actions right now. New participants may request GitHub Actions support if they like.

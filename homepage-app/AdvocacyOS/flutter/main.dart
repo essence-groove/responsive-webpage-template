@@ -18,10 +18,16 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_gemini/flutter_gemini.dart'; // Import the package
+
 import './adaptive_agenda_screen.dart';
 
+// IMPORTANT: Replace with your actual API key
+const String yourApiKey = "YOUR_API_KEY";
+
 void main() {
+  // NEW: Initialize the Gemini service with your API key
+  Gemini.init(apiKey: yourApiKey);
   runApp(const AdvocacyOSApp());
 }
 
@@ -98,7 +104,9 @@ class _CompassionateCheckInScreenState
   }
 
   void _finishCheckIn() {
-    final cost = double.tryParse(_costController.text);
+    final double? cost = double.tryParse(_costController.text);
+
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AdaptiveAgendaScreen(
@@ -345,17 +353,15 @@ class _CompassionateCheckInScreenState
           ),
         ),
         const SizedBox(height: 24),
-        // NEW: Associated Cost Input Field
+
         Semantics(
           label: "Optional: associated cost to meet this need in dollars.",
           child: TextField(
             controller: _costController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-            ],
             decoration: InputDecoration(
-              hintText: 'e.g., 30.00',
+              hintText: 'e.g., "30.00"',
+
               labelText: 'Associated Cost to Meet This Need? (\$)',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
