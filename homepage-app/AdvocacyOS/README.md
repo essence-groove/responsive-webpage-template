@@ -10,20 +10,20 @@ Individuals with disabilities frequently encounter systemic discrimination. Thei
 AdvocacyOS empowers users by transforming their lived experiences into a structured, chronologically-ordered, and easily shareable case file. It is not a social platform but a **personal fortress for evidence**.
 
 #### Key Features
-*   **Incident Ledger**: A simple, time-stamped journal to log every interaction or incident of discrimination as it occurs [55, 61-78].
-*   **Evidence Vault**: A secure, encrypted space to upload and tag supporting files like screenshots, documents, photos, and audio recordings [55, 61-78].
-*   **Case File Management**: The ability to create separate case files for different matters (e.g., "Housing Dispute," "SNAP Benefits Case," "Family Matter") and tag each piece of evidence to the relevant case [55, 64, 67-83].
-*   **Automated Timeline Generator**: The "killer feature" that automatically generates a clean, chronological timeline of events from a case file, which can be exported as a PDF [55, 64, 67-83].
-*   **Secure Sharing Portal**: Generate a secure, time-limited, read-only link to a case file's timeline to share with trusted parties like an attorney or legal aid worker [64, 67, 69-73, 75, 78-88].
-*   **Advocacy Resource Hub**: A curated in-app library with links to national and local resources like the ADA network, legal aid societies, and tenant rights organizations [64, 67, 69-73, 75, 78, 84-93].
+*   **Incident Ledger**: A simple, time-stamped journal to log every interaction or incident of discrimination as it occurs.
+*   **Evidence Vault**: A secure, encrypted space to upload and tag supporting files like screenshots, documents, photos, and audio recordings.
+*   **Case File Management**: The ability to create separate case files for different matters (e.g., "Housing Dispute," "SNAP Benefits Case," "Family Matter") and tag each piece of evidence to the relevant case.
+*   **Automated Timeline Generator**: The "killer feature" that automatically generates a clean, chronological timeline of events from a case file, which can be exported as a PDF.
+*   **Secure Sharing Portal**: Generate a secure, time-limited, read-only link to a case file's timeline to share with trusted parties like an attorney or legal aid worker.
+*   **Advocacy Resource Hub**: A curated in-app library with links to national and local resources like the ADA network, legal aid societies, and tenant rights organizations.
 
 #### Core Principles
 ##### Empowerment Through Tools, Not Prescription
-AdvocacyOS is designed to empower, not prescribe [84-101]. It provides a powerful tool to help users navigate their *own* unique journey, acting as a **compass rather than a map** [84-101]. It embodies the "Ayurveda Tycoon" model: using technology and systematic thinking (the Tycoon) to achieve balance, justice, and well-being (the Ayurveda) [84-102].
+AdvocacyOS is designed to empower, not prescribe. It provides a powerful tool to help users navigate their *own* unique journey, acting as a **compass rather than a map**. It embodies the "Ayurveda Tycoon" model: using technology and systematic thinking (the Tycoon) to achieve balance, justice, and well-being (the Ayurveda).
 
 ##### Strategic Disengagement
-A fundamental principle integrated into AdvocacyOS is **strategic disengagement** [84, 94-98, 100, 101, 103-122]. Ableist attacks are designed to drain an individual's energy [84, 96-98, 100, 101, 103-106, 108-113, 115-117, 119, 120, 123]. Arguing is a trap [84, 96-98, 100, 101, 103-106, 108-113, 115-117, 119, 120, 123].
-Strategic disengagement is a conscious act of power [84, 103-105, 107-117, 119, 120, 123]. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS** [84, 103-105, 107-123]. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty [84, 103-105, 107-123].
+A fundamental principle integrated into AdvocacyOS is **strategic disengagement**. Ableist attacks are designed to drain an individual's energy [84, 96-98, 100, 101, 103-106, 108-113, 115-117, 119, 120, 123]. Arguing is a trap.
+Strategic disengagement is a conscious act of power. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS** [84, 103-105, 107-123]. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
 
 ##### Designed for Accessibility
 AdvocacyOS is being built from the ground up with accessibility as a core design principle [103, 120, 123-127]. Adhering to standards like the Web Content Accessibility Guidelines (WCAG), the app prioritizes [103, 120, 123-127]:
