@@ -95,7 +95,7 @@ This powerful feedback loop enables AdvocacyOS to stand apart by]
 This ensures the AI is not just intelligent, but also wise, safe, and genuinely helpful for the disability community it serves, directly addressing the "Trust Gap".
 
 ##### Relevance to The Capability Engine
-The "AdvocacyOS Evaluation and Review Workflow" is also critical for the upcoming **Capability Engine** module [196, 206-208, 210, 212, 214, 216, 217, 226-231]. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment [196, 206-208, 210, 212, 214, 216, 217, 226-231].
+The "AdvocacyOS Evaluation and Review Workflow" is also critical for the upcoming **Capability Engine** module. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment.
 
 ##### Phased Integration of the Evaluation System
 To strategically manage complexity and ensure a rapid deployment of a valuable tool, AdvocacyOS adopts a phased approach for integrating its feedback system. This approach prioritizes immediate functionality while setting the stage for future enhancements [226-240].
