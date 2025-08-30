@@ -4,10 +4,10 @@ AdvocacyOS is a powerful and innovative digital tool designed to empower individ
 ➡️ **Explore the full knowledge base on** [NotebookLM](https://notebooklm.google.com/notebook/5e1d9b50-ea51-4767-a62b-fdaa26c9cf29) (request access if needed) 
 
 #### The Core Problem
-Individuals with disabilities frequently encounter systemic discrimination [41-43, 47-60]. Their claims are often dismissed because they lack a simple, secure, and organized system to track patterns of events and evidence over time [41-43, 47-60]. The burden of proof is high, and existing tools are often inadequate, leading to a cycle of vulnerability and injustice [41-43, 47-60].
+Individuals with disabilities frequently encounter systemic discrimination. Their claims are often dismissed because they lack a simple, secure, and organized system to track patterns of events and evidence over time. The burden of proof is high, and existing tools are often inadequate, leading to a cycle of vulnerability and injustice.
 
 #### The Solution: A Personal Fortress for Evidence
-AdvocacyOS empowers users by transforming their lived experiences into a structured, chronologically-ordered, and easily shareable case file [48-53, 55-59, 61-66]. It is not a social platform but a **personal fortress for evidence** [48-53, 55-59, 61-66].
+AdvocacyOS empowers users by transforming their lived experiences into a structured, chronologically-ordered, and easily shareable case file. It is not a social platform but a **personal fortress for evidence**.
 
 #### Key Features
 *   **Incident Ledger**: A simple, time-stamped journal to log every interaction or incident of discrimination as it occurs [55, 61-78].
