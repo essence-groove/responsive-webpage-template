@@ -29,7 +29,7 @@ The screen is divided into two clear, distinct sections, each with a grid of sel
     *   [Icon: Sun] Time Outside
     *   [Icon: Heart] Positive Connection
 
-#### Section B: "Log an Energy Withdrawal"
+#### Section B: "Log an Energy Debit"
 
 *   **Header Color:** A neutral grey.
 *   **Layout:** A similar grid of tappable cards.
