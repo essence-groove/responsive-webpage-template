@@ -18,6 +18,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import './adaptive_agenda_screen.dart';
 
 void main() {
@@ -32,7 +33,6 @@ class AdvocacyOSApp extends StatelessWidget {
     return MaterialApp(
       title: 'Capability Engine',
       theme: ThemeData(
-        // Theme choices are intentionally high-contrast for accessibility.
         primarySwatch: Colors.indigo,
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFFF5F5F7),
@@ -41,8 +41,8 @@ class AdvocacyOSApp extends StatelessWidget {
               fontSize: 28.0,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1D1D1F)),
-          bodyLarge: TextStyle(
-              fontSize: 18.0, color: Color(0xFF4A4A4A), height: 1.5),
+          bodyLarge:
+              TextStyle(fontSize: 18.0, color: Color(0xFF4A4A4A), height: 1.5),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -85,6 +85,7 @@ class _CompassionateCheckInScreenState
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _customLimitationController =
       TextEditingController();
+  final TextEditingController _costController = TextEditingController();
 
   void _nextStep() {
     setState(() {
@@ -97,12 +98,14 @@ class _CompassionateCheckInScreenState
   }
 
   void _finishCheckIn() {
+    final cost = double.tryParse(_costController.text);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AdaptiveAgendaScreen(
           energyLevel: _energyLevel,
           energyOutlook: _energyOutlook,
           limitations: _selectedLimitations,
+          associatedCost: cost,
         ),
       ),
     );
@@ -142,7 +145,6 @@ class _CompassionateCheckInScreenState
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,18 +181,18 @@ class _CompassionateCheckInScreenState
         Text('Let\'s check in.',
             style: Theme.of(context).textTheme.headlineSmall),
         const Spacer(),
-        
-        // Current Energy Level Slider
         Semantics(
           label: "Current energy level slider",
           value: "Current level is ${_energyLevel.round()} out of 5",
           child: Column(
             children: [
-              const Text("How is your energy right now?", style: TextStyle(fontSize: 16)),
+              const Text("How is your energy right now?",
+                  style: TextStyle(fontSize: 16)),
               Center(
                 child: Text(
                   _energyLevel.round().toString(),
-                  style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 60, fontWeight: FontWeight.bold),
                 ),
               ),
               Slider(
@@ -213,18 +215,18 @@ class _CompassionateCheckInScreenState
           ),
         ),
         const SizedBox(height: 32),
-
-        // Energy Outlook / Recovery Slider
         Semantics(
           label: "Energy outlook slider",
           value: "Current outlook is ${_energyOutlook.round()} out of 5",
           child: Column(
             children: [
-              const Text("How do you feel about using energy?", style: TextStyle(fontSize: 16)),
+              const Text("How do you feel about using energy?",
+                  style: TextStyle(fontSize: 16)),
               Center(
                 child: Text(
                   _energyOutlook.round().toString(),
-                  style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 60, fontWeight: FontWeight.bold),
                 ),
               ),
               Slider(
@@ -241,12 +243,14 @@ class _CompassionateCheckInScreenState
               ),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [Text('Wary / Need to Recover'), Text('Confident / Ready to Act')],
+                children: [
+                  Text('Wary / Need to Recover'),
+                  Text('Confident / Ready to Act')
+                ],
               ),
             ],
           ),
         ),
-
         const Spacer(),
         Center(
           child: ElevatedButton(
@@ -270,7 +274,6 @@ class _CompassionateCheckInScreenState
         const SizedBox(height: 8),
         const Text('(Select any that apply)'),
         const SizedBox(height: 24),
-        // ACCESSIBILITY: Added semantics for the group of chips.
         Semantics(
           label: "Select your current limitations",
           child: Wrap(
@@ -328,14 +331,32 @@ class _CompassionateCheckInScreenState
         const SizedBox(height: 8),
         const Text('(Optional)'),
         const SizedBox(height: 24),
-        // ACCESSIBILITY: Added semantics for the text field.
         Semantics(
           label: "Optional notes about your current needs.",
           child: TextField(
             controller: _notesController,
-            maxLines: 5,
+            maxLines: 3,
             decoration: InputDecoration(
               hintText: 'e.g., "A moment of quiet," "Some gentle stretching"...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        // NEW: Associated Cost Input Field
+        Semantics(
+          label: "Optional: associated cost to meet this need in dollars.",
+          child: TextField(
+            controller: _costController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+            ],
+            decoration: InputDecoration(
+              hintText: 'e.g., 30.00',
+              labelText: 'Associated Cost to Meet This Need? (\$)',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -359,4 +380,3 @@ enum CheckInStep {
   limitations,
   needs,
 }
-

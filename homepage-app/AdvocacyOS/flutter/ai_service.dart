@@ -32,7 +32,7 @@ class AiService {
 
     // In a real scenario, the energyOutlook value would be used to
     // craft a more nuanced prompt for the Gemini AI.
-    // For now, the mock response is tailored to the emergency scenario.
+    // This mock response is tailored to the escalated emergency scenario.
     return [
       MicroTask(description: 'Sit down. Take three slow, deep breaths.'),
       MicroTask(
@@ -44,10 +44,9 @@ class AiService {
       MicroTask(
           description:
               'Open your contacts. Find one other person or local service to call.'),
-      Micro-Task(
+      MicroTask(
           description:
               'Draft a short, clear message explaining your need before you call.'),
     ];
   }
 }
-

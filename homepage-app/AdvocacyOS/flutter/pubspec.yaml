@@ -16,23 +16,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 name: advocacy_os
-description: "A Flutter application for self-empowerment and building physical capability."
-publish_to: 'none' 
+description: A Flutter module for self-empowerment and building physical capability.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
 
 environment:
-  # UPDATED: This now requires Dart 3.9 or newer.
-  sdk: '>=3.9.0 <4.0.0'
+  sdk: '>=3.9.0 <4.0.0' # Updated for Dart 3.9
 
 dependencies:
   flutter:
     sdk: flutter
 
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  
-  # The flutter_gemini package is compatible with Dart 3.9
-  flutter_gemini: ^2.0.0
+  flutter_gemini: ^2.0.0 # Dependency for Gemini AI integration
 
 dev_dependencies:
   flutter_test:
@@ -42,3 +41,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-Regular.ttf
+        - asset: fonts/Inter-Bold.ttf
+          weight: 700
