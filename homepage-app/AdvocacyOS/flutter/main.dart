@@ -85,16 +85,7 @@ class _CompassionateCheckInScreenState
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _customLimitationController =
       TextEditingController();
-  // NEW: Controller for the cost input field
   final TextEditingController _costController = TextEditingController();
-
-  @override
-  void dispose() {
-    _notesController.dispose();
-    _customLimitationController.dispose();
-    _costController.dispose(); // NEW: Dispose the new controller
-    super.dispose();
-  }
 
   void _nextStep() {
     setState(() {
@@ -107,17 +98,14 @@ class _CompassionateCheckInScreenState
   }
 
   void _finishCheckIn() {
-    // NEW: Parse the cost from the controller. Default to 0.0 if empty or invalid.
-    final double associatedCost =
-        double.tryParse(_costController.text) ?? 0.0;
-
+    final cost = double.tryParse(_costController.text);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AdaptiveAgendaScreen(
           energyLevel: _energyLevel,
           energyOutlook: _energyOutlook,
           limitations: _selectedLimitations,
-          associatedCost: associatedCost, // NEW: Pass the cost data
+          associatedCost: cost,
         ),
       ),
     );
@@ -342,7 +330,7 @@ class _CompassionateCheckInScreenState
             style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 8),
         const Text('(Optional)'),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Semantics(
           label: "Optional notes about your current needs.",
           child: TextField(
@@ -357,27 +345,24 @@ class _CompassionateCheckInScreenState
           ),
         ),
         const SizedBox(height: 24),
-
         // NEW: Associated Cost Input Field
-        const Text('Associated Cost? (Optional)',
-            style: TextStyle(fontSize: 16)),
-        const SizedBox(height: 8),
         Semantics(
-          label: "Optional cost associated with meeting your needs.",
+          label: "Optional: associated cost to meet this need in dollars.",
           child: TextField(
             controller: _costController,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+            ],
             decoration: InputDecoration(
               hintText: 'e.g., 30.00',
-              prefixIcon: const Icon(Icons.attach_money),
+              labelText: 'Associated Cost to Meet This Need? (\$)',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
         ),
-
         const Spacer(),
         Center(
           child: ElevatedButton(
@@ -395,4 +380,3 @@ enum CheckInStep {
   limitations,
   needs,
 }
-
