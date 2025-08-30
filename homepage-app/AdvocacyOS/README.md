@@ -33,34 +33,34 @@ AdvocacyOS is being built from the ground up with accessibility as a core design
 *   **Nuanced Energy Assessment:** Moving beyond a simple energy level, the app includes a unique "Energy Outlook" assessment. This helps capture a user's confidence in using their energy, allowing for a more empathetic and safer action plan.
 
 #### The Evolution: AdvocacyOS with Gemini AI 🤖
-AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model [104, 105, 107, 108, 114, 116, 127, 129-140].
+AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model.
 
 ##### The Challenge: Need vs. Trust
-1.  **Immediate Need**: Individuals with disabilities require urgent, intelligent assistance for complex bureaucratic and legal challenges [104, 105, 108, 114, 129-144].
-2.  **The Trust Gap**: Generic AI models are not trained on the nuances of disability advocacy and may provide unsafe or inaccurate information [104, 105, 108, 114, 129-144].
+1.  **Immediate Need**: Individuals with disabilities require urgent, intelligent assistance for complex bureaucratic and legal challenges.
+2.  **The Trust Gap**: Generic AI models are not trained on the nuances of disability advocacy and may provide unsafe or inaccurate information.
 
 ##### The Solution: Community-Validated AI
-AdvocacyOS uses a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system [141-170]. This system allows users to not only receive answers but also to participate in validating the quality and safety of those answers for the entire community [141-170].
+AdvocacyOS uses a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system. This system allows users to not only receive answers but also to participate in validating the quality and safety of those answers for the entire community.
 
 ##### AdvocacyOS Evaluation and Review Workflow
-This innovative approach to transparency is central to the AI-powered AdvocacyOS [145, 146, 148, 150-161, 163, 165-169, 171-180]:
-1.  **User Query**: A user asks Gemini a question (e.g., "Help me draft an email to my landlord about a reasonable accommodation request") [145, 146, 148, 150, 152-161, 163, 165-169, 172-181].
-2.  **AI Response** : The user receives a generated response [145, 146, 148, 152-161, 163, 165-169, 172-181].
-3.  **Member Rating** : The user rates the response on multiple facets [145, 146, 148, 152-161, 163, 165-169, 172-181]:
-    *   **Accuracy** : Was the information factually correct? [145, 146, 148, 152-161, 163, 165-169, 172-184]
-    *   **Safety** : Was the advice safe and responsible? [145, 146, 148, 152-161, 163, 165-169, 172-184]
-    *   **Tone** : Was the language empowering and respectful? [145, 146, 148, 152-161, 163, 165-168, 172, 174-186]
-    *   **Actionability** : Did the response offer a practical solution? [145, 146, 148, 152-161, 163, 165-168, 172, 174-186]
-4.  **Multi-Layered Evaluation** : The rated interaction is passed to a secure review console where [145, 146, 148, 156, 159, 172, 174-177, 179, 180, 185-194]:
-    *   **Peer Evaluation** : Trusted members of the evaluation and review team can review the interaction [145, 146, 148, 156, 159, 172, 174-177, 179, 180, 182-194].
-    *   **Principal Evaluation** : The project lead performs a final review and synthesizes feedback to establish a final quality score [145, 146, 148, 156, 159, 172, 174-177, 179, 180, 182-194].
+This innovative approach to transparency is central to the AI-powered AdvocacyOS:
+1.  **User Query**: A user asks Gemini a question (e.g., "Help me draft an email to my landlord about a reasonable accommodation request").
+2.  **AI Response** : The user receives a generated response.
+3.  **Member Rating** : The user rates the response on multiple facets:
+    *   **Accuracy** : Was the information factually correct?
+    *   **Safety** : Was the advice safe and responsible?
+    *   **Tone** : Was the language empowering and respectful?
+    *   **Actionability** : Did the response offer a practical solution?
+4.  **Multi-Layered Evaluation** : The rated interaction is passed to a secure review console where:
+    *   **Peer Evaluation** : Trusted members of the evaluation and review team can review the interaction.
+    *   **Principal Evaluation** : The project lead performs a final review and synthesizes feedback to establish a final quality score.
 
-This powerful feedback loop uses evaluation results to fine-tune the AI, build a public knowledge base of best-in-class answers, and provide a transparent record of the AI's performance [185-187, 192, 195-218]. This ensures the AI is not only intelligent but also **wise, safe, and genuinely helpful** for the disability community [185-187, 192, 195-218].
+This powerful feedback loop uses evaluation results to fine-tune the AI, build a public knowledge base of best-in-class answers, and provide a transparent record of the AI's performance. This ensures the AI is not only intelligent but also **wise, safe, and genuinely helpful** for the disability community.
 
 #### Future Vision: Internal Empowerment
-The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives [21-26, 28, 29, 34-36, 192, 195, 197, 198, 200, 202-204, 211, 213, 219-223].
+The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives.
 
-Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md) [21-26, 28, 29, 32, 34, 171, 198, 219-224]
+Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md)
 
 ### AI Transparency and the AdvocacyOS Evaluation and Review Workflow
 AdvocacyOS explicitly incorporates the "AdvocacyOS Evaluation and Review Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models [22, 24, 26, 29, 32, 35, 171, 220, 222-224].
