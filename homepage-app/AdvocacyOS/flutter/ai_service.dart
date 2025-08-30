@@ -17,37 +17,64 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter_gemini/flutter_gemini.dart';
 import './adaptive_agenda_screen.dart'; // We need the MicroTask class
 
 class AiService {
-  // UPDATED: Now accepts energyOutlook
   static Future<List<MicroTask>> getAdaptivePlan({
     required String goal,
     required double energyLevel,
-    required double energyOutlook, // NEW: Parameter added
+    required double energyOutlook,
     required List<String> limitations,
   }) async {
-    // Simulate a network delay
-    await Future.delayed(const Duration(seconds: 2));
+    // 1. Construct the Safety-First Prompt
+    final prompt = """
+      Act as a supportive, risk-aware partner for a person with a physical disability who is in a high-stress emergency.
+      Their goal is: "$goal"
+      Their self-reported energy level is ${energyLevel.round()}/5.
+      Their self-reported outlook on using energy is ${energyOutlook.round()}/5 (1 is wary, 5 is confident).
+      Their self-reported limitations are: ${limitations.join(', ')}.
 
-    // In a real scenario, the energyOutlook value would be used to
-    // craft a more nuanced prompt for the AI model.
-    // This mock response is tailored to the escalated emergency scenario.
-    return [
-      MicroTask(description: 'Sit down. Take three slow, deep breaths.'),
-      MicroTask(
-          description:
-              'Write down the exact support you need and the deadline.'),
-      MicroTask(
-          description:
-              'Try to contact both family members one last time via text message.'),
-      MicroTask(
-          description:
-              'Open your contacts. Find one other person or local service to call.'),
-      MicroTask(
-          description:
-              'Draft a short, clear message explaining your need before you call.'),
-    ];
+      Based ONLY on this information, create a simple, step-by-step action plan.
+
+      RULES:
+      1.  Your tone must be calm, grounding, and acknowledging, never demanding or presumptive.
+      2.  The first one or two steps MUST be non-demanding, grounding actions (e.g., 'Sit down', 'Take a deep breath').
+      3.  Prioritize low-energy, low-risk communication methods (e.g., text messages before phone calls).
+      4.  Break down complex actions into small, manageable micro-tasks.
+      5.  Return the plan as a numbered list with each step on a new line. Do not include any other text, titles, or summaries.
+      """;
+
+    try {
+      // 2. Make the API Call
+      final response = await Gemini.instance.text(prompt);
+      final text = response?.content?.parts?.last.text;
+
+      if (text == null || text.trim().isEmpty) {
+        // Return a safe default if the AI gives an empty response
+        return [
+          MicroTask(
+              description: 'There was an issue creating a plan. Please rest.')
+        ];
+      }
+
+      // 3. Parse the Response
+      // Splits the response by newlines and removes any empty lines.
+      final steps = text
+          .split('\n')
+          .where((s) => s.trim().isNotEmpty)
+          .map((s) => MicroTask(
+              description: s.replaceAll(RegExp(r'^\d+\.\s*'), ''))) // Remove numbering
+          .toList();
+
+      return steps;
+    } catch (e) {
+      // Return a safe default if there is a network or API error
+      print('AI Service Error: $e');
+      return [
+        MicroTask(description: 'Could not connect to the service. Please rest.')
+      ];
+    }
   }
 }
 
