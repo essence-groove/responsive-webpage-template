@@ -28,6 +28,7 @@ AdvocacyOS is designed to empower, not prescribe. It provides a powerful tool to
 A fundamental principle integrated into AdvocacyOS is strategic disengagement. Ableist attacks are designed to drain an individual's energy. Arguing is a trap.
 Strategic disengagement is a conscious act of power. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately engages with AdvocacyOS. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
 ###### Designed for Accessibility
+
 AdvocacyOS is being built from the ground up with accessibility as a core design principle. Adhering to standards like the Web Content Accessibility Guidelines (WCAG), the app prioritizes:
 *   **Screen Reader Compatibility:** Ensuring all elements are properly labeled and navigable for users of assistive technologies.
 *   **Clear & High-Contrast UI:** Using a clean design with readable fonts and sufficient color contrast to reduce cognitive load and aid visibility.
@@ -63,6 +64,7 @@ Learn more about this new module: [**The Capability Engine**](CapabilityEngine..
 
 #### AI Transparency and the AdvocacyOS Evaluation and Review Workflow
 AdvocacyOS explicitly incorporates the "AdvocacyOS Evaluation and Review Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models.
+
 ##### The Core Problem: The Trust Gap
 Individuals with disabilities require urgent and intelligent assistance for complex bureaucratic, legal, and social challenges. However, generic AI models are often:
 *   Not specifically trained on the nuances of disability advocacy.
@@ -74,6 +76,7 @@ AdvocacyOS utilizes a specialized interface for Google's Gemini AI backend, feat
 ##### The "AdvocacyOS Evaluation and Review Workflow"
 This workflow is the core of AdvocacyOS's innovative approach to AI transparency and continuous improvement:
 1.  **User Query:** A user asks Gemini a question related to their advocacy needs.
+
 2.  **AI Response:** The user receives a generated response from Gemini AI.
 3.  **Member Rating:** The user rates the AI's response using a structured, multi-faceted rating widget. This includes ratings for:
     *   **Accuracy:** Was the information factually correct?
@@ -90,6 +93,7 @@ This powerful feedback loop enables AdvocacyOS to stand apart by:
 *   **Building a public knowledge base** of best-in-class answers.
 *   Providing a transparent record of the AI's performance.
 This ensures the AI is not just intelligent, but also wise, safe, and genuinely helpful for the disability community it serves, directly addressing the "Trust Gap".
+
 ##### Relevance to The Capability Engine
 The "AdvocacyOS Evaluation and Review Workflow" is also critical for the upcoming **Capability Engine** module. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment.
 
@@ -107,6 +111,7 @@ Once AdvocacyOS is in use, the project will be in a much stronger position to ev
 *   **Data Migration:** The data already collected in Firestore can be used to benchmark, test, or migrate to a new system.
 *   **Reduced Risk:** This strategy avoids committing to an unknown system early on, allowing for an informed choice based on evidence.
 
+
 This built-in feedback loop is considered the most effective and user-centric path, prioritizing immediate value delivery to the community while strategically planning for future enhancements.
 ##### Creator's Personal Commitment and Vision
 AdvocacyOS is a direct embodiment of the creator's personal experiences, technical skills, and strategic thinking, designed to address a critical, underserved need. The application is an ultimate expression of the "Ayurveda Tycoon" model, which uses technology and systematic thinking (the Tycoon) to foster balance, justice, and well-being (the Ayurveda).
@@ -121,3 +126,4 @@ To that end, the development of the Capability Engine is being immediately refoc
 ###### Current Development Status (As of August 2025):
 The project is in a brief, planned pause while the creator, Eeshvar Das, establishes the secure Google Cloud perimeter and backend environment. This is a non-negotiable step to ensure the absolute privacy and security required for handling the sensitive situations this app is designed for.
 Development on the live AI integration—focused on this new emergency protocol—will resume the moment this secure foundation is in place.
+

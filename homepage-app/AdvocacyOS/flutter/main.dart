@@ -19,6 +19,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart'; // Import the package
+
 import './adaptive_agenda_screen.dart';
 
 // IMPORTANT: Replace with your actual API key
@@ -38,7 +39,6 @@ class AdvocacyOSApp extends StatelessWidget {
     return MaterialApp(
       title: 'Capability Engine',
       theme: ThemeData(
-        // Theme choices are intentionally high-contrast for accessibility.
         primarySwatch: Colors.indigo,
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFFF5F5F7),
@@ -47,8 +47,8 @@ class AdvocacyOSApp extends StatelessWidget {
               fontSize: 28.0,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1D1D1F)),
-          bodyLarge: TextStyle(
-              fontSize: 18.0, color: Color(0xFF4A4A4A), height: 1.5),
+          bodyLarge:
+              TextStyle(fontSize: 18.0, color: Color(0xFF4A4A4A), height: 1.5),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -105,6 +105,7 @@ class _CompassionateCheckInScreenState
 
   void _finishCheckIn() {
     final double? cost = double.tryParse(_costController.text);
+
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -352,6 +353,7 @@ class _CompassionateCheckInScreenState
           ),
         ),
         const SizedBox(height: 24),
+
         Semantics(
           label: "Optional: associated cost to meet this need in dollars.",
           child: TextField(
@@ -359,6 +361,7 @@ class _CompassionateCheckInScreenState
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
               hintText: 'e.g., "30.00"',
+
               labelText: 'Associated Cost to Meet This Need? (\$)',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -383,4 +386,3 @@ enum CheckInStep {
   limitations,
   needs,
 }
-
