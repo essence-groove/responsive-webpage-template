@@ -124,13 +124,17 @@ class _HolisticEnergyLedgerScreenState
   // Builds the "Energy Balance" visualization bar at the top of the screen.
   Widget _buildEnergyBalanceBar() {
     return Semantics(
-      label: "Your current energy balance is ${_energyBalance * 100}% replenished.",
+      label:
+          "Your current energy balance is ${_energyBalance * 100}% replenished.",
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Your Energy Balance',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Container(
@@ -229,3 +233,4 @@ class _HolisticEnergyLedgerScreenState
     );
   }
 }
+
