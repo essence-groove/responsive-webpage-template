@@ -31,7 +31,7 @@ AdvocacyOS is being built from the ground up with accessibility as a core design
 *   **Large Touch Targets:** Making all interactive elements, like buttons and sliders, large and easy to tap, especially during high-stress situations.
 *   **Nuanced Energy Assessment:** Moving beyond a simple energy level, the app includes a unique "Energy Outlook" assessment. This helps capture a user's confidence in using their energy, allowing for a more empathetic and safer action plan.
 
-#### The Evolution: AdvocacyOS with Gemini AI 🤖
+#### The Evolution: AdvocacyOS with Integrated AI 🤖
 AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model.
 
 ##### The Challenge: Need vs. Trust
@@ -39,7 +39,7 @@ AdvocacyOS has evolved to integrate AI, providing the disability community with 
 2.  **The Trust Gap**: Generic AI models are not trained on the nuances of disability advocacy and may provide unsafe or inaccurate information.
 
 ##### The Solution: Community-Validated AI
-AdvocacyOS uses a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system. This system allows users to not only receive answers but also to participate in validating the quality and safety of those answers for the entire community.
+AdvocacyOS uses a specialized interface for an advanced AI backend, featuring a multi-layered, transparent evaluation system. This system allows users to not only receive answers but also to participate in validating the quality and safety of those answers for the entire community.
 
 ##### AdvocacyOS Evaluation and Review Workflow
 This innovative approach to transparency is central to the AI-powered AdvocacyOS:
