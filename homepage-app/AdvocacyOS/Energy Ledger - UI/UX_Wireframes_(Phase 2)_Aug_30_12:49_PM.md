@@ -17,7 +17,7 @@ This document outlines the visual layout and user flow for the main screen of th
 
 The screen is divided into two clear, distinct sections, each with a grid of selectable tags.
 
-#### Section A: "Log an Energy Deposit"
+#### Section A: "Log an Energy Credit"
 
 *   **Header Color:** A calming green.
 *   **Layout:** A grid of tappable cards. Each card contains a simple icon and a short text label.
