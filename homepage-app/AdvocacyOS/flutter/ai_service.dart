@@ -27,6 +27,23 @@ class AiService {
     required double energyOutlook,
     required List<String> limitations,
   }) async {
+    // This is the safe, pre-written plan that will be used if the AI call fails.
+    final fallbackPlan = [
+      MicroTask(description: 'Sit down. Take three slow, deep breaths.'),
+      MicroTask(
+          description:
+              'Write down the exact support you need and the deadline.'),
+      MicroTask(
+          description:
+              'Try to contact both family members one last time via text message.'),
+      MicroTask(
+          description:
+              'Open your contacts. Find one other person or local service to call.'),
+      MicroTask(
+          description:
+              'Draft a short, clear message explaining your need before you call.'),
+    ];
+
     // 1. Construct the Safety-First Prompt
     final prompt = """
       Act as a supportive, risk-aware partner for a person with a physical disability who is in a high-stress emergency.
@@ -51,29 +68,23 @@ class AiService {
       final text = response?.content?.parts?.last.text;
 
       if (text == null || text.trim().isEmpty) {
-        // Return a safe default if the AI gives an empty response
-        return [
-          MicroTask(
-              description: 'There was an issue creating a plan. Please rest.')
-        ];
+        // If the AI gives an empty response, use the safe fallback.
+        return fallbackPlan;
       }
 
       // 3. Parse the Response
-      // Splits the response by newlines and removes any empty lines.
       final steps = text
           .split('\n')
           .where((s) => s.trim().isNotEmpty)
           .map((s) => MicroTask(
-              description: s.replaceAll(RegExp(r'^\d+\.\s*'), ''))) // Remove numbering
+              description: s.replaceAll(RegExp(r'^\d+\.\s*'), '')))
           .toList();
 
-      return steps;
+      return steps.isNotEmpty ? steps : fallbackPlan;
     } catch (e) {
-      // Return a safe default if there is a network or API error
+      // If there is a network or API error, use the safe fallback.
       print('AI Service Error: $e');
-      return [
-        MicroTask(description: 'Could not connect to the service. Please rest.')
-      ];
+      return fallbackPlan;
     }
   }
 }
