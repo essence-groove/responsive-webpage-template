@@ -56,9 +56,6 @@ This innovative approach to transparency is central to the AI-powered AdvocacyOS
 
 This powerful feedback loop uses evaluation results to fine-tune the AI, build a public knowledge base of best-in-class answers, and provide a transparent record of the AI's performance. This ensures the AI is not only intelligent but also **wise, safe, and genuinely helpful** for the disability community.
 
-### AI Transparency and the AdvocacyOS Evaluation and Review Workflow
-AdvocacyOS explicitly incorporates the "AdvocacyOS Evaluation and Review Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models.
-
 ##### The Core Problem: The Trust Gap
 Individuals with disabilities require urgent and intelligent assistance for complex bureaucratic, legal, and social challenges. However, generic AI models are often:
 *   Not specifically trained on the nuances of disability advocacy.
