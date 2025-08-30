@@ -125,7 +125,7 @@ class _HolisticEnergyLedgerScreenState
   Widget _buildEnergyBalanceBar() {
     return Semantics(
       label:
-          "Your current energy balance is ${_energyBalance * 100}% replenished.",
+          "Based on your logged entries, this is an estimate of your energy balance at ${(_energyBalance * 100).toStringAsFixed(0)} percent.",
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
