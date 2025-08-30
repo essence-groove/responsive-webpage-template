@@ -226,4 +226,3 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
     );
   }
 }
-
