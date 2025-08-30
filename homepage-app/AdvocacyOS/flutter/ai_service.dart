@@ -31,7 +31,7 @@ class AiService {
     await Future.delayed(const Duration(seconds: 2));
 
     // In a real scenario, the energyOutlook value would be used to
-    // craft a more nuanced prompt for the Gemini AI.
+    // craft a more nuanced prompt for the AI model.
     // This mock response is tailored to the escalated emergency scenario.
     return [
       MicroTask(description: 'Sit down. Take three slow, deep breaths.'),
@@ -50,3 +50,4 @@ class AiService {
     ];
   }
 }
+
