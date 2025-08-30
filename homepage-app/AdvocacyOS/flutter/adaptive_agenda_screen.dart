@@ -18,27 +18,20 @@
  */
 
 import 'package:flutter/material.dart';
-import './ai_service.dart'; // Import the MOCK AI service
+import './ai_service.dart';
 
-// Represents a single micro-task in the agenda
-class MicroTask {
-  final String description;
-  bool isCompleted;
-
-  MicroTask({required this.description, this.isCompleted = false});
-}
-
-// The "Adaptive Now Agenda" screen
 class AdaptiveAgendaScreen extends StatefulWidget {
   final double energyLevel;
   final double energyOutlook;
   final List<String> limitations;
+  final double associatedCost; // NEW: Added cost parameter
 
   const AdaptiveAgendaScreen({
     super.key,
     required this.energyLevel,
     required this.energyOutlook,
     required this.limitations,
+    required this.associatedCost, // NEW: Required in constructor
   });
 
   @override
@@ -46,86 +39,86 @@ class AdaptiveAgendaScreen extends StatefulWidget {
 }
 
 class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
-  final TextEditingController _goalController = TextEditingController();
-  String _mainGoal = '';
-  bool _planCreated = false;
   bool _isLoading = false;
-
-  List<MicroTask> _tasks = [];
+  List<MicroTask> _plan = [];
+  final TextEditingController _goalController = TextEditingController();
+  bool _planCreated = false;
 
   Future<void> _createPlan() async {
-    if (_goalController.text.isNotEmpty) {
-      setState(() {
-        _isLoading = true;
-        _mainGoal = _goalController.text;
-      });
+    if (_goalController.text.isEmpty) return;
 
-      final generatedTasks = await AiService.getAdaptivePlan(
-        goal: _mainGoal,
-        energyLevel: widget.energyLevel,
-        energyOutlook: widget.energyOutlook,
-        limitations: widget.limitations,
-      );
+    setState(() {
+      _isLoading = true;
+      _planCreated = true;
+    });
 
-      setState(() {
-        _tasks = generatedTasks;
-        _planCreated = true;
-        _isLoading = false;
-      });
-    }
+    final plan = await AiService.getAdaptivePlan(
+      goal: _goalController.text,
+      energyLevel: widget.energyLevel,
+      energyOutlook: widget.energyOutlook,
+      limitations: widget.limitations,
+    );
+
+    setState(() {
+      _plan = plan;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _goalController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Adaptive Agenda'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.black,
+        title: const Text('Your Action Plan'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : (_planCreated ? _buildLiveAgendaView() : _buildGoalInputView()),
+        child: _planCreated ? _buildLiveAgendaView() : _buildGoalInputView(),
       ),
     );
   }
 
   Widget _buildGoalInputView() {
-    String limitationsText = widget.limitations.join(' and ');
-    if (limitationsText.isEmpty) {
-      limitationsText = 'no specific limitations';
-    }
-
-    String outlookText;
+    String outlookText = "";
     if (widget.energyOutlook <= 2) {
-      outlookText = "and you're feeling wary about using it.";
+      outlookText = "and I hear that you're feeling wary right now.";
+    } else if (widget.energyOutlook >= 4) {
+      outlookText = "and I understand your outlook on using it.";
     } else {
-      outlookText = "and you've noted your outlook on using it.";
+      outlookText = "and I understand your outlook.";
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // CORRECTED: This line now acknowledges the user's input safely.
         Text(
-          "Okay, you've shared that your energy level is around a ${widget.energyLevel.round()}, $outlookText Let's create a clear path forward.",
+          "Okay, you've shared that your energy level is around a ${widget.energyLevel.round()}. $outlookText Let's create a clear path forward.",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 24),
         Text(
-          'What is the most urgent situation you are facing right now?',
+          "What is the most urgent thing you need to accomplish?",
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 16),
-        TextField(
-          controller: _goalController,
-          decoration: InputDecoration(
-            hintText: 'e.g., "My essential support plan has failed"',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+        Semantics(
+          label: "Input for your most urgent goal or situation.",
+          child: TextField(
+            controller: _goalController,
+            decoration: InputDecoration(
+              hintText:
+                  'e.g., "My two support relatives are unresponsive"',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ),
@@ -141,90 +134,65 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
   }
 
   Widget _buildLiveAgendaView() {
-    if (_tasks.isEmpty) {
-      return const Center(child: Text("No tasks were generated. Please try again."));
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
     }
-
-    final String aiSuggestion = "Let's start with one small, grounding step.";
-    final MicroTask currentTask =
-        _tasks.firstWhere((task) => !task.isCompleted, orElse: () => _tasks.first);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Emergency Action Plan",
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        Text(
-          _mainGoal,
+          _goalController.text,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 24),
-        Card(
-          elevation: 2,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  aiSuggestion,
-                  style: const TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.black54),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Current Task: ${currentTask.description}',
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text('Mark as Complete'),
-                  ),
-                ),
-              ],
+        const SizedBox(height: 16),
+        Semantics(
+          label: "AI-suggested first step.",
+          child: Card(
+            elevation: 2,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                "Here is a safe, grounding place to start. Take one step at a time.",
+                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+              ),
             ),
           ),
         ),
         const SizedBox(height: 24),
         Expanded(
           child: ListView.builder(
-            itemCount: _tasks.length,
+            itemCount: _plan.length,
             itemBuilder: (context, index) {
-              final task = _tasks[index];
-              return CheckboxListTile(
-                title: Text(
-                  task.description,
-                  style: TextStyle(
-                    decoration: task.isCompleted
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
-                  ),
+              final task = _plan[index];
+              return Semantics(
+                label:
+                    "Task ${index + 1}: ${task.description}. Status: ${task.isCompleted ? 'Completed' : 'Not completed'}",
+                child: CheckboxListTile(
+                  title: Text(task.description),
+                  value: task.isCompleted,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      task.isCompleted = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
                 ),
-                value: task.isCompleted,
-                onChanged: (bool? value) {
-                  setState(() {
-                    task.isCompleted = value ?? false;
-                  });
-                },
               );
             },
           ),
         ),
-        Center(
-          child: TextButton.icon(
-            icon: const Icon(Icons.sentiment_satisfied_alt),
-            label: const Text('How are you feeling now?'),
-            onPressed: () {},
-          ),
-        )
       ],
     );
   }
 }
+
+class MicroTask {
+  final String description;
+  bool isCompleted;
+
+  MicroTask({required this.description, this.isCompleted = false});
+}
+
