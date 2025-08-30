@@ -1,7 +1,7 @@
 AdvocacyOS: A Personal Operating System for Justice
 ### AdvocacyOS: A Personal Operating System for Justice
-AdvocacyOS is a powerful and innovative digital tool designed to empower individuals with physical disabilities in their self-advocacy efforts [14-38]. It provides a secure and private system for documenting discrimination, managing advocacy, and building a robust body of evidence [14-38]. Think of it as a personal, private, and secure "operating system" for justice [14-38].
-➡️ **Explore the full knowledge base on** [NotebookLM](https://notebooklm.google.com/notebook/5e1d9b50-ea51-4767-a62b-fdaa26c9cf29) (request access if needed) [14-19, 30, 31, 39-47]
+AdvocacyOS is a powerful and innovative digital tool designed to empower individuals with physical disabilities in their self-advocacy efforts. It provides a secure and private system for documenting discrimination, managing advocacy, and building a robust body of evidence. Think of it as a personal, private, and secure "operating system" for justice.
+➡️ **Explore the full knowledge base on** [NotebookLM](https://notebooklm.google.com/notebook/5e1d9b50-ea51-4767-a62b-fdaa26c9cf29) (request access if needed) 
 
 #### The Core Problem
 Individuals with disabilities frequently encounter systemic discrimination [41-43, 47-60]. Their claims are often dismissed because they lack a simple, secure, and organized system to track patterns of events and evidence over time [41-43, 47-60]. The burden of proof is high, and existing tools are often inadequate, leading to a cycle of vulnerability and injustice [41-43, 47-60].
