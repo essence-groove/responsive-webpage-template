@@ -22,15 +22,15 @@ AdvocacyOS empowers users by transforming their lived experiences into a structu
 AdvocacyOS is designed to empower, not prescribe. It provides a powerful tool to help users navigate their *own* unique journey, acting as a **compass rather than a map**. It embodies the "Ayurveda Tycoon" model: using technology and systematic thinking (the Tycoon) to achieve balance, justice, and well-being (the Ayurveda).
 
 ##### Strategic Disengagement
-A fundamental principle integrated into AdvocacyOS is **strategic disengagement**. Ableist attacks are designed to drain an individual's energy [84, 96-98, 100, 101, 103-106, 108-113, 115-117, 119, 120, 123]. Arguing is a trap.
-Strategic disengagement is a conscious act of power. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS** [84, 103-105, 107-123]. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
+A fundamental principle integrated into AdvocacyOS is **strategic disengagement**. Ableist attacks are designed to drain an individual's energy. Arguing is a trap.
+Strategic disengagement is a conscious act of power. Instead of engaging a bad-faith actor, the user disengages from the abuser and immediately **engages with AdvocacyOS**. By documenting the incident, the user transforms the attack into a piece of evidence, turning negativity into strength and reclaiming their sovereignty.
 
 ##### Designed for Accessibility
-AdvocacyOS is being built from the ground up with accessibility as a core design principle [103, 120, 123-127]. Adhering to standards like the Web Content Accessibility Guidelines (WCAG), the app prioritizes [103, 120, 123-127]:
-*   **Screen Reader Compatibility:** Ensuring all elements are properly labeled and navigable for users of assistive technologies [120, 124-126].
-*   **Clear & High-Contrast UI:** Using a clean design with readable fonts and sufficient color contrast to reduce cognitive load and aid visibility [120, 124-126].
-*   **Large Touch Targets:** Making all interactive elements, like buttons and sliders, large and easy to tap, especially during high-stress situations [120, 124, 125, 127].
-*   **Nuanced Energy Assessment:** Moving beyond a simple energy level, the app includes a unique "Energy Outlook" assessment. This helps capture a user's confidence in using their energy, allowing for a more empathetic and safer action plan [124, 125, 127-129].
+AdvocacyOS is being built from the ground up with accessibility as a core design principle. Adhering to standards like the Web Content Accessibility Guidelines (WCAG), the app prioritizes:
+*   **Screen Reader Compatibility:** Ensuring all elements are properly labeled and navigable for users of assistive technologies.
+*   **Clear & High-Contrast UI:** Using a clean design with readable fonts and sufficient color contrast to reduce cognitive load and aid visibility.
+*   **Large Touch Targets:** Making all interactive elements, like buttons and sliders, large and easy to tap, especially during high-stress situations.
+*   **Nuanced Energy Assessment:** Moving beyond a simple energy level, the app includes a unique "Energy Outlook" assessment. This helps capture a user's confidence in using their energy, allowing for a more empathetic and safer action plan.
 
 #### The Evolution: AdvocacyOS with Gemini AI 🤖
 AdvocacyOS has evolved to integrate AI, providing the disability community with immediate access to powerful advocacy tools governed by a revolutionary transparency model [104, 105, 107, 108, 114, 116, 127, 129-140].
