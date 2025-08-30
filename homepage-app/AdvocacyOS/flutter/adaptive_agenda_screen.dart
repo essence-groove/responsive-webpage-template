@@ -91,9 +91,11 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
     if (widget.energyOutlook <= 2) {
       outlookText = "and I hear that you're feeling wary right now.";
     } else if (widget.energyOutlook >= 4) {
-      outlookText = "and I understand your outlook on using it.";
+      // UPDATED: Changed from "understand" to "noted" for neutrality.
+      outlookText = "and I've noted your outlook on using it.";
     } else {
-      outlookText = "and I understand your outlook.";
+      // UPDATED: Changed from "understand" to "noted" for neutrality.
+      outlookText = "and I've noted your outlook.";
     }
 
     return Column(
