@@ -60,7 +60,7 @@ This powerful feedback loop uses evaluation results to fine-tune the AI, build a
 #### Future Vision: Internal Empowerment
 The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives.
 
-Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md)
+Learn more about this new module: [**The Capability Engine**](CapabilityEngine.md)
 
 ### AI Transparency and the AdvocacyOS Evaluation and Review Workflow
 AdvocacyOS explicitly incorporates the "AdvocacyOS Evaluation and Review Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models.
