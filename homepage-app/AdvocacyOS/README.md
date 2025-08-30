@@ -63,36 +63,36 @@ The next evolution of AdvocacyOS shifts from external advocacy to internal empow
 Learn more about this new module: [**The Capability Engine**](CapabilityEngine..md)
 
 ### AI Transparency and the AdvocacyOS Evaluation and Review Workflow
-AdvocacyOS explicitly incorporates the "AdvocacyOS Evaluation and Review Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models [22, 24, 26, 29, 32, 35, 171, 220, 222-224].
+AdvocacyOS explicitly incorporates the "AdvocacyOS Evaluation and Review Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models.
 
 ##### The Core Problem: The Trust Gap
-Individuals with disabilities require urgent and intelligent assistance for complex bureaucratic, legal, and social challenges. However, generic AI models are often [147, 149, 157, 164, 170, 224, 225]:
-*   Not specifically trained on the nuances of disability advocacy [147, 149, 157, 162, 164, 170, 225].
-*   Prone to providing unsafe or inaccurate information [147, 149, 157, 162, 164, 170, 225].
-*   Lacking a mechanism for responses to be vetted by people with lived experience [147, 149, 157, 162, 164, 170, 225].
+Individuals with disabilities require urgent and intelligent assistance for complex bureaucratic, legal, and social challenges. However, generic AI models are often:
+*   Not specifically trained on the nuances of disability advocacy.
+*   Prone to providing unsafe or inaccurate information.
+*   Lacking a mechanism for responses to be vetted by people with lived experience.
 
 ##### The AdvocacyOS Solution: Community-Validated AI
-AdvocacyOS utilizes a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system [147, 149, 151, 153, 155, 158, 161, 162, 164, 166, 168, 170, 225]. This system allows users to not only receive AI-generated answers but also to actively participate in validating their quality and safety for the entire community [147, 149, 151, 153, 155, 158, 161, 162, 164, 166, 168, 170, 225].
+AdvocacyOS utilizes a specialized interface for Google's Gemini AI backend, featuring a multi-layered, transparent evaluation system. This system allows users to not only receive AI-generated answers but also to actively participate in validating their quality and safety for the entire community.
 
 ##### The "AdvocacyOS Evaluation and Review Workflow"
-This workflow is the core of AdvocacyOS's innovative approach to AI transparency and continuous improvement [151, 153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180]:
-1.  **User Query:** A user asks Gemini a question related to their advocacy needs (e.g., "Help me draft an email to my landlord about a reasonable accommodation request") [153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180, 181].
-2.  **AI Response:** The user receives a generated response from Gemini AI [153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180, 181].
-3.  **Member Rating:** The user rates the AI's response using a structured, multi-faceted rating widget. This includes ratings for [153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180, 181]:
-    *   **Accuracy:** Was the information factually correct? [153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180, 181]
-    *   **Safety:** Was the advice safe and responsible? [153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180, 181]
-    *   **Tone:** Was the language empowering and respectful? [153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180, 181]
-    *   **Actionability:** Did the response offer a practical, usable solution? [153, 155, 158, 161, 166, 168, 172, 174, 175, 177, 178, 180, 181]
-4.  **Multi-Layered Evaluation:** The user's rated interaction is then passed to a secure review console where [172, 174, 175, 177, 178, 180, 187-191, 193, 194]:
-    *   **Peer Evaluation:** Trusted members of the evaluation and review team can review the interaction and provide their own ratings and comments [172, 174, 175, 177, 178, 180, 187-191, 193, 194].
-    *   **Principal Evaluation:** The project lead performs a final review, synthesizing the user and peer feedback to establish a final quality score [172, 174, 175, 177, 178, 180, 187-191, 193, 194].
+This workflow is the core of AdvocacyOS's innovative approach to AI transparency and continuous improvement:
+1.  **User Query:** A user asks Gemini a question related to their advocacy needs (e.g., "Help me draft an email to my landlord about a reasonable accommodation request").
+2.  **AI Response:** The user receives a generated response from Gemini AI.
+3.  **Member Rating:** The user rates the AI's response using a structured, multi-faceted rating widget. This includes ratings for:
+    *   **Accuracy:** Was the information factually correct?
+    *   **Safety:** Was the advice safe and responsible?
+    *   **Tone:** Was the language empowering and respectful?
+    *   **Actionability:** Did the response offer a practical, usable solution?
+4.  **Multi-Layered Evaluation:** The user's rated interaction is then passed to a secure review console where:
+    *   **Peer Evaluation:** Trusted members of the evaluation and review team can review the interaction and provide their own ratings and comments.
+    *   **Principal Evaluation:** The project lead performs a final review, synthesizing the user and peer feedback to establish a final quality score.
 
 ##### How This System Differentiates AdvocacyOS
-This powerful feedback loop enables AdvocacyOS to stand apart by [187, 196, 198, 199, 201, 205-208, 210, 212, 214-218]:
-*   **Fine-tuning AI instructions** based on real-world feedback [187, 196, 198, 199, 201, 205-208, 210, 212, 214-218].
-*   **Building a public knowledge base** of best-in-class answers [187, 196, 198, 199, 201, 205-208, 210, 212, 214-218].
-*   **Providing a transparent record** of the AI's performance [187, 196, 198, 199, 201, 205-208, 210, 212, 214-218].
-This ensures the AI is not just intelligent, but also wise, safe, and genuinely helpful for the disability community it serves, directly addressing the "Trust Gap" [187, 196, 198, 199, 201, 205-208, 210, 212, 214-218].
+This powerful feedback loop enables AdvocacyOS to stand apart by]
+*   **Fine-tuning AI instructions** based on real-world feedback.
+*   **Building a public knowledge base** of best-in-class answers.
+*   **Providing a transparent record** of the AI's performance.
+This ensures the AI is not just intelligent, but also wise, safe, and genuinely helpful for the disability community it serves, directly addressing the "Trust Gap".
 
 ##### Relevance to The Capability Engine
 The "AdvocacyOS Evaluation and Review Workflow" is also critical for the upcoming **Capability Engine** module [196, 206-208, 210, 212, 214, 216, 217, 226-231]. It will ensure the **accuracy, safety, tone, and actionability** of AI-assisted task suggestions, providing essential ethical oversight for personalized task management aimed at internal empowerment [196, 206-208, 210, 212, 214, 216, 217, 226-231].
