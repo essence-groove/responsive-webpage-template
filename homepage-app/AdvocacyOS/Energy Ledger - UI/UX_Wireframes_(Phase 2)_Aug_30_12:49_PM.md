@@ -4,7 +4,7 @@ This document outlines the visual layout and user flow for the main screen of th
 
 ## Screen Layout: Main Ledger View
 
-**Goal:** Provide an at-a-glance view of the user's energy balance and allow for one-tap logging of both "Deposits" and "Withdrawals".
+**Goal:** Provide an at-a-glance view of the user's energy balance and allow for one-tap logging of both "Credits" and "Debits."
 
 ### 1. Energy Balance Visualization (Top of Screen)
 
