@@ -91,10 +91,8 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
     if (widget.energyOutlook <= 2) {
       outlookText = "and I hear that you're feeling wary right now.";
     } else if (widget.energyOutlook >= 4) {
-      // UPDATED: Changed from "understand" to "noted" for neutrality.
       outlookText = "and I've noted your outlook on using it.";
     } else {
-      // UPDATED: Changed from "understand" to "noted" for neutrality.
       outlookText = "and I've noted your outlook.";
     }
 
@@ -156,8 +154,9 @@ class _AdaptiveAgendaScreenState extends State<AdaptiveAgendaScreen> {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: const Padding(
               padding: EdgeInsets.all(16.0),
+              // UPDATED: New, safer wording with explainable AI principles.
               child: Text(
-                "Here is a safe, grounding place to start. Take one step at a time.",
+                "Based on the information you've shared, I've analyzed the situation for safe, grounding first steps. Here is a suggested place to start.",
                 style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
               ),
             ),
@@ -197,4 +196,3 @@ class MicroTask {
 
   MicroTask({required this.description, this.isCompleted = false});
 }
-
