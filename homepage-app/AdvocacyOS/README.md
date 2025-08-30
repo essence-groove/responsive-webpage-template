@@ -56,11 +56,6 @@ This innovative approach to transparency is central to the AI-powered AdvocacyOS
 
 This powerful feedback loop uses evaluation results to fine-tune the AI, build a public knowledge base of best-in-class answers, and provide a transparent record of the AI's performance. This ensures the AI is not only intelligent but also **wise, safe, and genuinely helpful** for the disability community.
 
-#### Future Vision: Internal Empowerment
-The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives.
-
-Learn more about this new module: [**The Capability Engine**](CapabilityEngine.md)
-
 ### AI Transparency and the AdvocacyOS Evaluation and Review Workflow
 AdvocacyOS explicitly incorporates the "AdvocacyOS Evaluation and Review Workflow" as a foundational and integral part of its AI architecture. This innovative workflow is central to how AdvocacyOS addresses the critical "Trust Gap" and differentiates itself from generic AI models.
 
@@ -112,6 +107,11 @@ Once AdvocacyOS is actively in use and has a steady stream of feedback data, the
 *   **Reduced Risk:** This strategy avoids committing to an unknown system early on, allowing for an informed choice based on evidence [36, 255, 257-261, 265, 267, 270-275].
 
 This built-in feedback loop is considered the most effective and user-centric path, prioritizing immediate value delivery to the community while strategically planning for future enhancements [33, 36, 219, 257, 270-279].
+
+#### Future Vision: Internal Empowerment
+The next evolution of AdvocacyOS shifts from external advocacy to internal empowerment, helping users build physical capability and reclaim agency over their daily lives.
+
+Learn more about this new module: [**The Capability Engine**](CapabilityEngine.md)
 
 ##### Creator's Personal Commitment and Vision
 AdvocacyOS is a direct embodiment of the creator's personal experiences, technical skills, and strategic thinking, designed to address a critical, underserved need [33, 36, 270-281]. The application is an ultimate expression of the "Ayurveda Tycoon" model, which uses technology and systematic thinking (the Tycoon) to foster balance, justice, and well-being (the Ayurveda) [33, 36, 270-281].
