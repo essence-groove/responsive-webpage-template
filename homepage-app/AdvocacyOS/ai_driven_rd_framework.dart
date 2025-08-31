@@ -120,7 +120,7 @@ The outputs from these AI queries will serve as the initial, estimated data that
     - Photography & Listing: **~8 hours**
     - Packing & Shipping: **~5 hours**
   - **Actionable Recommendation (AI-Generated):**
-    - **Strategy:** The AI recommends allocating **~23 hours** from your `Samadhi` cycle over the next 4-6 weeks to complete this objective.
+    - **Strategy:** The AI recommends allocating **~23 hours** from your `Deep Work & Creation` cycle over the next 4-6 weeks to complete this objective.
 ''';
 
   /// ### 2.3. New "Digital Asset Conversion" Card Wireframe
@@ -139,7 +139,7 @@ The outputs from these AI queries will serve as the initial, estimated data that
     - OCR & Processing: **~2 hours**
     - Tagging & Organization: **~4 hours**
   - **Actionable Recommendation (AI-Generated):**
-    - **Strategy:** The AI recommends allocating **~12 hours** from your `Samadhi` cycle to complete this objective.
+    - **Strategy:** The AI recommends allocating **~12 hours** from your `Deep Work & Creation` cycle to complete this objective.
 ''';
 }
 
