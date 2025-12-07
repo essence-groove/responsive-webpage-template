@@ -1,6 +1,6 @@
 # responsive-webpage-template
 
-## AdvocacyOS now in Development
+## APM Verse with Self-Advocacy now in Development
 AdvocacyOS development paced along with the broad reaching goals of Ayurveda Project Mangement
 
 ## Notes
