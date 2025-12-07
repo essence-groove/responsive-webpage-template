@@ -1,7 +1,7 @@
 # responsive-webpage-template
 
 ## APM Verse with Self-Advocacy now in Development
-AdvocacyOS development paced along with the broad reaching goals of Ayurveda Project Mangement
+APM Verse with Self-Advocacy development paced along with the broad reaching goals of Ayurveda Project Mangement
 
 ## Notes
 **Heroku no longer supported on GitHub**. Relevant issues will be addressed as they arrive.
