@@ -1,9 +1,8 @@
 /**
  * @file league_scheduler_2.cpp
- * @brief Implements the scheduling logic for the Ayurveda Project Management World baseball league (v3.9.2).
-
+ * @brief Implements the scheduling logic for the Ayurveda Project Management World [Baseball] league (apm-world v3.9.2).
  * @author  Eeshvar Das (Erik Douglas Ward)
- * @date 2025-Aug-07
+ * @date 2025-Aug-11
  *
  * @copyright Copyright (C) 2025 Eeshvar Das (Erik Douglas Ward)
  *
