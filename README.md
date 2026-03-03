@@ -1,5 +1,7 @@
 # responsive-webpage-template
 
+![Gemini_Generated_Image_fbinl6fbinl6fbin.png](https://drive.google.com/uc?export=view&id=1noQ_5uNcIAMizvGwKeorSicKczXvtTmO)
+
 ## APM Verse with Self-Advocacy now in Development
 APM Verse with Self-Advocacy development paced along with the broad reaching goals of Ayurveda Project Mangement
 
