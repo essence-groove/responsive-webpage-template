@@ -1,6 +1,6 @@
 # responsive-webpage-template
 
-![Gemini Generated Image](https://drive.google.com/uc?export=view&id=1noQ_5uNcIAMizvGwKeorSicKczXvtTmO)
+<img width="2816" height="1536" alt="Gemini_Generated_Image_fbinl6fbinl6fbin" src="https://github.com/user-attachments/assets/61c77973-4faa-4c9b-a79c-64ffb17a3296" />
 
 ## APM Verse with Self-Advocacy now in Development
 APM Verse with Self-Advocacy development paced along with the broad reaching goals of Ayurveda Project Mangement
